@@ -1,4 +1,2 @@
-print("testing") 
-
-
-print("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
+print("testing")
+print("asdasd")
