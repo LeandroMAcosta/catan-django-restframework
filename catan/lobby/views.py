@@ -7,7 +7,7 @@ class RoomsView(APIView):
 
     def get(self, request):
         rooms = Room.objects.all()
-        list_rooms  = [room.name for room in rooms]
+        list_rooms  = [room.id for room in rooms]
         return Response(list_rooms)
 
     def put(self, request):
