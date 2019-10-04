@@ -1,5 +1,4 @@
 from django.db import models
-from enum import Enum
 
 RESOURCES = (
     ('WO', 'Wool'),
@@ -23,7 +22,7 @@ class VertexPosition(models.Model):
 
 
 class Hex(models.Model):
-    # game will be a Foreign key to a board/game/room
+    # game_id will be a Foreign key to a board/game/room
     game_id = models.IntegerField(default=0)
     position = models.ForeignKey(VertexPosition, on_delete=models.CASCADE)
     resource = models.CharField(max_length=2, choices=RESOURCES, default='NO')

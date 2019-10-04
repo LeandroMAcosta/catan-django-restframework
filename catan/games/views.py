@@ -1,14 +1,14 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Hex
 from .serializers import HexSerializer
 # Create your views here.
 
 
-class HexList(generics.ListCreateAPIView):
-    serializer_class = HexSerializer
+class HexList(viewsets.ViewSet):
 
-    def get_queryset(self):
-        hex_list = Hex.objects.filter(game_id=self.kwargs['pk'])
-        return hex_list
+    def list(self, request, game_id=None):
+        queryset = Hex.objects.filter(game_id=game_id)
+        serializer = HexSerializer(queryset, many=True)
+        return Response({'hexes': serializer.data})
