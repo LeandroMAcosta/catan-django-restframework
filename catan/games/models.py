@@ -8,7 +8,7 @@ RESOURCES = (
     ('GR', 'Grain'),
     ('OR', 'Ore'),
     ('NO', 'Nothing'),
-    )
+)
 
 
 class VertexPosition(models.Model):
