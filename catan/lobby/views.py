@@ -10,7 +10,7 @@ class RoomsView(APIView):
         list_rooms  = [room.id for room in rooms]
         return Response(list_rooms)
 
-    def put(self, request):
-        pass
+    def put(self, request, id):
+        return Response([])
 
 
