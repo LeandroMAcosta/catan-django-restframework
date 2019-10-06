@@ -5,15 +5,16 @@ from rest_framework.views import APIView
 
 from .models import Room
 
+
 class RoomsView(APIView):
-    #The username and password of your superuser
-    #This should be in users
-    #This function retorn the superuser with a token
+    # The username and password of your superuser
+    # This should be in users
+    # This function retorn the superuser with a token
     def login(self):
         user = authenticate(username='Lucas', password='Aguantejmkmu1239')
         token, _ = Token.objects.get_or_create(user=user)
-        return (user,token)
-    
+        return (user, token)
+
     def get(self, request):
         rooms = Room.objects.all()
         list_rooms = [room.id for room in rooms]
@@ -28,13 +29,9 @@ class RoomsView(APIView):
             if id == rooms.id:
                 content = r
                 break
-        if content == None:
+        if content is None:
             content = {'error': 'The room does not exist'}
         else:
-            #Here join lobby
+            # Here join lobby
             pass
-                
-        return  Response(content)
-
-
-
+        return Response(content)
