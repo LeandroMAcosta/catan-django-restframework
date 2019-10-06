@@ -7,9 +7,7 @@ from .models import Resources
 
 
 class ResourcesView(APIView):
-
-
     def get(self, request, plyr):
         resource = Resources.objects.filter(owner_player=plyr)
-        list_resource  = [resources.id for resources in resource]
+        list_resource = [resources.id for resources in resource]
         return Response(list_resource)

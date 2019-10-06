@@ -1,7 +1,7 @@
 from django.db import models
 
 
-# Create your models here. 
+# Create your models here.
 class Resources(models.Model):
     WOOL = 'WO'
     LUMBER = 'LU'
@@ -23,6 +23,6 @@ class Resources(models.Model):
         )
     count_resource = models.IntegerField(default=0)
     owner_player = models.ForeignKey(
-        Player, #app
+        Player,
         on_delete=models.CASCADE,
         )
