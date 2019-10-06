@@ -11,7 +11,7 @@ class RoomsView(APIView):
     # This should be in users
     # This function retorn the superuser with a token
     def login(self):
-        user = authenticate(username='Lucas', password='Aguantejmkmu1239')
+        user = authenticate(username='', password='')
         token, _ = Token.objects.get_or_create(user=user)
         return (user, token)
 
