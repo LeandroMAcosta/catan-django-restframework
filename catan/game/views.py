@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+class GameViewSets(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = GameSerializer
