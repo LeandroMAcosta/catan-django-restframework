@@ -23,6 +23,6 @@ class Resources(models.Model):
         )
     count_resource = models.IntegerField(default=0)
     owner_player = models.ForeignKey(
-        Player,
+        player.Player,
         on_delete=models.CASCADE,
         )
