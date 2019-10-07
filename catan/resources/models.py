@@ -17,7 +17,7 @@ class Resources(models.Model):
         (ORE='Ore'),
         (NOTHING='Nothing'),
     ]
-    type_resource = models.CharField(
+    resource = models.CharField(
         choices=RESOURCES_CHOICES,
         default=NOTHING,
         )
