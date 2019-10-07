@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email', 'account')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email')
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -15,4 +15,4 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ('user', 'color',)
+        fields = ('user', 'colour',)
