@@ -17,8 +17,8 @@ class RoomsView(APIView):
 
     def get(self, request):
         query_set = Room.objects.all()
-        list_rooms = [room.id for room in query_set]
-        return Response(list_rooms)
+        rooms_serializer = RoomSerializer(query_set, many=True)
+        return Response(rooms_serializer.data)
 
     def put(self, request, room_id):
         try:
