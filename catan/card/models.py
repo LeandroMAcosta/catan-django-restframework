@@ -11,4 +11,7 @@ class Card(models.Model):
         ('knight', 'Knight')
     ]
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    card_type = models.CharField(max_length=2, choices=CARD_TYPE)
+    card_type = models.CharField(max_length=30, choices=CARD_TYPE)
+
+    def __str__(self):
+        return self.card_type

@@ -5,5 +5,5 @@ GameView_view = GameViewSets.as_view
 
 
 urlpatterns = [
-    path('<int:pk>/player/', GameView_view({'get': ''})),
+    path('<int:pk>/player/', GameView_view({'get': 'resources'})),
 ]

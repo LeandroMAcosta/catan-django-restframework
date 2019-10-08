@@ -11,3 +11,6 @@ class Player(models.Model):
     # development_cards =
     # resources_cards =
     # last_gained =
+
+    def __str__(self):
+        return self.user.username
