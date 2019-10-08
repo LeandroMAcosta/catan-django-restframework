@@ -37,8 +37,10 @@ class RoomsView(APIView):
                     status=status.HTTP_200_OK
                 )
         except Exception as e:
-            return Response('The ROOM does not exist',
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         room.players.add(user)
         return Response(status=status.HTTP_200_OK)
