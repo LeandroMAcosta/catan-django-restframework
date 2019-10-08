@@ -17,9 +17,12 @@ class RoomsView(APIView):
 
     def get(self, request):
         query_set = Room.objects.all()
-        rooms_s = RoomSerializer(query_set, many=True)
-        users = User.objects.all()
-        return Response(rooms_s.data)
+        rooms_s = RoomSerializer(query_set, many=True).data
+        for room in rooms_s:
+            room['players'] = [
+                player['user'] for player in room['players']
+            ]
+        return Response(rooms_s)
 
     def put(self, request, room_id):
         try:
