@@ -26,11 +26,15 @@ class RoomsView(APIView):
             user = User.objects.get(id=request.user.id)
 
             if user in room.players.all():
-                return Response('Already in the ROOM',
-                                status=status.HTTP_200_OK)
-            if(room.players.all().count() >= room.max_players):
-                return Response('The ROOM is full',
-                                status=status.HTTP_200_OK)
+                return Response(
+                    'Already in the ROOM',
+                    status=status.HTTP_200_OK
+                )
+            if room.players.all().count() >= room.max_players:
+                return Response(
+                    'The ROOM is full',
+                    status=status.HTTP_200_OK
+                )
         except Exception as e:
             return Response('The ROOM does not exist',
                             status=status.HTTP_404_NOT_FOUND)
