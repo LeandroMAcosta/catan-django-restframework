@@ -10,7 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'username', 'email')
 
 
+class UserNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = 'username'
+
+
 class PlayerSerializer(serializers.ModelSerializer):
+
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = Player
