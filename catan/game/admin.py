@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import Hex, VertexPosition
+from .models import Hex, VertexPosition, Game
 
 admin.site.register(VertexPosition)
 admin.site.register(Hex)
-
-# Register your models here.
+admin.site.register(Game)

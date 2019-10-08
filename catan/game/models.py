@@ -35,4 +35,9 @@ class Hex(models.Model):
     def __str__(self):
         v = self.position
         return 'Game ' + str(self.game_id) + ' ' + str(v)
-# Create your models here.
+
+
+class Game(models.Model):
+
+    def __str__(self):
+        return str(self.id)

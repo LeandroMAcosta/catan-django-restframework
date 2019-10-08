@@ -1,7 +1,10 @@
 from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
-from games import views
+from .views import GameViewSets, HexListViewSets
+
+GameView_view = GameViewSets.as_view
+HexListViewSets_view = HexListViewSets.as_view
 
 urlpatterns = [
-    path('<int:game_id>/board', views.HexList.as_view({'get': 'list'})),
+    path('<int:pk>/player/', GameView_view({'get': 'resources'})),
+    path('<int:game_id>/board', HexListViewSets_view({'get': 'list'})),
 ]
