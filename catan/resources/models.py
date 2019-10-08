@@ -21,8 +21,11 @@ class Resources(models.Model):
         choices=RESOURCES_CHOICES,
         default=NOTHING,
         )
-    count_resource = models.IntegerField(default=0)
     owner_player = models.ForeignKey(
         player.Player,
         on_delete=models.CASCADE,
         )
+
+    def __str__(self):
+        return self.resource
+
