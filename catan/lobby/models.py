@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from player.models import Player
 
 
 class Room(models.Model):
@@ -12,7 +13,6 @@ class Room(models.Model):
         on_delete=models.CASCADE
     )
     players = models.ManyToManyField(
-        User,
-        related_name='%(class)s_id'
+        Player,
     )
     max_players = models.IntegerField(default=4)

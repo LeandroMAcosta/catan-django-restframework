@@ -3,6 +3,7 @@ from .models import Room
 
 
 class RoomSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Room
-        fields = ('id', 'name', 'owner', 'players', 'max_players')
+        fields = '__all__'

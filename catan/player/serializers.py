@@ -11,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PlayerSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
 
     class Meta:
         model = Player

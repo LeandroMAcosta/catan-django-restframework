@@ -31,7 +31,7 @@ class RoomsView(APIView):
             if(room.players.all().count() >= room.max_players):
                 return Response('The ROOM is full',
                                 status=status.HTTP_200_OK)
-        except:
+        except Exception as e:
             return Response('The ROOM does not exist',
                             status=status.HTTP_404_NOT_FOUND)
 
