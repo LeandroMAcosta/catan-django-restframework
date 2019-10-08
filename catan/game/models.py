@@ -29,7 +29,7 @@ class VertexPosition(models.Model):
 
 class Hex(models.Model):
     # game_id will be a Foreign key to a board/game/room
-    game_id = models.ForeignKey(Game, on_delete = models.CASCADE)
+    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
     position = models.ForeignKey(VertexPosition, on_delete=models.CASCADE)
     resource = models.CharField(max_length=2, choices=RESOURCES, default='NO')
     token = models.PositiveIntegerField(default=0)
