@@ -17,8 +17,14 @@ class RoomsView(APIView):
 
     def get(self, request):
         query_set = Room.objects.all()
-        rooms_serializer = RoomSerializer(query_set, many=True)
-        return Response(rooms_serializer.data)
+        rooms_s = RoomSerializer(query_set, many=True)
+        users = User.objects.all()
+
+        rooms_s['players'] = [
+            User.objects.get(id=u_id)[username] for u_id in rooms_s['players']
+        ]
+
+        return Response(rooms_s.data)
 
     def put(self, request, room_id):
         try:
@@ -31,7 +37,7 @@ class RoomsView(APIView):
             if(room.players.all().count() >= room.max_players):
                 return Response('The ROOM is full',
                                 status=status.HTTP_200_OK)
-        except Exception as e:
+        except:
             return Response('The ROOM does not exist',
                             status=status.HTTP_404_NOT_FOUND)
 
