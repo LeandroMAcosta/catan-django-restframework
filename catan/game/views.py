@@ -9,7 +9,7 @@ from card.models import Card
 # from resource.models import Resource
 
 
-class HexListViewSets(viewsets.ViewSet):
+class HexListViewSets(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
     def list(self, request, game_id=None):
