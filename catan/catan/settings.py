@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework.authtoken',
     'rest_framework',
-    'lobby'
+    'lobby',
+    'game',
+    'player',
+    'card'
 ]
 
 REST_FRAMEWORK = {

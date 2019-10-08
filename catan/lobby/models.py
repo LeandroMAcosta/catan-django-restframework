@@ -13,7 +13,6 @@ class Room(models.Model):
     )
     players = models.ManyToManyField(
         User,
-        # Ver que onda esta linea
         related_name='%(class)s_id'
     )
     max_players = models.IntegerField(default=4)
