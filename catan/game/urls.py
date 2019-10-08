@@ -6,5 +6,5 @@ HexListViewSets_view = HexListViewSets.as_view
 
 urlpatterns = [
     path('<int:pk>/player/', GameView_view({'get': 'resources'})),
-    path('<int:game_id>/board', HexListViewSets_view({'get': 'list'})),
+    path('<int:game_id>/board/', HexListViewSets_view({'get': 'list'})),
 ]

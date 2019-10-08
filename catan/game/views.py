@@ -10,6 +10,7 @@ from card.models import Card
 
 
 class HexListViewSets(viewsets.ViewSet):
+    permission_classes = (permissions.AllowAny,)
 
     def list(self, request, game_id=None):
         queryset = Hex.objects.filter(game_id=game_id)
@@ -31,7 +32,7 @@ class GameViewSets(viewsets.ModelViewSet):
             # resource_serializer = ResourceSerializer(cards, many=True)
 
             return Response({
-                'cards': serializer.data,
+                'cards': card_serializer.data,
                 'resources': [],
             })
         except Exception as e:

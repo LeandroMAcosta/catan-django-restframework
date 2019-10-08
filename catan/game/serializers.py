@@ -6,14 +6,16 @@ class VertexPositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VertexPosition
-        fields = ('id', 'level', 'index')
+        fields = ('level', 'index')
 
 
 class HexSerializer(serializers.ModelSerializer):
 
+    position = VertexPositionSerializer()
+
     class Meta:
         model = Hex
-        fields = ('id', 'game_id', 'position', 'resource', 'token',)
+        fields = ('position', 'resource', 'token',)
 
 
 class GameSerializer(serializers.ModelSerializer):

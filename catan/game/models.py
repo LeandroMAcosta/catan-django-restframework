@@ -10,6 +10,12 @@ RESOURCES = (
 )
 
 
+class Game(models.Model):
+
+    def __str__(self):
+        return str(self.id)
+
+
 class VertexPosition(models.Model):
     level = models.PositiveIntegerField(default=0)
     index = models.PositiveIntegerField(default=0)
@@ -34,9 +40,3 @@ class Hex(models.Model):
     def __str__(self):
         v = self.position
         return 'Game ' + str(self.game_id) + ' ' + str(v)
-
-
-class Game(models.Model):
-
-    def __str__(self):
-        return str(self.id)
