@@ -1,17 +1,14 @@
 from django.db import models
-# from ../resorces import RESOURCE_CHOICES
+from utils.constants import RESOURCES
 
-
-# RESOURCES = RESOURCE_CHOICES
-
-RESOURCES = (
-    ('WO', 'Wool'),
-    ('LU', 'Lumber'),
-    ('BR', 'Brick'),
-    ('GR', 'Grain'),
-    ('OR', 'Ore'),
-    ('NO', 'Nothing'),
-)
+# RESOURCES = (
+#     ('WO', 'Wool'),
+#     ('LU', 'Lumber'),
+#     ('BR', 'Brick'),
+#     ('GR', 'Grain'),
+#     ('OR', 'Ore'),
+#     ('NO', 'Nothing'),
+# )
 
 
 class Game(models.Model):
@@ -35,7 +32,8 @@ class Hex(models.Model):
     # game_id will be a Foreign key to a board/game/room
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
     position = models.ForeignKey(VertexPosition, on_delete=models.CASCADE)
-    resource = models.CharField(max_length=2, choices=RESOURCES, default='NO')
+    resource = models.CharField(max_length=10, choices=RESOURCES,
+                                default='nothing')
     token = models.PositiveIntegerField(default=0)
 
     class Meta:
