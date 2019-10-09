@@ -124,5 +124,7 @@ dmypy.json
 **/migrations
 **/migrations/**
 
+catan/game/migrations/0001_initial.py
+catan/lobby/migrations/0001_initial.py
 
-db.sqlite3
+catan/db.sqlite3
