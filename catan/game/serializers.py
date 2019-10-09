@@ -6,7 +6,7 @@ class VertexPositionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VertexPosition
-        fields = ('level', 'index')
+        fields = ('level', 'index',)
 
 
 class HexSerializer(serializers.ModelSerializer):

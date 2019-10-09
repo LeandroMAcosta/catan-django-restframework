@@ -1,4 +1,8 @@
 from django.db import models
+# from ../resorces import RESOURCE_CHOICES
+
+
+# RESOURCES = RESOURCE_CHOICES
 
 RESOURCES = (
     ('WO', 'Wool'),
