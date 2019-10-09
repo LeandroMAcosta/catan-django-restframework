@@ -124,3 +124,5 @@ dmypy.json
 **/migrations
 **/migrations/**
 
+
+db.sqlite3
