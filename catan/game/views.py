@@ -1,10 +1,23 @@
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import Hex
+from .serializers import HexSerializer
 from rest_framework import permissions, viewsets, status
 from game.serializers import GameSerializer
 from card.serializers import CardSerializer
 from card.models import Card
-# from resource.models import Resource
+from resource.models import Resource
+from resource.serializers import ResourceSerializer
+
+
+class HexListViewSets(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, game_id=None):
+        queryset = Hex.objects.filter(game_id=game_id)
+        serializer = HexSerializer(queryset, many=True)
+        return Response({'hexes': serializer.data})
 
 
 class GameViewSets(viewsets.ModelViewSet):
@@ -12,17 +25,17 @@ class GameViewSets(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     queryset = Card.objects.all()
 
-    def resources(self, request, pk=None):
+    def list_cards_and_resources(self, request, pk=None):
         try:
             cards = Card.objects.filter(player__user=request.user)
             card_serializer = CardSerializer(cards, many=True)
 
-            # resources = Resource.objects.filter(player__user=request.user)
-            # resource_serializer = ResourceSerializer(cards, many=True)
+            resources = Resource.objects.filter(player__user=request.user)
+            resource_serializer = ResourceSerializer(resources, many=True)
 
             return Response({
-                'cards': serializer.data,
-                'resources': [],
+                'cards': card_serializer.data,
+                'resources': resource_serializer.data,
             })
         except Exception as e:
-            return Response(status=status.django)
+            return Response(status=status.HTTP_400_BAD_REQUEST)

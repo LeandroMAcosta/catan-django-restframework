@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'lobby',
     'game',
     'player',
-    'card'
+    'card',
+    'resource',
 ]
 
 REST_FRAMEWORK = {
