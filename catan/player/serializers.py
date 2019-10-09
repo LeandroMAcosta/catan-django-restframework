@@ -7,12 +7,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username', 'email')
+        fields = '__all__'
+
+
+class UsernameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username',)
 
 
 class PlayerSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
+
+    user = serializers.StringRelatedField()
 
     class Meta:
         model = Player
-        fields = ('user', 'colour',)
+        fields = '__all__'
