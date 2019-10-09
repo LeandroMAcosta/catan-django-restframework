@@ -1,11 +1,5 @@
 from django.db import models
 from player.models import Player
-from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework import permissions, viewsets, status
-from game.serializers import GameSerializer
-from card.serializers import CardSerializer
-from card.models import Card
 
 
 class Card(models.Model):
