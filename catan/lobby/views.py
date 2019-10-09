@@ -1,7 +1,8 @@
 from .models import Room
 from .serializers import RoomSerializer
 from django.contrib.auth.models import User
-from rest_framework import status, permissions
+from player.models import Player
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -22,14 +23,24 @@ class RoomsView(APIView):
             room['players'] = [
                 player['user'] for player in room['players']
             ]
-        return Response(rooms_s)
+
+        return Response(
+            rooms_s,
+            status=status.HTTP_200_OK
+        )
 
     def put(self, request, room_id):
         try:
             room = Room.objects.get(id=room_id)
             user = User.objects.get(id=request.user.id)
+            # Falta hacer que se levante la exception correcta
+            # Cuando ese user no es un player se rompe
+            # Cuando se rompe tira "The room does no exist"
+            # Deberia tirar "you are not a player"
+            newPlayer = Player.objects.get(user=user)
+            print("asdasd", newPlayer)
 
-            if user in room.players.all():
+            if newPlayer in room.players.all():
                 return Response(
                     'Already in the ROOM',
                     status=status.HTTP_200_OK
@@ -45,5 +56,6 @@ class RoomsView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        room.players.add(user)
+        room.players.add(newPlayer)
+
         return Response(status=status.HTTP_200_OK)

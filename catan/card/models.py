@@ -15,3 +15,10 @@ class Card(models.Model):
 
     def __str__(self):
         return self.card_type
+from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework import permissions, viewsets, status
+from game.serializers import GameSerializer
+from card.serializers import CardSerializer
+from card.models import Card
+# from resource.models import Resource
