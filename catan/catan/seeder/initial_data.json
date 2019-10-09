@@ -37,5 +37,13 @@
       "player": 1,
       "card_type": "year_of_plenty"
     }
+  },
+  {
+    "model": "resource.resource",
+    "pk": 1,
+    "fields": {
+      "resource": "lumber",
+      "player": 1
+    }
   }
 ]

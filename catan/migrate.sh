@@ -4,7 +4,7 @@ find . -path "*/migrations/*.pyc"  -delete
 
 rm db.sqlite3
 
-python manage.py makemigrations card player game
+python manage.py makemigrations card player game resource
 python manage.py migrate
 
 echo "yes" | python manage.py flush

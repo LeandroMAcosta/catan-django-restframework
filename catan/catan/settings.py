@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'game',
     'player',
     'card',
+    'resource',
 ]
 
 MIDDLEWARE = [
