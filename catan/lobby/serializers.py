@@ -1,10 +1,9 @@
 from rest_framework import serializers
 from .models import Room
-from player.serializers import PlayerSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    players = PlayerSerializer(many=True)
+    players = serializers.StringRelatedField()
 
     class Meta:
         model = Room
