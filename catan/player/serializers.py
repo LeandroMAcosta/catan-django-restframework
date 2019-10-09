@@ -10,6 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UsernameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username',)
+
+
 class PlayerSerializer(serializers.ModelSerializer):
 
     user = serializers.StringRelatedField()
