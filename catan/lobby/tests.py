@@ -8,8 +8,8 @@ from .models import Room
 factory = APIRequestFactory()
 view = RoomsView.as_view()
 
-class room_test():
-    def test_user(self):
+class room_test(TestCase):
+    def setUp(self):
         self.i_user('jorge','jorge@gmail.com','abcde1234')
         self.i_user('gon','gon@gmail.com','abcde1234')
         self.i_user('leandro','leandro@gmail.com','abcde1234')
@@ -39,7 +39,3 @@ class room_test():
         User.objects.create(username = username, email=email, password=password)
 
 
-test = room_test()
-
-test.test_user()
-test.test_list_room
