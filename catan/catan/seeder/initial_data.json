@@ -1,0 +1,41 @@
+[
+  {
+    "model": "game.game",
+    "pk": 1,
+    "fields": {}
+  },
+  {
+    "model": "game.vertexposition",
+    "pk": 1,
+    "fields": {
+      "level": 1,
+      "index": 2
+    }
+  },
+  {
+    "model": "game.hex",
+    "pk": 1,
+    "fields": {
+      "game_id": 1,
+      "position": 1,
+      "resource": "WO",
+      "token": 1
+    }
+  },
+  {
+    "model": "player.player",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "colour": "rojito"
+    }
+  },
+  {
+    "model": "card.card",
+    "pk": 1,
+    "fields": {
+      "player": 1,
+      "card_type": "year_of_plenty"
+    }
+  }
+]
