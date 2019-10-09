@@ -23,7 +23,7 @@ class GameViewSets(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     queryset = Card.objects.all()
 
-    def resources(self, request, pk=None):
+    def list_cards_and_resources(self, request, pk=None):
         try:
             cards = Card.objects.filter(player__user=request.user)
             card_serializer = CardSerializer(cards, many=True)
