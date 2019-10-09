@@ -1,10 +1,21 @@
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import Hex
+from .serializers import HexSerializer
 from rest_framework import permissions, viewsets, status
 from game.serializers import GameSerializer
 from card.serializers import CardSerializer
 from card.models import Card
-# from resource.models import Resource
+
+
+class HexListViewSets(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, game_id=None):
+        queryset = Hex.objects.filter(game_id=game_id)
+        serializer = HexSerializer(queryset, many=True)
+        return Response({'hexes': serializer.data})
 
 
 class GameViewSets(viewsets.ModelViewSet):
@@ -21,7 +32,7 @@ class GameViewSets(viewsets.ModelViewSet):
             # resource_serializer = ResourceSerializer(cards, many=True)
 
             return Response({
-                'cards': serializer.data,
+                'cards': card_serializer.data,
                 'resources': [],
             })
         except Exception as e:
