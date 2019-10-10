@@ -1,4 +1,5 @@
 from django.db import models
+
 from player.models import Player
 from utils.constants import RESOURCES
 

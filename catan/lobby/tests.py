@@ -1,8 +1,10 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
-from django.contrib.auth.models import User
+
 from catan.tests import BaseTestCase
+
 from .views import RoomsView
 from .models import Room
 from .serializers import RoomSerializer

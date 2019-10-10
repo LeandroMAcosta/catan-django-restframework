@@ -1,11 +1,12 @@
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets, status
-from .models import Hex, Game
-from .serializers import HexSerializer
-from game.serializers import GameSerializer
+
 from card.models import Card
 from resource.models import Resource
 from player.models import Player
+
+from .models import Hex, Game
+from .serializers import HexSerializer, GameSerializer
 
 
 class HexListViewSets(viewsets.ModelViewSet):
@@ -29,10 +30,7 @@ class GameViewSets(viewsets.ModelViewSet):
 
             cards = Card.objects.filter(player=player)
             resources = Resource.objects.filter(player=player)
-            data = {
-                'cards': cards,
-                'resources': resources
-            }
+            data = {'cards': cards, 'resources': resources}
             serializer = self.serializer_class(data)
 
             return Response(serializer.data)

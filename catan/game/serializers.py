@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from game.models import Hex, VertexPosition, Game
+
+from .models import Hex, VertexPosition, Game
 
 
 class VertexPositionSerializer(serializers.ModelSerializer):

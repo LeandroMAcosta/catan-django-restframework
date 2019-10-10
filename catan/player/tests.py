@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate, get_user_model
-from player.models import Player
+
 from game.models import Game
+
+from .models import Player
 
 User = get_user_model()
 
@@ -46,4 +48,3 @@ class PlayerTestCase(TestCase):
             password=self.USER_PASSWORD
         )
         self.assertNotEqual(user, None)
-

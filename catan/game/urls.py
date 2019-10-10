@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import GameViewSets, HexListViewSets
 
 GameView_view = GameViewSets.as_view

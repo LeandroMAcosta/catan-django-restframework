@@ -1,17 +1,15 @@
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
-from .views import GameViewSets
-from .models import Game, VertexPosition, Hex
+
 from card.models import Card
 from resource.models import Resource
-from django.test import TestCase
-from .views import HexListViewSets
-from .serializers import (
-    GameSerializer,
-    HexSerializer
-)
 from player.models import Player
+
+from .serializers import GameSerializer, HexSerializer
+from .views import GameViewSets, HexListViewSets
+from .models import Game, VertexPosition, Hex
 
 User = get_user_model()
 

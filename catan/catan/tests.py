@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+
 from player.models import Player
 from card.models import Card
 from lobby.models import Room

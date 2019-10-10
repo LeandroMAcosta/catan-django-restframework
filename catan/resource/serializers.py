@@ -6,5 +6,4 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resource
-        # fields = ('resource', 'owner',)
         fields = "__all__"
