@@ -12,7 +12,7 @@ from resource.serializers import ResourceSerializer
 class HexListViewSets(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
-    def list(self, request, game_id=None):
+    def list(self, request, game_id):
         queryset = Hex.objects.filter(game_id=game_id)
         serializer = HexSerializer(queryset, many=True)
         return Response({'hexes': serializer.data})

@@ -9,14 +9,9 @@ from .models import Game, VertexPosition, Hex
 from card.models import Card
 from resource.models import Resource
 from django.test import TestCase
-from catan.tests import BaseTestCase
 from game.models import Game, Hex, VertexPosition
 from .views import HexListViewSets
-# from django.contrib.auth import authenticate
-# from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
-# from .views import GameViewSets
-# from .models import Game, VertexPosition, Hex
 from .serializers import (
     GameSerializer,
     VertexPositionSerializer,
@@ -63,9 +58,9 @@ class ResourcesTestCase(BaseTestCase):
         self.assertEqual(response.data['resources'], resources.data)
 
 
-class BoardTestCase(TestCase):
+class BoardTest(TestCase):
 
-    def SetUp(self):
+    def setUp(self):
         # Check if the game created right
         game = Game.objects.create()
         # Store this game_id for later use
@@ -81,26 +76,27 @@ class BoardTestCase(TestCase):
         vertex2 = VertexPosition.objects.create(index=1, level=1)
         self.assertEqual(VertexPosition.objects.count(), 2)
         # Make some hexes and check if the first got created properly
-        hexa = Hex.objects.create(game_id=game.id, position=vertex1.id,
+        hexa = Hex.objects.create(game_id=game, position=vertex1,
                                   token=4, resource="lumber")
-        self.assertEqual(hexa, None)
-        self.assertEqual(hexa.game_id, game.id)
-        self.assertEqual(hexa.position, vertex1.id)
+        self.assertNotEqual(hexa, None)
+        self.assertEqual(hexa.game_id, game)
+        self.assertEqual(hexa.position, vertex1)
         self.assertEqual(hexa.token, 4)
         self.assertEqual(hexa.resource, "lumber")
-        Hex.objects.create(game_id=game.id, position=vertex2.id, token=9,
+        Hex.objects.create(game_id=game, position=vertex2, token=9,
                            resource="wool")
-        Hex.objects.create(game_id=game2.id, position=vertex1.id, token=12,
+        Hex.objects.create(game_id=game2, position=vertex1, token=12,
                            resource="nothing")
         self.assertEqual(Hex.objects.count(), 3)
 
-        def HexListTest(self):
-            view = HexListViewSets.as_view({'get': 'list'})
-            factory = APIRequestFactory()
-            url = 'api/games/'+str(gid)+'/board'
-            request = factory.get(url)
-            response = view(request)
-            hexes = Hex.objects.filter(game_id=gid)
-            serializer = HexSerializer(hexes, many=True)
-            result = {'hexes': serializer.data}
-            self.assertEqual(response.data, result)
+    def test_hex_list(self):
+        view = HexListViewSets.as_view({'get': 'list'})
+        factory = APIRequestFactory()
+        gid = self.gid
+        kwargs = {'game_id': gid}
+        request = factory.get('api/games/<int:game_id>/board/')
+        response = view(request, game_id=gid)
+        hexes = Hex.objects.filter(game_id=gid)
+        serializer = HexSerializer(hexes, many=True)
+        result = {'hexes': serializer.data}
+        self.assertEqual(response.data, result)
