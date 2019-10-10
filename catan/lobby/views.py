@@ -1,22 +1,14 @@
 from .models import Room
 from .serializers import RoomSerializer
-from django.contrib.auth.models import User
-from player.models import Player
-from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_200_OK
-)
 
 
-class RoomsView(APIView):
+class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def list(self, request):
         query_set = Room.objects.all()
         rooms = RoomSerializer(query_set, many=True).data
         return Response(
@@ -24,7 +16,7 @@ class RoomsView(APIView):
             status=status.HTTP_200_OK
         )
 
-    def put(self, request, room_id):
+    def update(self, request, room_id):
         try:
             room = Room.objects.get(id=room_id)
             user = request.user
@@ -39,7 +31,7 @@ class RoomsView(APIView):
                     'The ROOM is full',
                     status=status.HTTP_200_OK
                 )
-        except Exception as e:
+        except Exception:
             return Response(
                 'The ROOM does not exist',
                 status=status.HTTP_404_NOT_FOUND
