@@ -1,6 +1,6 @@
+import json
 from catan.tests import BaseTestCase
 from django.contrib.auth import get_user_model
-
 # from django.contrib.auth import authenticate
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
@@ -32,31 +32,23 @@ class ResourcesTestCase(BaseTestCase):
         self.i_card(player)
         self.i_card(player)
         self.i_card(player)
-        
+
         factory = APIRequestFactory()
 
         request = factory.get('/api/games/1/player/')
 
-        view = GameViewSets.as_view({'get': 'list'})
+        view = GameViewSets.as_view({'get': 'list_cards_and_resources'})
         factory = APIRequestFactory()
 
         force_authenticate(request, user=user)
 
-        print(view)
-        
         response = view(request)
 
-        # Get data from db
         cards = Card.objects.filter(player=player)
         resources = Resource.objects.filter(player=player)
 
-        data = {
-            'cards': CardSerializer(cards, many=True),
-            'resources': ResourceSerializer(resources, many=True),
-        }
+        cards = CardSerializer(cards, many=True)
+        resources = ResourceSerializer(resources, many=True)
 
-        # serializer = RoomSerializer(rooms, many=True)
-
-        print(data, response.data)
-        # Compare the datadb with APIResponse
-        # self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data['cards'], cards.data)
+        self.assertEqual(response.data['resources'], resources.data)
