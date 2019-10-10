@@ -1,6 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from player.models import Player
+from card.models import Card
+from lobby.models import Room
+from game.models import Game
 
 User = get_user_model()
 
@@ -27,8 +30,25 @@ class BaseTestCase(TestCase):
             password=password
         )
 
-    def i_player(self, user, colour):
+    def i_player(self, user, game, colour='rojito'):
         return Player.objects.create(
             user=user,
             colour=colour,
+            game=game
         )
+
+    def i_card(self, player, card_type='road_building'):
+        return Card.objects.create(
+            player=player,
+            card_type=card_type,
+        )
+
+    def i_room(self, name, owner, players):
+        new_room = Room.objects.create(
+            name=name,
+            owner=User.objects.get(username=owner)
+        )
+        new_room.players.set(User.objects.filter(username__contains=players))
+
+    def i_game(self):
+        return Game.objects.create()

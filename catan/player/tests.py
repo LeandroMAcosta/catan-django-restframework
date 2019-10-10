@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from catan.tests import BaseTestCase
 from player.models import Player
+from game.models import Game
 
 
 class PlayerTestCase(BaseTestCase):
@@ -17,7 +18,10 @@ class PlayerTestCase(BaseTestCase):
             username=self.USER_USERNAME,
             password=self.USER_PASSWORD
         )
-        self.i_player(user, 'red')
+        self.i_game()
+        games = Game.objects.all()
+        game = games[0]
+        self.i_player(user=user, game=game)
         player = Player.objects.get(user=user)
 
         self.assertNotEqual(player, None)
