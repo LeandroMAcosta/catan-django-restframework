@@ -7,3 +7,10 @@ class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Card
         fields = ('id', 'player', 'card_type',)
+
+
+class CardTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Card
+        fields = ('card_type',)

@@ -1,12 +1,11 @@
 from rest_framework.response import Response
-from .models import Hex
-from .serializers import HexSerializer
 from rest_framework import permissions, viewsets, status
+from .models import Hex, Game
+from .serializers import HexSerializer
 from game.serializers import GameSerializer
-from card.serializers import CardSerializer
 from card.models import Card
 from resource.models import Resource
-from resource.serializers import ResourceSerializer
+from player.models import Player
 
 
 class HexListViewSets(viewsets.ModelViewSet):
@@ -23,17 +22,19 @@ class GameViewSets(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     queryset = Card.objects.all()
 
-    def list_cards_and_resources(self, request, pk=None):
+    def list_cards_and_resources(self, request, game_id):
         try:
-            cards = Card.objects.filter(player__user=request.user)
-            card_serializer = CardSerializer(cards, many=True)
+            game = Game.objects.get(id=game_id)
+            player = Player.objects.get(user=request.user, game=game)
 
-            resources = Resource.objects.filter(player__user=request.user)
-            resource_serializer = ResourceSerializer(resources, many=True)
+            cards = Card.objects.filter(player=player)
+            resources = Resource.objects.filter(player=player)
+            data = {
+                'cards': cards,
+                'resources': resources
+            }
+            serializer = self.serializer_class(data)
 
-            return Response({
-                'cards': card_serializer.data,
-                'resources': resource_serializer.data,
-            })
+            return Response(serializer.data)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)

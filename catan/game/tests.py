@@ -1,7 +1,4 @@
-import json
-from catan.tests import BaseTestCase
 from django.contrib.auth import get_user_model
-# from django.contrib.auth import authenticate
 from rest_framework.test import force_authenticate
 from rest_framework.test import APIRequestFactory
 from .views import GameViewSets
@@ -9,53 +6,73 @@ from .models import Game, VertexPosition, Hex
 from card.models import Card
 from resource.models import Resource
 from django.test import TestCase
-from game.models import Game, Hex, VertexPosition
 from .views import HexListViewSets
-from rest_framework.test import APIRequestFactory
 from .serializers import (
     GameSerializer,
-    VertexPositionSerializer,
     HexSerializer
 )
-from card.serializers import CardSerializer
-from resource.serializers import ResourceSerializer
+from player.models import Player
 
 User = get_user_model()
 
 
-class ResourcesTestCase(BaseTestCase):
+class ResourcesTestCase(TestCase):
+    def setUp(self):
+        self.USER_USERNAME = "testuser"
+        self.USER_EMAIL = "testuser@test.com"
+        self.USER_PASSWORD = "supersecure"
+        self.GAME_ID = 666
+        self.PLAYER_ID = 667
+
+        # Create user
+        user_data = {
+            "username": self.USER_USERNAME,
+            "email": self.USER_EMAIL,
+            "password": self.USER_PASSWORD,
+        }
+        user = User._default_manager.create_user(**user_data)
+        user.save()
+
+        # Create Game
+        game_data = {
+            'id': self.GAME_ID,
+        }
+        game = Game.objects.create(**game_data)
+        game.save()
+
+        # Create Player
+        player_data = {
+            'id': self.PLAYER_ID,
+            'user': user,
+            'game': game,
+            'colour': 'colour',
+        }
+        player = Player.objects.create(**player_data)
+        player.save()
 
     def test_list_cards_and_resources(self):
-        user = User.objects.get(username=self.USER_USERNAME)
-        self.i_game()
-
-        games = Game.objects.all()
-        game = games[0]
-
-        player = self.i_player(user=user, game=game)
-        self.i_card(player)
-        self.i_card(player)
-        self.i_card(player)
-
         factory = APIRequestFactory()
-
-        request = factory.get('/api/games/1/player/')
-
+        request = factory.get('/api/games/<int:game_id>/player/')
         view = GameViewSets.as_view({'get': 'list_cards_and_resources'})
-        factory = APIRequestFactory()
+
+        user = User.objects.get(username=self.USER_USERNAME)
+        game = Game.objects.get(pk=self.GAME_ID)
+        player = Player.objects.get(game=game, user=user)
 
         force_authenticate(request, user=user)
 
-        response = view(request)
+        response = view(request, game_id=self.GAME_ID)
 
         cards = Card.objects.filter(player=player)
         resources = Resource.objects.filter(player=player)
+        data = {
+            'cards': cards,
+            'resources': resources
+        }
 
-        cards = CardSerializer(cards, many=True)
-        resources = ResourceSerializer(resources, many=True)
+        serializer = GameSerializer(data)
 
-        self.assertEqual(response.data['cards'], cards.data)
-        self.assertEqual(response.data['resources'], resources.data)
+        self.assertEqual(serializer.data, response.data)
 
 
 class BoardTest(TestCase):
@@ -93,7 +110,6 @@ class BoardTest(TestCase):
         view = HexListViewSets.as_view({'get': 'list'})
         factory = APIRequestFactory()
         gid = self.gid
-        kwargs = {'game_id': gid}
         request = factory.get('api/games/<int:game_id>/board/')
         response = view(request, game_id=gid)
         hexes = Hex.objects.filter(game_id=gid)

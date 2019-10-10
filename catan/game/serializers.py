@@ -19,6 +19,9 @@ class HexSerializer(serializers.ModelSerializer):
 
 
 class GameSerializer(serializers.ModelSerializer):
+    resources = serializers.StringRelatedField(many=True)
+    cards = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Game
+        fields = ('cards', 'resources')

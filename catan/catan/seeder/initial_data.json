@@ -27,7 +27,8 @@
     "pk": 1,
     "fields": {
       "user": 1,
-      "colour": "rojito"
+      "colour": "rojito",
+      "game": 1
     }
   },
   {
