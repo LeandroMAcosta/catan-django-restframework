@@ -43,17 +43,15 @@ class RoomTest(TestCase):
         # Get data from db
         rooms = Room.objects.all()
         serializer = RoomSerializer(rooms, many=True)
-                
+
         # Compare the datadb with APIResponse
         self.assertEqual(response.data, serializer.data)
 
     def test_join_room(self):
         pass
-        
+
         """factory = APIRequestFactory()
         user = User.objects.get(username='gon')
         request = factory.put('/api/users/login/', username=user, password='abcde1234')
         
         print(request)"""
-
-
