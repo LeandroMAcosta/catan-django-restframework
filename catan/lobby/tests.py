@@ -52,6 +52,6 @@ class RoomTest(TestCase):
 
         """factory = APIRequestFactory()
         user = User.objects.get(username='gon')
-        request = factory.put('/api/users/login/', username=user, password='abcde1234')
-        
+        request = factory.put('/api/users/login/', username=user,
+         password='abcde1234')
         print(request)"""
