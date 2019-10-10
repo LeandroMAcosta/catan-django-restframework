@@ -24,7 +24,7 @@ class RoomTest(TestCase):
         new_room.players.set(User.objects.filter(username__contains=players))
 
     def setUp(self):
-        self.view = RoomsView.as_view()
+        self.view = RoomsView.as_view({'get': 'list'})
         self.factory = APIRequestFactory()
 
         self.i_user('tester', 'tester@gmail.com', 'abcde1234')
@@ -55,7 +55,6 @@ class RoomTest(TestCase):
         # Get data from db
         rooms = Room.objects.all()
         serializer = RoomSerializer(rooms, many=True)
-
         # Compare the datadb with APIResponse
         self.assertEqual(response.data, serializer.data)
 
