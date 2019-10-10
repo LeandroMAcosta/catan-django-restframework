@@ -3,3 +3,8 @@ test:pylint:
     script:
         - pip install pycodestyle
         - pycodestyle --exclude='migrations*, settings*' .
+
+test:unittest:
+    image: python:3.6
+    script:
+        - python manage.py test
