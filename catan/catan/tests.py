@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from player.models import Player
+from lobby.models import Room
+
 
 User = get_user_model()
 
@@ -32,3 +34,10 @@ class BaseTestCase(TestCase):
             user=user,
             colour=colour,
         )
+
+    def i_room(self, name, owner, players):
+        new_room = Room.objects.create(
+            name=name,
+            owner=User.objects.get(username=owner)
+        )
+        new_room.players.set(User.objects.filter(username__contains=players))
