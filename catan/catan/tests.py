@@ -5,6 +5,7 @@ from card.models import Card
 from lobby.models import Room
 from game.models import Game
 
+
 User = get_user_model()
 
 
@@ -51,4 +52,4 @@ class BaseTestCase(TestCase):
         new_room.players.set(User.objects.filter(username__contains=players))
 
     def i_game(self):
-        return Game.objects.create()
+        Game.objects.create()
