@@ -50,10 +50,19 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'auth.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ]
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
 }
+
+# JWT_AUTH = {
+# #     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=10000),
+# #     'JWT_ALLOW_REFRESH': True,
+#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=1),
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
