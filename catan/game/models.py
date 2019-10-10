@@ -1,15 +1,6 @@
 from django.db import models
 from utils.constants import RESOURCES
 
-# RESOURCES = (
-#     ('WO', 'Wool'),
-#     ('LU', 'Lumber'),
-#     ('BR', 'Brick'),
-#     ('GR', 'Grain'),
-#     ('OR', 'Ore'),
-#     ('NO', 'Nothing'),
-# )
-
 
 class Game(models.Model):
 
