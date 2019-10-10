@@ -7,5 +7,7 @@ test:pylint:
 test:unittest:
     image: python:3.6
     script:
-        - pip install -r catan/requirements.txt
+        - cd catan/
+        - pip install -r requirements.txt
+        - ./migrate.sh
         - python manage.py test
