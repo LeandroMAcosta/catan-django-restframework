@@ -1,8 +1,10 @@
 from django.urls import path, include
-from rest_framework_jwt.views import obtain_jwt_token
+from .views import CustomObtainAuthToken
+
+obtain_auth_token = CustomObtainAuthToken.as_view()
 
 urlpatterns = [
-    path('users/login/', obtain_jwt_token),
+    path('users/login/', obtain_auth_token),
     path('room/', include('lobby.urls')),
     path('games/', include('game.urls')),
 ]

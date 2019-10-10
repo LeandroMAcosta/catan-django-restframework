@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework.authtoken.views import ObtainAuthToken
 
-# Create your views here.
+from .serializers import CustomAuthTokenSerializer
+
+
+class CustomObtainAuthToken(ObtainAuthToken):
+    serializer_class = CustomAuthTokenSerializer
