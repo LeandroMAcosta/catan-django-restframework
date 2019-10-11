@@ -1,10 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import (
-    SessionAuthentication,
-    BasicAuthentication
-)
 
 from card.models import Card
 from resource.models import Resource
@@ -24,7 +20,6 @@ class HexListViewSets(viewsets.ModelViewSet):
 
 
 class GameViewSets(viewsets.ModelViewSet):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = GameSerializer
     queryset = Card.objects.all()
@@ -32,8 +27,7 @@ class GameViewSets(viewsets.ModelViewSet):
     def list_cards_and_resources(self, request, game_id):
         try:
             game = Game.objects.get(id=game_id)
-            player = Player.objects.get(user=request.user, game=game)
-
+            player = Player.objects.get(user=request.user, game=game)            
             cards = Card.objects.filter(player=player)
             resources = Resource.objects.filter(player=player)
             data = {'cards': cards, 'resources': resources}
