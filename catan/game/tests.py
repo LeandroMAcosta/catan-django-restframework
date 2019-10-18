@@ -79,35 +79,53 @@ class BoardTest(TestCase):
         # Check if the game created right
         game = Game.objects.create()
         # Store this game_id for later use
-        self.gid = game.id
-        self.assertNotEqual(game, None)
-        self.assertEqual(Game.objects.count(), 1)
-        game2 = Game.objects.create()
-        # Check if the vertex created right
-        vertex1 = VertexPosition.objects.create(index=1, level=2)
-        self.assertNotEqual(vertex1, None)
-        self.assertEqual(vertex1.index, 1)
-        self.assertEqual(vertex1.level, 2)
-        vertex2 = VertexPosition.objects.create(index=1, level=1)
-        self.assertEqual(VertexPosition.objects.count(), 2)
-        # Make some hexes and check if the first got created properly
-        hexa = Hex.objects.create(game_id=game, position=vertex1,
-                                  token=4, resource="lumber")
-        self.assertNotEqual(hexa, None)
-        self.assertEqual(hexa.game_id, game)
-        self.assertEqual(hexa.position, vertex1)
-        self.assertEqual(hexa.token, 4)
-        self.assertEqual(hexa.resource, "lumber")
-        Hex.objects.create(game_id=game, position=vertex2, token=9,
-                           resource="wool")
-        Hex.objects.create(game_id=game2, position=vertex1, token=12,
-                           resource="nothing")
-        self.assertEqual(Hex.objects.count(), 3)
+        self.game = game
+        # self.assertNotEqual(game, None)
+        # self.assertEqual(Game.objects.count(), 1)
+        # game2 = Game.objects.create()
+        # # Check if the vertex created right
+        # vertex1 = VertexPosition.objects.create(index=1, level=2)
+        # self.assertNotEqual(vertex1, None)
+        # self.assertEqual(vertex1.index, 1)
+        # self.assertEqual(vertex1.level, 2)
+        # vertex2 = VertexPosition.objects.create(index=1, level=1)
+        # self.assertEqual(VertexPosition.objects.count(), 2)
+        # # Make some hexes and check if the first got created properly
+        # hexa = Hex.objects.create(game_id=game, position=vertex1,
+        #                           token=4, resource="lumber")
+        # self.assertNotEqual(hexa, None)
+        # self.assertEqual(hexa.game_id, game)
+        # self.assertEqual(hexa.position, vertex1)
+        # self.assertEqual(hexa.token, 4)
+        # self.assertEqual(hexa.resource, "lumber")
+        # Hex.objects.create(game_id=game, position=vertex2, token=9,
+        #                    resource="wool")
+        # Hex.objects.create(game_id=game2, position=vertex1, token=12,
+        #                    resource="nothing")
+        # self.assertEqual(Hex.objects.count(), 3)
+
+    # def test_create_game(self):
+    #     game = Game.objects.create()
+    #     self.assertNotEqual(game, None)
+
+    # def test_create_vertex(self):
+    #     v = VertexPosition.objects.create(index=1, level=2)
+    #     self.assertNotEqual(v, None)
+
+    # def test_create_vertex
 
     def test_hex_list(self):
+        gid = self.game.id
+        v = VertexPosition.objects.create(index=0, level=0)
+        h = Hex.objects.create(game_id=self.game, position=v, token=0,
+                               resource="nothing")
+        for i in range(0, 3):
+            for j in range(0, 6*i):
+                v = VertexPosition.objects.create(index=j, level=index)
+                h = Hex.objects.create(game_id=self.game, position=v, token=0,
+                                       resource="lumber")
         view = HexListViewSets.as_view({'get': 'list'})
         factory = APIRequestFactory()
-        gid = self.gid
         request = factory.get('api/games/<int:game_id>/board/')
         response = view(request, game_id=gid)
         hexes = Hex.objects.filter(game_id=gid)
