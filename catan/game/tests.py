@@ -104,26 +104,38 @@ class BoardTest(TestCase):
         #                    resource="nothing")
         # self.assertEqual(Hex.objects.count(), 3)
 
-    # def test_create_game(self):
-    #     game = Game.objects.create()
-    #     self.assertNotEqual(game, None)
+    def test_create_game(self):
+        game = Game.objects.create()
+        self.assertNotEqual(game, None)
 
-    # def test_create_vertex(self):
-    #     v = VertexPosition.objects.create(index=1, level=2)
-    #     self.assertNotEqual(v, None)
+    def test_create_vertex(self):
+        v = VertexPosition.objects.create(index=1, level=2)
+        self.assertNotEqual(v, None)
+        self.assertEqual(v.index, 1)
+        self.assertEqual(v.level, 2)
 
-    # def test_create_vertex
+    def test_create_hex(self):
+        g = Game.objects.create()
+        v = VertexPosition.objects.create(level=0, index=0)
+        h = Hex.objects.create(game_id=g, position=v, token=2,
+                               resource='brick')
+        self.assertNotEqual(h, None)
+        self.assertEqual(h.game_id, g)
+        self.assertEqual(h.position, v)
+        self.assertEqual(h.token, 2)
+        self.assertEqual(h.resource, 'brick')
 
     def test_hex_list(self):
         gid = self.game.id
         v = VertexPosition.objects.create(index=0, level=0)
         h = Hex.objects.create(game_id=self.game, position=v, token=0,
                                resource="nothing")
+        # Create a full board
         for i in range(0, 3):
             for j in range(0, 6*i):
-                v = VertexPosition.objects.create(index=j, level=index)
+                v = VertexPosition.objects.create(index=j, level=i)
                 h = Hex.objects.create(game_id=self.game, position=v, token=0,
-                                       resource="lumber")
+                                       resource='lumber')
         view = HexListViewSets.as_view({'get': 'list'})
         factory = APIRequestFactory()
         request = factory.get('api/games/<int:game_id>/board/')
