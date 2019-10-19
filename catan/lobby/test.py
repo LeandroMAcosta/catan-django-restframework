@@ -56,7 +56,7 @@ class RoomTest(TestCase):
         # Que la room no exista
         # Que la room este llena
 
-    def test_create_room():
+    def test_create_room(self):
         pass
         # Que se cree una room correctamente
         # Campos vacios: tipo "name": o "board_id":
