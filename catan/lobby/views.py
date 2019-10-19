@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Room
+from board.models import Board
 from .serializers import RoomSerializer
 from .exeptions import RoomAlreadyExist, RoomNotExist, NameAlreadyExist
 
@@ -20,8 +21,10 @@ class RoomsView(viewsets.ModelViewSet):
             if Room.objects.filter(name=name).exists():
                 raise NameAlreadyExist
 
+            board = Board.objects.get(id=board_id)
+
             Room.objects.create(
-                board_id=board_id,
+                board=board,
                 name=name,
                 owner=request.user,
             )
@@ -53,10 +56,10 @@ class RoomsView(viewsets.ModelViewSet):
 
     def join(self, request, room_id):
         try:
-            if not Room.objects.filter(board_id=room_id).exists():
+            if not Room.objects.filter(id=room_id).exists():
                 raise RoomNotExist
 
-            room = Room.objects.get(board_id=room_id)
+            room = Room.objects.get(id=room_id)
             user = request.user
 
             if user in room.players.all():

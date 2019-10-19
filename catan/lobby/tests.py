@@ -7,12 +7,15 @@ from catan.tests import BaseTestCase
 
 from .views import RoomsView
 from .models import Room
+from board.models import Board
 from .serializers import RoomSerializer
 
 
 class RoomTest(TestCase):
 
     def setUp(self):
+
+        BaseTestCase.i_board(self, 'boardname')
 
         BaseTestCase.i_user(self, 'tester', 'tester@gmail.com', 'abcde1234')
         BaseTestCase.i_user(self, 'jorge', 'jorge@gmail.com', 'abcde1234')
@@ -27,8 +30,8 @@ class RoomTest(TestCase):
 
         self.assertEqual(User.objects.count(), 10)
 
-        BaseTestCase.i_room(self, 'room1', 'jorge', 'gon')
-        BaseTestCase.i_room(self, 'room2', 'leandro', 'lucas')
+        BaseTestCase.i_room(self, 'room1', 'jorge', 'gon', 'boardname')
+        BaseTestCase.i_room(self, 'room2', 'leandro', 'lucas', 'boardname')
 
         self.assertEqual(Room.objects.count(), 2)
 
