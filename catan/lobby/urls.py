@@ -7,5 +7,5 @@ urlpatterns = [
         'post': 'create',
         'get': 'list',
         })),
-    path('<int:room_id>/', RoomsView.as_view({'put': 'update'})),
+    path('<int:room_id>/', RoomsView.as_view({'put': 'join'})),
 ]

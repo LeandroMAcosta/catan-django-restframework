@@ -42,6 +42,11 @@ class RoomsView(viewsets.ModelViewSet):
                 'Name already in use',
                 status=status.HTTP_409_CONFLICT
             )
+        except Exception:
+            return Response(
+                'mensaje',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -53,9 +58,9 @@ class RoomsView(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
-    def update(self, request, room_id):
+    def join(self, request, room_id):
         try:
-            room = Room.objects.get(id=room_id)
+            room = Room.objects.get(board_id=room_id)
             user = request.user
 
             if user in room.players.all():
