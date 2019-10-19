@@ -38,7 +38,7 @@ class RoomTest(TestCase):
 
         # Make an authenticated request to the view...
         user = User.objects.get(username='tester')
-        request = factory.get('/api/room')
+        request = factory.get('/api/rooms')
         force_authenticate(request, user=user)
         response = view(request)
 

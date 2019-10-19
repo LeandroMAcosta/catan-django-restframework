@@ -4,6 +4,7 @@ from .models import Room
 
 class RoomSerializer(serializers.ModelSerializer):
     players = serializers.StringRelatedField(many=True)
+    owner = serializers.StringRelatedField()
 
     class Meta:
         model = Room

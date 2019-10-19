@@ -6,8 +6,44 @@ from .models import Room
 from .serializers import RoomSerializer
 
 
+class RoomAlreadyExist(Exception):
+    pass
+
+
+class NameAlreadyExist(Exception):
+    pass
+
+
 class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
+
+    def create(self, request):
+        try:
+            name = request.data["name"]
+            board_id = request.data["board_id"]
+
+            if Room.objects.filter(board_id=board_id).exists():
+                raise RoomAlreadyExist
+            if Room.objects.filter(name=name).exists():
+                raise NameAlreadyExist
+
+            Room.objects.create(
+                board_id=board_id,
+                name=name,
+                owner=request.user,
+            )
+        except RoomAlreadyExist:
+            return Response(
+                'The room already exists',
+                status=status.HTTP_409_CONFLICT
+            )
+        except NameAlreadyExist:
+            return Response(
+                'Name already in use',
+                status=status.HTTP_409_CONFLICT
+            )
+
+        return Response(status=status.HTTP_201_CREATED)
 
     def list(self, request):
         query_set = Room.objects.all()
