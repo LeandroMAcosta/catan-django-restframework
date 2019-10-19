@@ -1,22 +1,51 @@
-from .models import Room
-from .serializers import RoomSerializer
-from django.contrib.auth.models import User
-from player.models import Player
-from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_200_OK
-)
+
+from .models import Room
+from .serializers import RoomSerializer
 
 
-class RoomsView(APIView):
+class RoomAlreadyExist(Exception):
+    pass
+
+
+class NameAlreadyExist(Exception):
+    pass
+
+
+class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def create(self, request):
+        try:
+            name = request.data["name"]
+            board_id = request.data["board_id"]
+
+            if Room.objects.filter(board_id=board_id).exists():
+                raise RoomAlreadyExist
+            if Room.objects.filter(name=name).exists():
+                raise NameAlreadyExist
+
+            Room.objects.create(
+                board_id=board_id,
+                name=name,
+                owner=request.user,
+            )
+        except RoomAlreadyExist:
+            return Response(
+                'The room already exists',
+                status=status.HTTP_409_CONFLICT
+            )
+        except NameAlreadyExist:
+            return Response(
+                'Name already in use',
+                status=status.HTTP_409_CONFLICT
+            )
+
+        return Response(status=status.HTTP_201_CREATED)
+
+    def list(self, request):
         query_set = Room.objects.all()
         rooms = RoomSerializer(query_set, many=True).data
         return Response(
@@ -24,9 +53,9 @@ class RoomsView(APIView):
             status=status.HTTP_200_OK
         )
 
-    def put(self, request, room_id):
+    def join(self, request, room_id):
         try:
-            room = Room.objects.get(id=room_id)
+            room = Room.objects.get(board_id=room_id)
             user = request.user
 
             if user in room.players.all():
@@ -39,7 +68,7 @@ class RoomsView(APIView):
                     'The ROOM is full',
                     status=status.HTTP_200_OK
                 )
-        except Exception as e:
+        except Exception:
             return Response(
                 'The ROOM does not exist',
                 status=status.HTTP_404_NOT_FOUND
