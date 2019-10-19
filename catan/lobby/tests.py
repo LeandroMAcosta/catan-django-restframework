@@ -65,3 +65,4 @@ class RoomTest(TestCase):
         # Campos vacios: tipo "name": o "board_id":
         # Rooms que ya existen
         # Nombres de Room que ya existen
+        # No existe la Board

@@ -8,3 +8,7 @@ class RoomNotExist(Exception):
 
 class NameAlreadyExist(Exception):
     pass
+
+
+class BoardNotExist(Exception):
+    pass
