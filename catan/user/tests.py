@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate
-# from rest_framework.test import APIRequestFactory
 
 from .models import User
 
@@ -32,3 +31,15 @@ class UserTestCase(TestCase):
             password=self.USER_PASSWORD+"badpassword"
         )
         self.assertEqual(user, None)
+
+    def test_correct_signup(self):
+        pass
+
+    def test_passwordempty_signup(self):
+        pass
+
+    def test_usernameempty_signup(self):
+        pass
+
+    def test_username_alredyexist(self):
+        pass
