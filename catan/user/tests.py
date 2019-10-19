@@ -33,13 +33,33 @@ class UserTestCase(TestCase):
         self.assertEqual(user, None)
 
     def test_correct_signup(self):
+        """
+        url = /api/users/
+        method = POST
+        data = user y pass
+        """
         pass
 
     def test_passwordempty_signup(self):
+        """
+        url = /api/users/
+        method = POST
+        data = user y pass
+        """
         pass
 
     def test_usernameempty_signup(self):
+        """
+        url = /api/users/
+        method = POST
+        data = user y pass
+        """
         pass
 
     def test_username_alredyexist(self):
+        """
+        url = /api/users/
+        method = POST
+        data = user y pass
+        """
         pass
