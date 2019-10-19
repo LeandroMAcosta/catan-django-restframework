@@ -1,18 +1,13 @@
 from django.db import models
+
 from player.models import Player
+from utils.constants import RESOURCES
 
 
 class Resource(models.Model):
-    RESOURCES_CHOICES = [
-        ('brick', 'Wool'),
-        ('lumber', 'Lumber'),
-        ('wool', 'Brick'),
-        ('grain', 'Grain'),
-        ('ore', 'Ore')
-    ]
     resource = models.CharField(
         max_length=10,
-        choices=RESOURCES_CHOICES,
+        choices=RESOURCES,
     )
     player = models.ForeignKey(
         Player,

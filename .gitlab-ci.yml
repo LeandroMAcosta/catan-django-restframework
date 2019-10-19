@@ -3,3 +3,12 @@ test:pylint:
     script:
         - pip install pycodestyle
         - pycodestyle --exclude='migrations*, settings*' .
+
+test:unittest:
+    image: python:3.6
+    script:
+        - pip install -r requirements.txt
+        - cd catan/
+        - python manage.py makemigrations card game lobby player resource
+        - python manage.py migrate 
+        - python manage.py test

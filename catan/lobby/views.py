@@ -4,14 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Room
 from .serializers import RoomSerializer
-
-
-class RoomAlreadyExist(Exception):
-    pass
-
-
-class NameAlreadyExist(Exception):
-    pass
+from .exeptions import RoomAlreadyExist, RoomNotExist, NameAlreadyExist
 
 
 class RoomsView(viewsets.ModelViewSet):
@@ -42,6 +35,11 @@ class RoomsView(viewsets.ModelViewSet):
                 'Name already in use',
                 status=status.HTTP_409_CONFLICT
             )
+        except Exception:
+            return Response(
+                'BADREQUEST',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -55,6 +53,9 @@ class RoomsView(viewsets.ModelViewSet):
 
     def join(self, request, room_id):
         try:
+            if not Room.objects.filter(board_id=room_id).exists():
+                raise RoomNotExist
+
             room = Room.objects.get(board_id=room_id)
             user = request.user
 
@@ -68,7 +69,7 @@ class RoomsView(viewsets.ModelViewSet):
                     'The ROOM is full',
                     status=status.HTTP_200_OK
                 )
-        except Exception:
+        except RoomNotExist:
             return Response(
                 'The ROOM does not exist',
                 status=status.HTTP_404_NOT_FOUND

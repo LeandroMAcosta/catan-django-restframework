@@ -18,7 +18,7 @@
     "fields": {
       "game_id": 1,
       "position": 1,
-      "resource": "WO",
+      "resource": "wool",
       "token": 1
     }
   },
@@ -27,7 +27,8 @@
     "pk": 1,
     "fields": {
       "user": 1,
-      "colour": "rojito"
+      "colour": "rojito",
+      "game": 1
     }
   },
   {

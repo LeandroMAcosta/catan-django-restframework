@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from game.models import Hex, VertexPosition, Game
+
+from .models import Hex, VertexPosition, Game
 
 
 class VertexPositionSerializer(serializers.ModelSerializer):
@@ -19,6 +20,9 @@ class HexSerializer(serializers.ModelSerializer):
 
 
 class GameSerializer(serializers.ModelSerializer):
+    resources = serializers.StringRelatedField(many=True)
+    cards = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Game
+        fields = ('cards', 'resources')

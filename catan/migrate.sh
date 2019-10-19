@@ -4,7 +4,20 @@ find . -path "*/migrations/*.pyc"  -delete
 
 rm db.sqlite3
 
-python manage.py makemigrations card player game resource
+newapps=()
+    apps=$(ls -d ./catan/*/ 2>&1)
+    for key in $apps
+    do
+        app=$( basename $key )
+        if [ $app != "catan" ] && [ $app != "tests" ] && [ $app != "seeder" ] && [ $app != "__pycache__" ]
+        then
+            newapps+=$app" "
+        fi
+    done
+
+python manage.py makemigrations 
+python manage.py makemigrations $newapps
+python manage.py makemigrations player card resource lobby game
 python manage.py migrate
 
 echo "yes" | python manage.py flush
