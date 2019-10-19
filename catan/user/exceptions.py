@@ -1,0 +1,4 @@
+
+
+class UserOrPasswordEmpty(Exception):
+    pass
