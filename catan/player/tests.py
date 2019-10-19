@@ -41,10 +41,3 @@ class PlayerTestCase(TestCase):
         }
         player = Player.objects.create(**player_data)
         player.save()
-
-    def test_authenticate_user(self):
-        user = authenticate(
-            username=self.USER_USERNAME,
-            password=self.USER_PASSWORD
-        )
-        self.assertNotEqual(user, None)
