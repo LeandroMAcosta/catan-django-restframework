@@ -13,36 +13,36 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializerWithToken(serializers.ModelSerializer):
+    pass
+    # token = serializers.SerializerMethodField()
+    # password = serializers.CharField(write_only=True)
+    # # user = serializers.CharField(label=_("User"))
 
-    token = serializers.SerializerMethodField()
-    password = serializers.CharField(write_only=True)
-    # user = serializers.CharField(label=_("User"))
+    # def get_token(self, user):
+    #     token = Token.objects.create(user=user)
+    #     return str(token)
 
-    def get_token(self, user):
-        token = Token.objects.create(user=user)
-        return str(token)
-
-    def validate(self, attrs):
-        username = attrs.get('user')
-        password = attrs.get('password')
-        print("\n\n\n\n\n\n")
-        print(username, password)
-        print("\n\n\n\n\n\n")
-        attrs['user'] = username
-        return attrs
-
-
-    # def create(self, validated_data):
-    #     password = validated_data.pop('password', None)
-    #     username = validated_data['user']
-    #     print("\n\n\n\n\nvalidated_data:\n")
-    #     print(validated_data)
+    # def validate(self, attrs):
+    #     username = attrs.get('user')
+    #     password = attrs.get('password')
     #     print("\n\n\n\n\n\n")
-    #     instance = User(username=username)
-    #     if password is not None:
-    #         instance.set_password(password)
-    #     instance.save()
-    #     return instance
+    #     print(username, password)
+    #     print("\n\n\n\n\n\n")
+    #     attrs['user'] = username
+    #     return attrs
+
+
+    # # def create(self, validated_data):
+    # #     password = validated_data.pop('password', None)
+    # #     username = validated_data['user']
+    # #     print("\n\n\n\n\nvalidated_data:\n")
+    # #     print(validated_data)
+    # #     print("\n\n\n\n\n\n")
+    # #     instance = User(username=username)
+    # #     if password is not None:
+    # #         instance.set_password(password)
+    # #     instance.save()
+    # #     return instance
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
