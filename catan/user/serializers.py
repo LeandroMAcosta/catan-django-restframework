@@ -31,18 +31,17 @@ class UserSerializerWithToken(serializers.ModelSerializer):
     #     attrs['user'] = username
     #     return attrs
 
-
-    # # def create(self, validated_data):
-    # #     password = validated_data.pop('password', None)
-    # #     username = validated_data['user']
-    # #     print("\n\n\n\n\nvalidated_data:\n")
-    # #     print(validated_data)
-    # #     print("\n\n\n\n\n\n")
-    # #     instance = User(username=username)
-    # #     if password is not None:
-    # #         instance.set_password(password)
-    # #     instance.save()
-    # #     return instance
+    # def create(self, validated_data):
+    #     password = validated_data.pop('password', None)
+    #     username = validated_data['user']
+    #     print("\n\n\n\n\nvalidated_data:\n")
+    #     print(validated_data)
+    #     print("\n\n\n\n\n\n")
+    #     instance = User(username=username)
+    #     if password is not None:
+    #         instance.set_password(password)
+    #     instance.save()
+    #     return instance
 
 
 class CustomAuthTokenSerializer(serializers.Serializer):
