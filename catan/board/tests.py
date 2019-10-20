@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from board.models import Board, Vertex, Hexagon
 from game.models import Game
+from lobby.models import Room
 
 User = get_user_model()
 
@@ -16,7 +17,22 @@ class BoardTest(TestCase):
         }
         self.user = User._default_manager.create_user(**user_data)
         self.user.save()
-        self.game = Game()
+        board_data = {
+            'name': 'boardcito',
+            'owner': self.user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': False,
+            'owner': self.user,
+        }
+        self.room = Room(**room_data)
+        self.room.save()
+        self.game = Game(room=self.room)
         self.game.save()
 
     def test_create_board(self):
@@ -25,15 +41,6 @@ class BoardTest(TestCase):
         self.assertNotEqual(board, None)
         self.assertEqual(board.owner, self.user)
         self.assertEqual(board.name, "TestBoard")
-
-    def test_create_vertex(self):
-        v = Vertex.objects.create(game=self.game, level=1, index=2, used=True)
-        v.save()
-        self.assertNotEqual(v, None)
-        self.assertEqual(v.game, self.game)
-        self.assertEqual(v.level, 1)
-        self.assertEqual(v.index, 2)
-        self.assertEqual(v.used, True)
 
     def test_create_hex(self):
         b = Board.objects.create(owner=self.user, name="Placeholder")
