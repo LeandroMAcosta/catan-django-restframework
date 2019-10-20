@@ -6,8 +6,9 @@ from rest_framework.test import APIRequestFactory
 from card.models import Card
 from resource.models import Resource
 from player.models import Player
-from board.models import Vertex, Hexagon
+from board.models import Vertex, Hexagon, Board
 from board.serializers import HexagonSerializer
+from lobby.models import Room
 
 from .serializers import GameSerializer
 from .views import GameViewSets, HexListViewSets
@@ -18,11 +19,11 @@ User = get_user_model()
 
 class ResourcesTestCase(TestCase):
     def setUp(self):
-        self.USER_USERNAME = "testuser"
-        self.USER_EMAIL = "testuser@test.com"
+        self.USER_USERNAME = "testuser2"
+        self.USER_EMAIL = "testuser2@test.com"
         self.USER_PASSWORD = "supersecure"
-        self.GAME = 666
-        self.PLAYER_ID = 667
+        self.GAME = 6667
+        self.PLAYER_ID = 6677
 
         # Create user
         user_data = {
@@ -33,13 +34,26 @@ class ResourcesTestCase(TestCase):
         user = User._default_manager.create_user(**user_data)
         user.save()
 
-        # Create Game
-        game_data = {
-            'id': self.GAME,
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
         }
-        game = Game.objects.create(**game_data)
+        board = Board(**board_data)
+        board.save()
+
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': False,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
+
+        game = Game()
         game.save()
 
+        self.GAME = game.id
         # Create Player
         player_data = {
             'id': self.PLAYER_ID,
@@ -91,5 +105,6 @@ class ResourcesTestCase(TestCase):
 class GameTest(TestCase):
 
     def test_create_game(self):
-        game = Game.objects.create()
+        game = Game()
+        game.save()
         self.assertNotEqual(game, None)

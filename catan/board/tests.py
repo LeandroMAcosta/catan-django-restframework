@@ -16,7 +16,7 @@ class BoardTest(TestCase):
         }
         self.user = User._default_manager.create_user(**user_data)
         self.user.save()
-        self.game = Game.objects.create()
+        self.game = Game()
         self.game.save()
 
     def test_create_board(self):

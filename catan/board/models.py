@@ -60,7 +60,7 @@ class Vertex(models.Model):
         return neighbors
 
     def __str__(self):
-        # return "game={0}:({1}, {2})".format(self.game, self.level, self.index)
+        # return "{0}:({1}, {2})".format(self.game, self.level, self.index)
         return "({0}, {1})".format(self.level, self.index)
 
 

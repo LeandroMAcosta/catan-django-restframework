@@ -4,9 +4,6 @@ from django.db import models
 
 class Game(models.Model):
 
-    def __str__(self):
-        return str(self.id)
-
     def get_board(self):
         return self.room.board
 
@@ -28,6 +25,9 @@ class Game(models.Model):
                     else:
                         vertex_data['level'] = 2
                     job.vertex_set.create(**vertex_data)
+
+    def __str__(self):
+        return str(self.id)
 
 
 post_init.connect(Game.create_vertex, sender=Game)
