@@ -5,8 +5,6 @@ from board.models import Vertex
 
 class Game(models.Model):
 
-    auxiliar = models.BooleanField(default=False) # testeando signals
-
     def __str__(self):
         return str(self.id)
 
