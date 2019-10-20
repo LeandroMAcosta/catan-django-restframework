@@ -5,6 +5,7 @@ from player.models import Player
 from card.models import Card
 from lobby.models import Room
 from game.models import Game
+from board.models import Board
 
 
 User = get_user_model()
@@ -45,12 +46,18 @@ class BaseTestCase(TestCase):
             card_type=card_type,
         )
 
-    def i_room(self, name, owner, players):
+    def i_room(self, name, owner, players, board):
         new_room = Room.objects.create(
             name=name,
-            owner=User.objects.get(username=owner)
+            owner=User.objects.get(username=owner),
+            board=Board.objects.get(name=board)
         )
         new_room.players.set(User.objects.filter(username__contains=players))
+
+    def i_board(self, name):
+        Board.objects.create(
+            name=name
+        )
 
     def i_game(self):
         Game.objects.create()

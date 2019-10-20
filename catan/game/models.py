@@ -41,4 +41,3 @@ class Hex(models.Model):
     def __str__(self):
         v = self.position
         return 'Game ' + str(self.game_id) + ' ' + str(v)
-
