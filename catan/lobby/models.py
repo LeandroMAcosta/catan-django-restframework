@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from game.models import Game
+# from game.models import Game
 from board.models import Board
 
 
@@ -14,12 +14,12 @@ class Room(models.Model):
         on_delete=models.CASCADE,
         related_name='owner'
     )
-    game = models.OneToOneField(
-        Game,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
+    # game = models.OneToOneField(
+    #     Game,
+    #     on_delete=models.CASCADE,
+    #     blank=True,
+    #     null=True
+    # )
     board = models.ForeignKey(
         Board,
         on_delete=models.CASCADE,

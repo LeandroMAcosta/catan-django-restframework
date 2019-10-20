@@ -7,7 +7,10 @@ from utils.constants import RESOURCES
 
 class Board(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
@@ -20,8 +23,7 @@ class Vertex(models.Model):
     used = models.BooleanField(default=False)
 
     class Meta:
-        pass
-        # unique_together = ['game', 'level', 'index']
+        unique_together = ['game', 'level', 'index']
 
     def get_neighbors(self):
         vertex_game = Vertex.objects.filter(game=self.game)
@@ -50,13 +52,12 @@ class Vertex(models.Model):
                 index=k*index + (k+1)*(index+k)//3
             )
             neighbors.append(vertex)
-        else:
-            if (index - 1) % 5 == 0 or (index + 1) % 5 == 0:
-                vertex = vertex_game.get(
-                    level=1,
-                    index=index - 2*((1+index)//5)
-                )
-                neighbors.append(vertex)
+        elif (index - 1) % 5 == 0 or (index + 1) % 5 == 0:
+            vertex = vertex_game.get(
+                level=1,
+                index=index - 2*((1+index)//5)
+            )
+            neighbors.append(vertex)
         return neighbors
 
     def __str__(self):

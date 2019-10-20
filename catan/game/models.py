@@ -1,8 +1,14 @@
-from django.db.models.signals import post_init
+from django.db.models.signals import post_save
 from django.db import models
+
+# from lobby.models import Room
 
 
 class Game(models.Model):
+    room = models.OneToOneField(
+        "lobby.Room",
+        on_delete=models.CASCADE
+    )
 
     def get_board(self):
         return self.room.board
@@ -10,8 +16,9 @@ class Game(models.Model):
     @staticmethod
     def create_vertex(sender, **kwargs):
         job = kwargs.get('instance')
-        job.save()
-        if job:
+        # job.save()
+        if kwargs['created']:
+            print('vertex created')
             for level in [6, 18, 30]:
                 for index in range(level):
                     vertex_data = {
@@ -30,4 +37,4 @@ class Game(models.Model):
         return str(self.id)
 
 
-post_init.connect(Game.create_vertex, sender=Game)
+post_save.connect(Game.create_vertex, sender=Game)

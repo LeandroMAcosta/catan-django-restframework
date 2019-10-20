@@ -12,4 +12,4 @@ class Settlement(models.Model):
     )
 
     def __str__(self):
-        return self.vertex + " from " + self.owner
+        return str(str(self.vertex) + " from " + str(self.owner))

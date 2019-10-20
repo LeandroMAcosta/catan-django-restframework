@@ -16,4 +16,4 @@ class Player(models.Model):
     # last_gained =
 
     def __str__(self):
-        return self.user.username
+        return str(self.user)
