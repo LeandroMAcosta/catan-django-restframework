@@ -54,9 +54,10 @@ class BaseTestCase(TestCase):
         )
         new_room.players.set(User.objects.filter(username__contains=players))
 
-    def i_board(self, name):
+    def i_board(self, name, owner):
         Board.objects.create(
-            name=name
+            name=name,
+            owner=owner
         )
 
     def i_game(self):

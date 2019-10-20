@@ -14,7 +14,7 @@ class Room(models.Model):
         on_delete=models.CASCADE,
         related_name='owner'
     )
-    game_id = models.ForeignKey(
+    game_id = models.OneToOneField(
         Game,
         on_delete=models.CASCADE,
         blank=True,

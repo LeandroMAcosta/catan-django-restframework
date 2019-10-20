@@ -15,8 +15,6 @@ class RoomTest(TestCase):
 
     def setUp(self):
 
-        BaseTestCase.i_board(self, 'boardname')
-
         BaseTestCase.i_user(self, 'tester', 'tester@gmail.com', 'abcde1234')
         BaseTestCase.i_user(self, 'jorge', 'jorge@gmail.com', 'abcde1234')
         BaseTestCase.i_user(self, 'gon', 'gon@gmail.com', 'abcde1234')
@@ -26,9 +24,10 @@ class RoomTest(TestCase):
         BaseTestCase.i_user(self, 'leandro', 'leandro@gmail.com', 'abcde1234')
         BaseTestCase.i_user(self, 'lucas', 'lucas@gmail.com', 'abcde1234')
         BaseTestCase.i_user(self, 'lucas1', 'lucas1@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'lucas2', 'lucas2@gmail.com', 'abcde1234')
+        user = BaseTestCase.i_user(self, 'lucas2', 'lucas2@gmail.com', 'abcde1234')
 
         self.assertEqual(User.objects.count(), 10)
+        BaseTestCase.i_board(self, 'boardname', user)
 
         BaseTestCase.i_room(self, 'room1', 'jorge', 'gon', 'boardname')
         BaseTestCase.i_room(self, 'room2', 'leandro', 'lucas', 'boardname')
