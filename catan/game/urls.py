@@ -9,7 +9,7 @@ urlpatterns = [
     path('<int:game>/player/', GameView_view({
         'get': 'list_cards_and_resources'
     })),
-    path('<int:game_id>/board/', HexListViewSets_view({
+    path('<int:game>/board/', HexListViewSets_view({
         'get': 'list'
     })),
 ]

@@ -1,16 +1,28 @@
 [
   {
-    "model": "game.game",
-    "pk": 1,
-    "fields": {}
-  },
-  {
     "model": "board.board",
     "pk": 1,
     "fields": {
       "name": "nombresito",
       "owner": 1
     }
+  },
+  {
+    "model": "lobby.room",
+    "pk": 1,
+    "fields": {
+      "name": "nombresito del room",
+      "max_players": 4,
+      "game_has_started": 1,
+      "owner": 1,
+      "game": 1,
+      "board": 1
+    }
+  },
+  {
+    "model": "game.game",
+    "pk": 1,
+    "fields": {}
   },
   {
     "model": "board.vertex",

@@ -15,5 +15,5 @@ class RoomSerializer(serializers.ModelSerializer):
             'players',
             'max_players',
             'game_has_started',
-            'game_id',
+            'game',
         )
