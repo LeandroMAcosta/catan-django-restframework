@@ -102,7 +102,13 @@ class RoomsView(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def start_game(self, request, room_id):
-        query_set = Room.objects.get(id=room_id)
+        try:
+            query_set = Room.objects.get(id=room_id)
+        except Exception:
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_404_NOT_FOUND
+            )
 
         if query_set.game_has_started:
             return Response(
@@ -117,7 +123,7 @@ class RoomsView(viewsets.ModelViewSet):
             )
         colours = ['red', 'green', 'blue', 'yellow']
         # Cuando hagamos Game hacemos esta parte
-        game = Game.objects.create()
+        game = Game.objects.get_or_create()
 
         for colour, user in enumerate(room['players']):
             Player.objects.create(
@@ -128,4 +134,15 @@ class RoomsView(viewsets.ModelViewSet):
         query_set.game_has_started = True
         query_set.save()
 
+        return Response(status=status.HTTP_200_OK)
+
+    def cancel_lobby(self, request, room_id):
+        try:
+            query_set = Room.objects.get(id=room_id)
+            query_set.delete()
+        except Exception:
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_404_NOT_FOUND
+            )
         return Response(status=status.HTTP_200_OK)

@@ -10,5 +10,6 @@ urlpatterns = [
     path('<int:room_id>/', RoomsView.as_view({
         'put': 'join',
         'patch': 'start_game',
+        'delete': 'cancel_lobby'
         })),
 ]
