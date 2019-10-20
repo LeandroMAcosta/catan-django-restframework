@@ -7,7 +7,6 @@ from catan.tests import BaseTestCase
 
 from .views import RoomsView
 from .models import Room
-from board.models import Board
 from .serializers import RoomSerializer
 
 
@@ -54,14 +53,27 @@ class RoomTest(TestCase):
     def test_join_room(self):
         pass
         # Que se una a una room correctamente
-        # Que ya este en una room
+        # Que ya este en esa room
         # Que la room no exista
         # Que la room este llena
+        # Datos incorrectos
 
     def test_create_room(self):
         pass
         # Que se cree una room correctamente
-        # Campos vacios: tipo "name": o "board_id":
+        # Campos vacios: tipo "name": o "board_id": (datos incorrectos)
         # Rooms que ya existen
-        # Nombres de Room que ya existen
+        # Nombres de Room que ya se estan usando
         # No existe la Board
+
+    def test_start_game(self):
+        pass
+        # El juego se crea correctamente
+        # El juego ya habia empezado
+        # No hay 3 o 4 usuarios para empezar a jugar
+        # La room no existe
+
+    def test_cancel_lobby(self):
+        pass
+        # La room no existe
+        # La room se elimina (cancela) correctamente
