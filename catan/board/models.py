@@ -3,14 +3,6 @@ from django.contrib.auth.models import User
 
 from utils.constants import RESOURCES
 
-"""
-# nivel 1, sacar vecinos de nivel 2
-for index in range(18):
-    if index % 3 != 0:
-        print("{0} {1}".format(1, index), end="")
-        print(" => {0} {1}".format(2, index + 2*((index+1)//3)))
-"""
-
 
 class Board(models.Model):
     name = models.CharField(max_length=100)
