@@ -3,6 +3,14 @@ from django.contrib.auth.models import User
 
 from utils.constants import RESOURCES
 
+"""
+# nivel 1, sacar vecinos de nivel 2
+for index in range(18):
+    if index % 3 != 0:
+        print("{0} {1}".format(1, index), end="")
+        print(" => {0} {1}".format(2, index + 2*((index+1)//3)))
+"""
+
 
 class Board(models.Model):
     name = models.CharField(max_length=100)
@@ -21,6 +29,40 @@ class Vertex(models.Model):
     class Meta:
         pass
         # unique_together = ['game', 'level', 'index']
+
+    def get_neighbors(self):
+        vertex_game = Vertex.objects.filter(game=self.game)
+        level = self.level
+        index = self.index
+        limit = [6, 18, 30]
+        neighbors = []
+
+        # Neighbors of the same level
+        neighbors.append(
+            vertex_game.get(level=level, index=(index-1) % limit[level])
+        )
+        neighbors.append(
+            vertex_game.get(level=level, index=(index+1) % limit[level])
+        )
+
+        # Neighbors of other level
+        if level == 0:
+            neighbors.append(vertex_game.get(level=1, index=index*3))
+        elif level == 1:
+            if index % 3 == 0:
+                neighbors.append(
+                    vertex_game.get(level=0, index=index//3)
+                )
+            else:
+                neighbors.append(
+                    vertex_game.get(level=1, index=index + 2*((index+1)//3))
+                )
+        else:
+            if (index - 1) % 5 == 0 or (index + 1) % 5 == 0:
+                neighbors.append(
+                    vertex_game.get(level=1, index=index - 2*((1+index)//5))
+                )
+        return neighbors
 
     def __str__(self):
         return '(' + str(self.level) + ',' + str(self.index) + ')'
