@@ -39,21 +39,23 @@ class Vertex(models.Model):
 
         # Neighbors of other level
         if level == 0:
-            neighbors.append(vertex_game.get(level=1, index=index*3))
+            vertex = vertex_game.get(level=1, index=index*3)
+            neighbors.append(vertex)
         elif level == 1:
-            if index % 3 == 0:
-                neighbors.append(
-                    vertex_game.get(level=0, index=index//3)
-                )
-            else:
-                neighbors.append(
-                    vertex_game.get(level=1, index=index + 2*((index+1)//3))
-                )
+            new_level = index % 3
+            k = new_level == 2
+            vertex = vertex_game.get(
+                level=new_level,
+                index=k*index + (k+1)*(index+k)//3
+            )
+            neighbors.append(vertex)
         else:
             if (index - 1) % 5 == 0 or (index + 1) % 5 == 0:
-                neighbors.append(
-                    vertex_game.get(level=1, index=index - 2*((1+index)//5))
+                vertex = vertex_game.get(
+                    level=1,
+                    index=index - 2*((1+index)//5)
                 )
+                neighbors.append(vertex)
         return neighbors
 
     def __str__(self):
