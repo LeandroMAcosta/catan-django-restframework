@@ -42,5 +42,5 @@ class Hexagon(models.Model):
         unique_together = ['board', 'level', 'index']
 
     def __str__(self):
-        v = self.position
-        return 'Board ' + str(self.board) + ' ' + str(v)
+        v = '(' + str(self.level) + ',' + str(self.index) + ')'
+        return 'Board ' + str(self.board) + ' ' + v
