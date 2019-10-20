@@ -8,6 +8,7 @@
     "model": "game.vertexposition",
     "pk": 1,
     "fields": {
+      "game_id": 1,
       "level": 1,
       "index": 2
     }
@@ -17,7 +18,8 @@
     "pk": 1,
     "fields": {
       "game_id": 1,
-      "position": 1,
+      "level": 1,
+      "index": 2,
       "resource": "wool",
       "token": 1
     }
