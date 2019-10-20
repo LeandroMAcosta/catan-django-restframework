@@ -1,5 +1,10 @@
 [
   {
+    "model": "game.game",
+    "pk": 1,
+    "fields": {}
+  },
+  {
     "model": "board.board",
     "pk": 1,
     "fields": {
@@ -17,20 +22,6 @@
       "owner": 1,
       "game": 1,
       "board": 1
-    }
-  },
-  {
-    "model": "game.game",
-    "pk": 1,
-    "fields": {}
-  },
-  {
-    "model": "board.vertex",
-    "pk": 1,
-    "fields": {
-      "game": 1,
-      "level": 1,
-      "index": 2
     }
   },
   {
