@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from game.models import Game
 
 from utils.constants import RESOURCES
 
@@ -13,7 +14,7 @@ class Board(models.Model):
 
 
 class Vertex(models.Model):
-    game = models.ForeignKey("game.Game", on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     level = models.PositiveIntegerField(default=0)
     index = models.PositiveIntegerField(default=0)
     used = models.BooleanField(default=False)
@@ -59,7 +60,8 @@ class Vertex(models.Model):
         return neighbors
 
     def __str__(self):
-        return '(' + str(self.level) + ',' + str(self.index) + ')'
+        # return "game={0}:({1}, {2})".format(self.game, self.level, self.index)
+        return "({0}, {1})".format(self.level, self.index)
 
 
 class Hexagon(models.Model):
