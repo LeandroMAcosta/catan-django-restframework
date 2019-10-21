@@ -66,7 +66,10 @@ class GameViewSets(viewsets.ModelViewSet):
             data = request.data['payload']
             action = request.data['type']
             getattr(player, action)(data)
-            return Response("Settlement created.", status=status.HTTP_200_OK)
+            return Response(
+                "Settlement created.",
+                status=status.HTTP_201_CREATED
+            )
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",

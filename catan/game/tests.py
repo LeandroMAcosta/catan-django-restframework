@@ -1,7 +1,13 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from rest_framework.test import force_authenticate
-from rest_framework.test import APIRequestFactory
+from django.urls import reverse
+
+from rest_framework import status
+from rest_framework.test import (
+    force_authenticate,
+    APIRequestFactory,
+    APITestCase
+)
 
 from card.models import Card
 from resource.models import Resource
@@ -102,47 +108,97 @@ class ResourcesTestCase(TestCase):
         self.assertEqual(serializer.data, response.data)
 
 
-class GameTest(TestCase):
+class GameTest(APITestCase):
     def setUp(self):
-        self.USERNAME = "testuser2"
-        self.EMAIL = "testuser2@test.com"
-        self.PASSWORD = "supersecure"
-
-        user_data = {
-            'username': self.USERNAME,
-            'email': self.EMAIL,
-            'password': self.USER_PASSWORD,
-        }
-        self.user = User._default_manager.create_user(**user_data)
+        # User
+        self.username = "testuser2"
+        self.email = "testuser2@test.com"
+        self.password = "supersecure"
+        self.user = User._default_manager.create_user(
+            username=self.username,
+            email=self.email,
+        )
+        self.user.set_password(self.password)
         self.user.save()
 
-        board_data = {
-            'name': 'boardcito',
-            'owner': self.user
-        }
-        board = Board(**board_data)
-        board.save()
+        # Board
+        self.board_name = 'boardcito'
+        self.board_owner = self.user
+        self.board = Board(
+            name=self.board_name,
+            owner=self.board_owner
+        )
+        self.board.save()
 
-        room_data = {
-            'name': 'roomcito',
-            'board': board,
-            'game_has_started': True,
-            'owner': self.user,
-        }
-        room = Room(**room_data)
-        room.save()
+        # Room
+        self.room = Room(
+            name='roomcito',
+            board=self.board,
+            game_has_started=True,
+            owner=self.user,
+        )
+        self.room.save()
 
-        self.game = Game(room=room)
+        # Game
+        self.game = Game(room=self.room)
         self.game.save()
 
-    def test_settlement(self):
-        factory = APIRequestFactory()
-        url = '/api/games/{0}/player/actions/'.format(self.game.id)
+        # Player
+        self.player = Player(
+            user=self.user,
+            game=self.game,
+            colour='colorcito'
+        )
+        self.player.save()
+        self.client.force_authenticate(self.user)
+
+    def test_settlement_ok(self):
         data = {
             'type': 'build_settlement',
             'payload': {
-                'index': 1,
-                'level': 2
+                'index': 0,
+                'level': 0
             }
         }
-        request = factory.post(url, data)
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_settlement_out_of_bounds(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 10,
+                'level': 10
+            }
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_settlement_game_not_exits(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[30]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
