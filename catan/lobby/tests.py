@@ -8,22 +8,47 @@ from board.models import Board
 from .serializers import RoomSerializer
 from .views import RoomsView
 from .models import Room
+from . import functions_test as functions
 
 
 class RoomTest(TestCase):
-
-    def setUp(self):
-        self.USER_USERNAME = "testuser2"
-        self.USER_EMAIL = "testuser2@test.com"
-        self.USER_PASSWORD = "supersecure"
+    def create_login_user(self, name, email, password):
+        self.USER_USERNAME = name
+        self.USER_EMAIL = email
+        self.USER_PASSWORD = password
         # Create user
         user_data = {
             "username": self.USER_USERNAME,
             "email": self.USER_EMAIL,
             "password": self.USER_PASSWORD,
         }
-        user2 = User._default_manager.create_user(**user_data)
-        user2.save()
+        user = User._default_manager.create_user(**user_data)
+        user.save()
+        return user
+
+    def create_board(self, name, user):
+        board_data = {
+            'name': name,
+            'owner': user
+        }
+        board = Board(**board_data)
+        board.save()
+        return board
+
+    def create_room(self, name, board, user, max_players, gs):
+        room_data = {
+            'name': name,
+            'board': board,
+            'max_players': max_players,
+            'game_has_started': gs,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
+        return room, room_data
+
+    def setUp(self):
+        user = self.create_login_user("pepe", "peep@gmail.com", "pepe123")
 
     def test_list_room(self):
         factory = APIRequestFactory()
@@ -46,23 +71,8 @@ class RoomTest(TestCase):
 
         # Test2: WHIT rooms
 
-        # Create board
-        board_data = {
-            'name': 'boardcito',
-            'owner': user
-        }
-        board = Board(**board_data)
-        board.save()
-
-        # Create rooms
-        room_data = {
-            'name': 'roomcito',
-            'board': board,
-            'game_has_started': False,
-            'owner': user,
-        }
-        room = Room(**room_data)
-        room.save()
+        board = self.create_board('boardcito', user)
+        room, room_data = self.create_room('roomcito', board, user, 4, False)
 
         # APIResponse
         request = factory.get('/api/rooms/')
@@ -101,24 +111,8 @@ class RoomTest(TestCase):
 
         # Test2: The user joins the room
 
-        # Create board
-        board_data = {
-            'name': 'boardcito',
-            'owner': user
-        }
-        board = Board(**board_data)
-        board.save()
-
-        # Create rooms
-        room_data = {
-            'name': 'roomcito',
-            'board': board,
-            'max_players': 2,
-            'game_has_started': False,
-            'owner': user,
-        }
-        room = Room(**room_data)
-        room.save()
+        board = self.create_board('boardcito', user)
+        room, _ = self.create_room('roomcito', board, user, 2, False)
 
         id = 1
         request = factory.put('/api/rooms/' + str(id) + '/')
@@ -133,7 +127,7 @@ class RoomTest(TestCase):
             room
         }
         serializer = RoomSerializer(data, many=True).data
-        self.assertEqual(serializer[0]['players'][0], 'testuser2')
+        self.assertEqual(serializer[0]['players'][0], 'pepe')
 
         # User already in the ROOM
         id = 1
@@ -145,33 +139,13 @@ class RoomTest(TestCase):
 
         # The ROOM is full
         # Filling the room
-        self.USER_USERNAME = "u1"
-        self.USER_EMAIL = "u1@test.com"
-        self.USER_PASSWORD = "supersecure"
-        user_data = {
-            "username": self.USER_USERNAME,
-            "email": self.USER_EMAIL,
-            "password": self.USER_PASSWORD,
-        }
-        user = User._default_manager.create_user(**user_data)
-        user.save()
-
+        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
         request = factory.put('/api/rooms/' + str(id) + '/')
         force_authenticate(request, user=user)
         view = RoomsView.as_view({'put': 'join'})
         response = view(request, room_id=id)
 
-        self.USER_USERNAME = "u2"
-        self.USER_EMAIL = "u2@test.com"
-        self.USER_PASSWORD = "supersecure"
-        user_data = {
-            "username": self.USER_USERNAME,
-            "email": self.USER_EMAIL,
-            "password": self.USER_PASSWORD,
-        }
-        user = User._default_manager.create_user(**user_data)
-        user.save()
-
+        user = self.create_login_user("u2", "u2@gmail.com", "supersecure")
         request = factory.put('/api/rooms/' + str(id) + '/')
         force_authenticate(request, user=user)
         view = RoomsView.as_view({'put': 'join'})
@@ -192,25 +166,9 @@ class RoomTest(TestCase):
         response = view(request, name="room", board_id=1)
         self.assertEqual(response.data, 'The Board not exist')
 
-        # The ROOM already exists
-        # Create board
-        board_data = {
-            'name': 'boardcito',
-            'owner': user
-        }
-        board = Board(**board_data)
-        board.save()
-
-        # Create rooms
-        room_data = {
-            'name': 'roomcito',
-            'board': board,
-            'max_players': 2,
-            'game_has_started': False,
-            'owner': user,
-        }
-        room = Room(**room_data)
-        room.save()
+        # Test2: The ROOM already exists
+        board = self.create_board('boardcito', user)
+        room, room_data = self.create_room('roomcito', board, user, 2, False)
 
         request = factory.post('/api/rooms/')
         force_authenticate(request, user=user)
@@ -218,13 +176,8 @@ class RoomTest(TestCase):
         response = view(request, name="roomcito", board_id=1)
         self.assertEqual(response.data, 'The room already exists')
 
-        # Que se cree una room correctamente
-        board_data = {
-            'name': 'boardcito',
-            'owner': user
-        }
-        board = Board(**board_data)
-        board.save()
+        # Test3: Create ROOM
+        board = self.create_board('boardcito', user)
 
         request = factory.post('/api/rooms/')
         force_authenticate(request, user=user)
@@ -233,11 +186,68 @@ class RoomTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_start_game(self):
-        pass
-        # El juego se crea correctamente
-        # El juego ya habia empezado
-        # No hay 3 o 4 usuarios para empezar a jugar
-        # La room no existe
+        factory = APIRequestFactory()
+        # Make an authenticated request to the view...
+        user = User.objects.get(username=self.USER_USERNAME)
+
+        # Test1: The Room not exist
+        # APIResponse
+        id = 1
+        request = factory.patch('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'patch': 'start_game'})
+        response = view(request, room_id=1)
+        self.assertEqual(response.data, 'The ROOM does not exist')
+
+        # Test2: The game has started
+        board = self.create_board('boardcito', user)
+        room, room_data = self.create_room('roomcito', board, user, 2, True)
+
+        # APIResponse
+        id = 1
+        request = factory.patch('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'patch': 'start_game'})
+        response = view(request, room_id=1)
+        self.assertEqual(response.data, 'The game has started')
+
+        # Test3: There are no 3 or 4 users to start playing
+        room, room_data = self.create_room('lala', board, user, 4, False)
+
+        # APIResponse
+        id = 1
+        request = factory.patch('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'patch': 'start_game'})
+        response = view(request, room_id=2)
+        self.assertEqual(response.data, '3 or 4 players are required')
+
+        # Test4: The game is created correctly
+        id = 2
+        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
+        request = factory.put('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'put': 'join'})
+        response = view(request, room_id=id)
+
+        self.create_login_user("u2", "u2@gmail.com", "supersecure")
+        request = factory.put('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'put': 'join'})
+        response = view(request, room_id=id)
+
+        self.create_login_user("u3", "u3@gmail.com", "supersecure")
+        request = factory.put('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'put': 'join'})
+        response = view(request, room_id=id)
+
+        # APIResponse
+        request = factory.patch('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'patch': 'start_game'})
+        response = view(request, room_id=id)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_cancel_lobby(self):
         pass
