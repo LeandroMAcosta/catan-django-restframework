@@ -103,9 +103,46 @@ class ResourcesTestCase(TestCase):
 
 
 class GameTest(TestCase):
+    def setUp(self):
+        self.USERNAME = "testuser2"
+        self.EMAIL = "testuser2@test.com"
+        self.PASSWORD = "supersecure"
 
-    def test_create_game(self):
-        pass
-        # game = Game(room)
-        # game.save()
-        # self.assertNotEqual(game, None)
+        user_data = {
+            'username': self.USERNAME,
+            'email': self.EMAIL,
+            'password': self.USER_PASSWORD,
+        }
+        self.user = User._default_manager.create_user(**user_data)
+        self.user.save()
+
+        board_data = {
+            'name': 'boardcito',
+            'owner': self.user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': True,
+            'owner': self.user,
+        }
+        room = Room(**room_data)
+        room.save()
+
+        self.game = Game(room=room)
+        self.game.save()
+
+    def test_settlement(self):
+        factory = APIRequestFactory()
+        url = '/api/games/{0}/player/actions/'.format(self.game.id)
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 1,
+                'level': 2
+            }
+        }
+        request = factory.post(url, data)

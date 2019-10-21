@@ -16,9 +16,7 @@ class Game(models.Model):
     @staticmethod
     def create_vertex(sender, **kwargs):
         job = kwargs.get('instance')
-        # job.save()
         if kwargs['created']:
-            print('vertex created')
             for level in [6, 18, 30]:
                 for index in range(level):
                     vertex_data = {

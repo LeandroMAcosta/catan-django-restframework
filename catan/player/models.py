@@ -18,8 +18,13 @@ class Player(models.Model):
 
     def build_settlement(self, data):
         game = self.game
-        vertex = game.vertex_set.get(**data)
+        limit = [6, 18, 30]
+        level = data['level']
+        index = data['index']
+        if not (0 <= level < 3 and 0 <= index < limit[level]):
+            raise Exception("Index or level out of bounds.")
 
+        vertex = game.vertex_set.get(**data)
         if vertex.used:
             raise Exception("Vertex alredy in use.")
 
