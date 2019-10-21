@@ -10,7 +10,7 @@ urlpatterns = [
         'get': 'list_cards_and_resources'
     })),
     path('<int:game>/player/actions/', GameView({
-        'post': 'build_settlement'
+        'post': 'action'
     })),
     path('<int:game>/board/', HexView({
         'get': 'list'

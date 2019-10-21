@@ -60,32 +60,13 @@ class GameViewSets(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def build_settlement(self, request, game):
+    def action(self, request, game):
         try:
-            game = Game.objects.get(pk=game)
             player = Player.objects.get(game=game, user=request.user)
-            vertex_data = {
-                'game': game,
-                'level': request.data['level'],
-                'index': request.data['index'],
-            }
-            vertex = Vertex.objects.get(**vertex_data)
-            if vertex.used:
-                return Response(
-                    "Vertex alredy in use",
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
-            Settlement.objects.create(
-                owner=player,
-                vertex=vertex
-            )
-            vertex.used = True
-            vertex.save()
-            return Response(
-                "Settlement created",
-                status=status.HTTP_201_CREATED
-            )
+            data = request.data['payload']
+            action = request.data['type']
+            getattr(player, action)(data)
+            return Response("Settlement created.", status=status.HTTP_200_OK)
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",
@@ -99,5 +80,10 @@ class GameViewSets(viewsets.ModelViewSet):
         except Player.DoesNotExist:
             return Response(
                 "Player of authenticated user does not exist",
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as error:
+            return Response(
+                str(error),
                 status=status.HTTP_404_NOT_FOUND
             )
