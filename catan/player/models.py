@@ -34,5 +34,22 @@ class Player(models.Model):
         vertex.used = True
         vertex.save()
 
+    # def build_road(self, data):
+    #     game = self.game
+    #     v1 = data.first
+    #     v2 = data.second
+    #     limit = [6, 18, 30]
+    #     if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
+    #         raise Exception("Level out of bounds")
+    #     if not (0 <= v1['index'] < limit[v1['level']]
+    #             and 0 <= v2['index'] < limit[v2['level']]):
+    #         raise Exception("Index out of bounds")
+    #     vertex1 = game.vertex_set.get(**data.first)
+    #     vertex2 = game.vertex_set.get(**data.second)
+    #     if not (vertex2 in vertex1.get_neighbors())
+    #     r = self.road_set.create()
+    #     r.vertexes.add(vertex1, vertex2)
+    #     r.save()
+
     def __str__(self):
         return str(self.user)

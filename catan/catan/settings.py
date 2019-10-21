@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'card',
     'resource',
     'board',
-    'settlement'
+    'settlement',
+    'road',
 ]
 
 MIDDLEWARE = [
