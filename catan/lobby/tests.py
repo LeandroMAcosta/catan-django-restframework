@@ -1,67 +1,106 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import force_authenticate
+from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
-from catan.tests import BaseTestCase
-
+from board.models import Board
+from .serializers import RoomSerializer
 from .views import RoomsView
 from .models import Room
-from .serializers import RoomSerializer
 
 
 class RoomTest(TestCase):
 
     def setUp(self):
+        self.USER_USERNAME = "testuser"
+        self.USER_EMAIL = "testuser@test.com"
+        self.USER_PASSWORD = "supersecure"
 
-        BaseTestCase.i_user(self, 'tester', 'tester@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'jorge', 'jorge@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'gon', 'gon@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'gon1', 'gon1@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'gon2', 'gon2@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'gon3', 'gon3@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'leandro', 'leandro@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'lucas', 'lucas@gmail.com', 'abcde1234')
-        BaseTestCase.i_user(self, 'lucas1', 'lucas1@gmail.com', 'abcde1234')
-        user = BaseTestCase.i_user(
-            self,
-            'lucas2',
-            'lucas2@gmail.com',
-            'abcde1234'
-        )
+        self.USER_USERNAME = "testuser2"
+        self.USER_EMAIL = "testuser2@test.com"
+        self.USER_PASSWORD = "supersecure"
 
-        self.assertEqual(User.objects.count(), 10)
-        BaseTestCase.i_board(self, 'boardname', user)
-
-        BaseTestCase.i_room(self, 'room1', 'jorge', 'gon', 'boardname')
-        BaseTestCase.i_room(self, 'room2', 'leandro', 'lucas', 'boardname')
-
-        self.assertEqual(Room.objects.count(), 2)
+        # Create user
+        user_data = {
+            "username": self.USER_USERNAME,
+            "email": self.USER_EMAIL,
+            "password": self.USER_PASSWORD,
+        }
+        user = User._default_manager.create_user(**user_data)
+        user.save()
 
     def test_list_room(self):
-        view = RoomsView.as_view({'get': 'list'})
         factory = APIRequestFactory()
-
         # Make an authenticated request to the view...
-        user = User.objects.get(username='tester')
-        request = factory.get('/api/rooms')
+        user = User.objects.get(username=self.USER_USERNAME)
+
+        # Test1: WITHOUT rooms
+
+        # APIResponse
+        request = factory.get('/api/rooms/')
         force_authenticate(request, user=user)
+        view = RoomsView.as_view({'get': 'list'})
         response = view(request)
 
-        # Get data from db
-        rooms = Room.objects.all()
-        serializer = RoomSerializer(rooms, many=True)
+        # Expected serializer output
+        data = []
+        serializer = RoomSerializer(data, many=True)
 
-        # Compare the datadb with APIResponse
-        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.data, serializer.data, [])
+
+        # Test2: WHIT rooms
+
+        # Create board
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        # Create rooms
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': False,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
+
+        # APIResponse
+        request = factory.get('/api/rooms/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'get': 'list'})
+        response = view(request)
+        assert response.status_code == 200
+
+        # Expected serializer output
+        room = Room.objects.get(name='roomcito')
+        data = {
+            room
+        }
+        serializer = RoomSerializer(data, many=True)
+
+        self.assertEqual(response.data, serializer.data, room_data)
 
     def test_join_room(self):
-        pass
+        factory = APIRequestFactory()
+        # Make an authenticated request to the view...
+        user = User.objects.get(username=self.USER_USERNAME)
+
+        # Test1: The Room does not exist
+        # APIResponse
+        id = 123456789
+        request = factory.put('/api/rooms/' + str(id))
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'put': 'join'})
+        response = view(request, room_id=id)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
         # Que se una a una room correctamente
         # Que ya este en esa room
-        # Que la room no exista
         # Que la room este llena
-        # Datos incorrectos
 
     def test_create_room(self):
         pass
