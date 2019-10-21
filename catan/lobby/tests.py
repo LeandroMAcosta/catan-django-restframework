@@ -144,7 +144,6 @@ class RoomTest(TestCase):
         self.assertEqual(response.data, 'Already in the ROOM')
 
         # The ROOM is full
-
         # Filling the room
         self.USER_USERNAME = "u1"
         self.USER_EMAIL = "u1@test.com"
@@ -181,12 +180,57 @@ class RoomTest(TestCase):
         self.assertEqual(response.data, 'The ROOM is full')
 
     def test_create_room(self):
-        pass
+        factory = APIRequestFactory()
+        # Make an authenticated request to the view...
+        user = User.objects.get(username=self.USER_USERNAME)
+
+        # Test1: The Board not exist
+        # APIResponse
+        request = factory.post('/api/rooms/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'post': 'create'})
+        response = view(request, name="room", board_id=1)
+        self.assertEqual(response.data, 'The Board not exist')
+
+        # The ROOM already exists
+        # Create board
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        # Create rooms
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'max_players': 2,
+            'game_has_started': False,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
+
+        request = factory.post('/api/rooms/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'post': 'create'})
+        response = view(request, name="roomcito", board_id=1)
+        self.assertEqual(response.data, 'The room already exists')
+
         # Que se cree una room correctamente
-        # Campos vacios: tipo "name": o "board_id": (datos incorrectos)
-        # Rooms que ya existen
-        # Nombres de Room que ya se estan usando
-        # No existe la Board
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        request = factory.post('/api/rooms/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'post': 'create'})
+        response = view(request, name="ROOMCREADA", board_id=2)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_start_game(self):
         pass

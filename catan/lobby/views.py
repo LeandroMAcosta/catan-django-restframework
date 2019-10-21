@@ -20,11 +20,8 @@ from .exeptions import (
 class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
-    def create(self, request):
+    def create(self, request, name, board_id):
         try:
-            name = request.data["name"]
-            board_id = request.data["board_id"]
-
             if Room.objects.filter(board_id=board_id).exists():
                 raise RoomAlreadyExist
             if Room.objects.filter(name=name).exists():
