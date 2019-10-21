@@ -1,36 +1,38 @@
+from django.db.models.signals import post_save
 from django.db import models
 
-from utils.constants import RESOURCES
+# from lobby.models import Room
 
 
 class Game(models.Model):
+    room = models.OneToOneField(
+        "lobby.Room",
+        on_delete=models.CASCADE
+    )
+
+    def get_board(self):
+        return self.room.board
+
+    @staticmethod
+    def create_vertex(sender, **kwargs):
+        job = kwargs.get('instance')
+        if kwargs['created']:
+            for level in [6, 18, 30]:
+                for index in range(level):
+                    vertex_data = {
+                        "game": job,
+                        "index": index,
+                    }
+                    if level == 6:
+                        vertex_data['level'] = 0
+                    elif level == 18:
+                        vertex_data['level'] = 1
+                    else:
+                        vertex_data['level'] = 2
+                    job.vertex_set.create(**vertex_data)
 
     def __str__(self):
         return str(self.id)
 
 
-class VertexPosition(models.Model):
-    level = models.PositiveIntegerField(default=0)
-    index = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        unique_together = ['level', 'index']
-
-    def __str__(self):
-        return '(' + str(self.level) + ',' + str(self.index) + ')'
-
-
-class Hex(models.Model):
-    # game_id will be a Foreign key to a board/game/room
-    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
-    position = models.ForeignKey(VertexPosition, on_delete=models.CASCADE)
-    resource = models.CharField(max_length=10, choices=RESOURCES,
-                                default='nothing')
-    token = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        unique_together = ['game_id', 'position']
-
-    def __str__(self):
-        v = self.position
-        return 'Game ' + str(self.game_id) + ' ' + str(v)
+post_save.connect(Game.create_vertex, sender=Game)

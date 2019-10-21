@@ -16,8 +16,8 @@ newapps=()
     done
 
 python manage.py makemigrations 
-python manage.py makemigrations $newapps
-python manage.py makemigrations player card resource lobby game
+#python manage.py makemigrations $newapps
+python manage.py makemigrations player card resource lobby game board settlement
 python manage.py migrate
 
 echo "yes" | python manage.py flush
