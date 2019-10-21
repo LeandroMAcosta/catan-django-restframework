@@ -6,7 +6,6 @@ from rest_framework import viewsets, status
 
 from board.serializers import HexagonSerializer
 from board.models import Hexagon, Vertex
-from settlement.models import Settlement
 from resource.models import Resource
 from player.models import Player
 from card.models import Card
@@ -19,7 +18,7 @@ class HexListViewSets(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def list(self, request, game):
-        if Game.objects.filter(id=game).count() == 0:
+        if not Game.objects.filter(id=game).exist():
             response = {'Error': 'Game does not exists'}
             return Response(
                 response,
