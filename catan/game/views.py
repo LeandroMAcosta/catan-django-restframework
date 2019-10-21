@@ -31,7 +31,7 @@ class HexListViewSets(viewsets.ModelViewSet):
         if size == 0:
             return Response(
                 {'Error': 'Empty Board'},
-                status=status.HTTP_406_NOT_ACCEPTABLE
+                status=status.HTTP_404_NOT_FOUND
             )
         elif size != 19:
             response = {
@@ -40,7 +40,7 @@ class HexListViewSets(viewsets.ModelViewSet):
             }
             return Response(
                 response,
-                status=status.HTTP_406_NOT_ACCEPTABLE
+                status=status.HTTP_406_NOT_FOUND
             )
         return Response({'hexes': serializer.data}, status=status.HTTP_200_OK)
 
@@ -66,10 +66,21 @@ class GameViewSets(viewsets.ModelViewSet):
             data = request.data['payload']
             action = request.data['type']
             getattr(player, action)(data)
-            return Response(
-                "Settlement created.",
-                status=status.HTTP_201_CREATED
-            )
+            if action == 'build_settlement':
+                return Response(
+                    "Settlement created.",
+                    status=status.HTTP_201_CREATED
+                )
+            elif action == 'build_road':
+                return Response(
+                    'Road created.',
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    'Error',
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",
@@ -86,7 +97,9 @@ class GameViewSets(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as error:
+            err = str(error)
+            # print(err)
             return Response(
-                str(error),
+                err,
                 status=status.HTTP_404_NOT_FOUND
             )
