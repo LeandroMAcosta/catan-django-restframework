@@ -376,3 +376,21 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_buy_card(self):
+
+        data = {
+            'type': 'buy_card',
+            'payload': None
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_buy_card_no_resources(self):
+        # TODO MAKE TEST WHEN THE RESOURCE CHECKS ARE IMPLEMENTED
+        pass

@@ -1,6 +1,7 @@
+import random
+
 from django.db import models
 from django.contrib.auth.models import User
-
 from game.models import Game
 # from settlement.models import Settlement
 
@@ -57,6 +58,15 @@ class Player(models.Model):
         r.clean()
         r.save()
         return "Created road."
+
+    def buy_card(self, data):
+        cards_types = ['road_building', 'year_of_plenty',
+                       'monopoly', 'victory_point', 'knight']
+        cnumber = random.randrange(0, 5)
+        self.card_set.create(card_type=cards_types[cnumber])
+        # for c in self.card_set.all():
+        #     print(str(c))
+        return "Card purchased"
 
     def __str__(self):
         return str(self.user)
