@@ -65,22 +65,12 @@ class GameViewSets(viewsets.ModelViewSet):
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
-            getattr(player, action)(data)
-            if action == 'build_settlement':
-                return Response(
-                    "Settlement created.",
-                    status=status.HTTP_201_CREATED
-                )
-            elif action == 'build_road':
-                return Response(
-                    'Road created.',
-                    status=status.HTTP_201_CREATED
-                )
-            else:
-                return Response(
-                    'Error',
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            message = getattr(player, action)(data)
+            return Response(message,
+                            status=status.HTTP_201_CREATED)
+        except AttributeError:
+            return Response("Bad Request",
+                            status=status.HTTP_400_BAD_REQUEST)
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",

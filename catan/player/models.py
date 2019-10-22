@@ -33,6 +33,7 @@ class Player(models.Model):
         )
         vertex.used = True
         vertex.save()
+        return "Created settlement."
 
     def build_road(self, data):
         game = self.game
@@ -55,6 +56,7 @@ class Player(models.Model):
         r = self.road_set.create(v1=vertex1, v2=vertex2)
         r.clean()
         r.save()
+        return "Created road."
 
     def __str__(self):
         return str(self.user)
