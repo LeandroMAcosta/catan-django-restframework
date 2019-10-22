@@ -3,6 +3,7 @@ import random
 from django.db import models
 from django.contrib.auth.models import User
 from game.models import Game
+from utils.constants import RESOURCES
 # from settlement.models import Settlement
 
 
@@ -16,6 +17,33 @@ class Player(models.Model):
     # development_cards =
     # resources_cards =
     # last_gained =
+
+    @staticmethod
+    def create_resources(sender, **kwargs):
+        job = kwargs.get('instance')
+        if kwargs['created']:
+            for r in RESOURCES:
+                if r[0] == 'nothing':
+                    continue
+                job.resource_set.create(resource=r[0])
+
+    def increase_resources(self, resources):
+        resource_list = []
+        for resource in resources:
+            r = self.resource_set.get(resource=resource[0])
+            r.add(resource[1])
+            resource_list.append(r)
+        for resource in resource_list:
+            resource.save()
+
+    def decrease_resources(self, resources):
+        resource_list = []
+        for resource in resources:
+            r = self.resource_set.get(resource=resources[0])
+            r.decrement(value)
+            resource_list.append(r)
+        for resource in resource_list:
+            resource.save()
 
     def build_settlement(self, data):
         game = self.game
