@@ -58,5 +58,9 @@ class Player(models.Model):
         r.save()
         return "Created road."
 
+    def bank_trade(self, data):
+        receive = data['receive']
+        give = data['give']
+
     def __str__(self):
         return str(self.user)
