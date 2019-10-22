@@ -1,26 +1,34 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from rest_framework.test import force_authenticate
-from rest_framework.test import APIRequestFactory
+from django.urls import reverse
+
+from rest_framework import status
+from rest_framework.test import (
+    force_authenticate,
+    APIRequestFactory,
+    APITestCase
+)
 
 from card.models import Card
 from resource.models import Resource
 from player.models import Player
+from board.models import Board
+from lobby.models import Room
 
-from .serializers import GameSerializer, HexSerializer
-from .views import GameViewSets, HexListViewSets
-from .models import Game, VertexPosition, Hex
+from .serializers import GameSerializer
+from .views import GameViewSets
+from .models import Game
 
 User = get_user_model()
 
 
 class ResourcesTestCase(TestCase):
     def setUp(self):
-        self.USER_USERNAME = "testuser"
-        self.USER_EMAIL = "testuser@test.com"
+        self.USER_USERNAME = "testuser2"
+        self.USER_EMAIL = "testuser2@test.com"
         self.USER_PASSWORD = "supersecure"
-        self.GAME_ID = 666
-        self.PLAYER_ID = 667
+        self.GAME = 6667
+        self.PLAYER_ID = 6677
 
         # Create user
         user_data = {
@@ -31,38 +39,64 @@ class ResourcesTestCase(TestCase):
         user = User._default_manager.create_user(**user_data)
         user.save()
 
-        # Create Game
-        game_data = {
-            'id': self.GAME_ID,
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
         }
-        game = Game.objects.create(**game_data)
+        board = Board(**board_data)
+        board.save()
+
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': False,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
+
+        game = Game(room=room)
         game.save()
 
+        self.GAME = game.id
         # Create Player
         player_data = {
             'id': self.PLAYER_ID,
             'user': user,
             'game': game,
-            'colour': 'colour',
+            'colour': 'colorcito',
         }
         player = Player.objects.create(**player_data)
         player.save()
 
     def test_list_cards_and_resources(self):
         factory = APIRequestFactory()
-        request = factory.get('/api/games/<int:game_id>/player/')
+        request = factory.get('/api/games/<int:game>/player/')
         view = GameViewSets.as_view({'get': 'list_cards_and_resources'})
 
         user = User.objects.get(username=self.USER_USERNAME)
-        game = Game.objects.get(pk=self.GAME_ID)
+        game = Game.objects.get(pk=self.GAME)
         player = Player.objects.get(game=game, user=user)
+        Card.objects.create(
+            card_type='road_building',
+            player=player
+        )
+        Card.objects.create(
+            card_type='road_building',
+            player=player
+        )
+        Resource.objects.create(
+            resource='wool',
+            player=player
+        )
 
         force_authenticate(request, user=user)
 
-        response = view(request, game_id=self.GAME_ID)
+        response = view(request, game=game.id)
 
         cards = Card.objects.filter(player=player)
         resources = Resource.objects.filter(player=player)
+
         data = {
             'cards': cards,
             'resources': resources
@@ -73,74 +107,97 @@ class ResourcesTestCase(TestCase):
         self.assertEqual(serializer.data, response.data)
 
 
-class BoardTest(TestCase):
-
+class GameTest(APITestCase):
     def setUp(self):
-        # Check if the game created right
-        game = Game.objects.create()
-        # Store this game_id for later use
-        self.game = game
-        # self.assertNotEqual(game, None)
-        # self.assertEqual(Game.objects.count(), 1)
-        # game2 = Game.objects.create()
-        # # Check if the vertex created right
-        # vertex1 = VertexPosition.objects.create(index=1, level=2)
-        # self.assertNotEqual(vertex1, None)
-        # self.assertEqual(vertex1.index, 1)
-        # self.assertEqual(vertex1.level, 2)
-        # vertex2 = VertexPosition.objects.create(index=1, level=1)
-        # self.assertEqual(VertexPosition.objects.count(), 2)
-        # # Make some hexes and check if the first got created properly
-        # hexa = Hex.objects.create(game_id=game, position=vertex1,
-        #                           token=4, resource="lumber")
-        # self.assertNotEqual(hexa, None)
-        # self.assertEqual(hexa.game_id, game)
-        # self.assertEqual(hexa.position, vertex1)
-        # self.assertEqual(hexa.token, 4)
-        # self.assertEqual(hexa.resource, "lumber")
-        # Hex.objects.create(game_id=game, position=vertex2, token=9,
-        #                    resource="wool")
-        # Hex.objects.create(game_id=game2, position=vertex1, token=12,
-        #                    resource="nothing")
-        # self.assertEqual(Hex.objects.count(), 3)
+        # User
+        self.username = "testuser2"
+        self.email = "testuser2@test.com"
+        self.password = "supersecure"
+        self.user = User._default_manager.create_user(
+            username=self.username,
+            email=self.email,
+        )
+        self.user.set_password(self.password)
+        self.user.save()
 
-    def test_create_game(self):
-        game = Game.objects.create()
-        self.assertNotEqual(game, None)
+        # Board
+        self.board_name = 'boardcito'
+        self.board_owner = self.user
+        self.board = Board(
+            name=self.board_name,
+            owner=self.board_owner
+        )
+        self.board.save()
 
-    def test_create_vertex(self):
-        v = VertexPosition.objects.create(index=1, level=2)
-        self.assertNotEqual(v, None)
-        self.assertEqual(v.index, 1)
-        self.assertEqual(v.level, 2)
+        # Room
+        self.room = Room(
+            name='roomcito',
+            board=self.board,
+            game_has_started=True,
+            owner=self.user,
+        )
+        self.room.save()
 
-    def test_create_hex(self):
-        g = Game.objects.create()
-        v = VertexPosition.objects.create(level=0, index=0)
-        h = Hex.objects.create(game_id=g, position=v, token=2,
-                               resource='brick')
-        self.assertNotEqual(h, None)
-        self.assertEqual(h.game_id, g)
-        self.assertEqual(h.position, v)
-        self.assertEqual(h.token, 2)
-        self.assertEqual(h.resource, 'brick')
+        # Game
+        self.game = Game(room=self.room)
+        self.game.save()
 
-    def test_hex_list(self):
-        gid = self.game.id
-        v = VertexPosition.objects.create(index=0, level=0)
-        h = Hex.objects.create(game_id=self.game, position=v, token=0,
-                               resource="nothing")
-        # Create a full board
-        for i in range(0, 3):
-            for j in range(0, 6*i):
-                v = VertexPosition.objects.create(index=j, level=i)
-                h = Hex.objects.create(game_id=self.game, position=v, token=0,
-                                       resource='lumber')
-        view = HexListViewSets.as_view({'get': 'list'})
-        factory = APIRequestFactory()
-        request = factory.get('api/games/<int:game_id>/board/')
-        response = view(request, game_id=gid)
-        hexes = Hex.objects.filter(game_id=gid)
-        serializer = HexSerializer(hexes, many=True)
-        result = {'hexes': serializer.data}
-        self.assertEqual(response.data, result)
+        # Player
+        self.player = Player(
+            user=self.user,
+            game=self.game,
+            colour='colorcito'
+        )
+        self.player.save()
+        self.client.force_authenticate(self.user)
+
+    def test_settlement_ok(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_settlement_out_of_bounds(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 10,
+                'level': 10
+            }
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_settlement_game_not_exits(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[30]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

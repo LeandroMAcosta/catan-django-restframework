@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.contrib.auth import authenticate, get_user_model
 
 from game.models import Game
+from lobby.models import Room
+from board.models import Board
 
 from .models import Player
 
@@ -25,11 +27,26 @@ class PlayerTestCase(TestCase):
         user = User._default_manager.create_user(**user_data)
         user.save()
 
+        board_data = {
+            'name': 'boardcito',
+            'owner': user
+        }
+        board = Board(**board_data)
+        board.save()
+
+        room_data = {
+            'name': 'roomcito',
+            'board': board,
+            'game_has_started': False,
+            'owner': user,
+        }
+        room = Room(**room_data)
+        room.save()
         # Create Game
         game_data = {
-            'id': self.GAME_ID,
+            'room': room
         }
-        game = Game.objects.create(**game_data)
+        game = Game(**game_data)
         game.save()
 
         # Create Player
