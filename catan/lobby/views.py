@@ -93,9 +93,10 @@ class RoomsView(viewsets.ModelViewSet):
         if room.game_has_started:
             return Response("The game has started")
         if not (3 < room.number_of_players() < 4):
-            message = "3 or 4 players are required"
-            caca = status.HTTP_406_NOT_ACCEPTABLE
-            return Response(message, status=caca)
+            return Response(
+                "3 or 4 players are required",
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
 
         room.start_game()
         return Response()

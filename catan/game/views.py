@@ -41,7 +41,7 @@ class HexListViewSets(viewsets.ModelViewSet):
                 response,
                 status=status.HTTP_406_NOT_FOUND
             )
-        return Response({'hexes': serializer.data}, status=status.HTTP_200_OK)
+        return Response({'hexes': serializer.data})
 
 
 class GameViewSets(viewsets.ModelViewSet):
