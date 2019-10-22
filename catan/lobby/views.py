@@ -20,11 +20,8 @@ from .exeptions import (
 class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
-    def create(self, request):
+    def create(self, request, name, board_id):
         try:
-            name = request.data["name"]
-            board_id = request.data["board_id"]
-
             if Room.objects.filter(board_id=board_id).exists():
                 raise RoomAlreadyExist
             if Room.objects.filter(name=name).exists():
@@ -41,7 +38,7 @@ class RoomsView(viewsets.ModelViewSet):
         except RoomAlreadyExist:
             return Response(
                 'The room already exists',
-                status=status.HTTP_409_CONFLICT
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
         except NameAlreadyExist:
             return Response(
@@ -51,7 +48,7 @@ class RoomsView(viewsets.ModelViewSet):
         except BoardNotExist:
             return Response(
                 'The Board not exist',
-                status=status.HTTP_409_CONFLICT
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
         except Exception:
             return Response(
@@ -90,7 +87,7 @@ class RoomsView(viewsets.ModelViewSet):
         except RoomNotExist:
             return Response(
                 'The ROOM does not exist',
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
         except Exception:
             return Response(
@@ -107,7 +104,7 @@ class RoomsView(viewsets.ModelViewSet):
         except Exception:
             return Response(
                 'The ROOM does not exist',
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
         if query_set.game_has_started:
@@ -123,7 +120,9 @@ class RoomsView(viewsets.ModelViewSet):
             )
         colours = ['red', 'green', 'blue', 'yellow']
         # Cuando hagamos Game hacemos esta parte
-        game = Game.objects.get_or_create()
+        game = Game.objects.create(
+            room=query_set
+        )
 
         for colour, user in enumerate(room['players']):
             Player.objects.create(
@@ -143,6 +142,6 @@ class RoomsView(viewsets.ModelViewSet):
         except Exception:
             return Response(
                 'The ROOM does not exist',
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
         return Response(status=status.HTTP_200_OK)

@@ -12,12 +12,11 @@ from rest_framework.test import (
 from card.models import Card
 from resource.models import Resource
 from player.models import Player
-from board.models import Vertex, Hexagon, Board
-from board.serializers import HexagonSerializer
+from board.models import Board
 from lobby.models import Room
 
 from .serializers import GameSerializer
-from .views import GameViewSets, HexListViewSets
+from .views import GameViewSets
 from .models import Game
 
 User = get_user_model()
