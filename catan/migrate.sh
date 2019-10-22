@@ -16,7 +16,8 @@ newapps=()
     done
 
 python manage.py makemigrations 
-python manage.py makemigrations $newapps
+#python manage.py makemigrations $newapps
+python manage.py makemigrations player card resource lobby game board settlement
 python manage.py migrate
 
 echo "yes" | python manage.py flush
@@ -29,4 +30,4 @@ echo "--------------------------------------"
 
 echo "from django.contrib.auth.models import User; User.objects.filter(email='admin@example.com').delete(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123')" | python manage.py shell
 
-python manage.py loaddata catan/seeder/initial_data.json
+# python manage.py loaddata catan/seeder/initial_data.json

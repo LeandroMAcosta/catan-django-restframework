@@ -128,3 +128,4 @@ catan/game/migrations/0001_initial.py
 catan/lobby/migrations/0001_initial.py
 
 catan/db.sqlite3
+*/.vscode/settings.json
