@@ -394,3 +394,39 @@ class GameTest(APITestCase):
     def test_buy_card_no_resources(self):
         # TODO MAKE TEST WHEN THE RESOURCE CHECKS ARE IMPLEMENTED
         pass
+
+    def test_bank_trade_ok(self):
+        data = {
+            'type': 'bank_trade',
+            'payload': {
+                'give': '',
+                'receive': ''
+            }
+        }
+
+    def test_bank_trade_equal_receive_and_give(self):
+        data = {
+            'type': 'bank_trade',
+            'payload': {
+                'give': '',
+                'receive': ''
+            }
+        }
+
+    def test_bank_trade_bad_receive(self):
+        data = {
+            'type': 'bank_trade',
+            'payload': {
+                'give': '',
+                'receive': ''
+            }
+        }
+
+    def test_bank_trade_few_resources(self):
+        data = {
+            'type': 'bank_trade',
+            'payload': {
+                'give': '',
+                'receive': ''
+            }
+        }
