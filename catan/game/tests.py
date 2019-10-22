@@ -201,3 +201,178 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_ok(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                },
+                {
+                    'level': 0,
+                    'index': 1,
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_road_oob(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 10,
+                    'index': 20
+                },
+                {
+                    'level': 42,
+                    'index': 69,
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_non_adjacent(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                },
+                {
+                    'level': 2,
+                    'index': 0,
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_repeated_arguments(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                },
+                {
+                    'level': 0,
+                    'index': 0,
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_insufficient_arguments(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_too_many_arguments(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                },
+                {
+                    'level': 0,
+                    'index': 1,
+                },
+                {
+                    'level': 0,
+                    'index': 2
+                },
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_road_used_edge(self):
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 0,
+                    'index': 0
+                },
+                {
+                    'level': 0,
+                    'index': 1,
+                }
+
+            ]
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        # Second road SHOULD FAIL
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
