@@ -12,8 +12,8 @@ class Road(models.Model):
         Vertex, on_delete=models.CASCADE, related_name='road_out')
 
     def __str__(self):
-        return "Road " + str(self.v1) + " " + str(self.v2) +
-        " from " + str(self.owner)
+        return "Road " + str(self.v1) + " " + str(self.v2) + " from "
+        + str(self.owner)
 
     def Meta(self):
         unique_together = ['owner', 'v1', 'v2']
