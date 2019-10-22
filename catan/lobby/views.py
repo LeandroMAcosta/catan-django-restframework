@@ -19,6 +19,7 @@ from .exeptions import (
 
 class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
+    queryset = Room.objects.all()
 
     def create(self, request, name, board_id):
         try:
@@ -66,12 +67,12 @@ class RoomsView(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
-    def join(self, request, room_id):
+    def join(self, request, pk):
         try:
-            if not Room.objects.filter(id=room_id).exists():
+            if not Room.objects.filter(id=pk).exists():
                 raise RoomNotExist
 
-            room = Room.objects.get(id=room_id)
+            room = Room.objects.get(id=pk)
             user = request.user
 
             if user in room.players.all():
@@ -98,46 +99,29 @@ class RoomsView(viewsets.ModelViewSet):
         room.players.add(user)
         return Response(status=status.HTTP_200_OK)
 
-    def start_game(self, request, room_id):
-        try:
-            query_set = Room.objects.get(id=room_id)
-        except Exception:
-            return Response(
-                'The ROOM does not exist',
-                status=status.HTTP_406_NOT_ACCEPTABLE
-            )
+    def start_game(self, request, pk=None):
 
-        if query_set.game_has_started:
+        room = self.get_object()
+
+        if room.game_has_started:
             return Response(
                 "The game has started",
                 status=status.HTTP_200_OK
             )
-        room = RoomSerializer(query_set).data
-        if len(room['players']) < 3 or len(room['players']) > 4:
+
+        if not (3 < room.number_of_players() < 4):
             return Response(
                 "3 or 4 players are required",
-                status=status.HTTP_200_OK
+                status=status.HTTP_406_NOT_ACCEPTABLE
             )
-        colours = ['red', 'green', 'blue', 'yellow']
-        # Cuando hagamos Game hacemos esta parte
-        game = Game.objects.create(
-            room=query_set
-        )
 
-        for colour, user in enumerate(room['players']):
-            Player.objects.create(
-                user=User.objects.get(username=user),
-                colour=colours[colour],
-                game=game
-            )
-        query_set.game_has_started = True
-        query_set.save()
+        room.start_game()
 
         return Response(status=status.HTTP_200_OK)
 
-    def cancel_lobby(self, request, room_id):
+    def cancel_lobby(self, request, pk):
         try:
-            query_set = Room.objects.get(id=room_id)
+            query_set = Room.objects.get(id=pk)
             query_set.delete()
         except Exception:
             return Response(
