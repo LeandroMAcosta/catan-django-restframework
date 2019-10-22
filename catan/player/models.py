@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from utils.constants import RESOURCES
 from game.models import Game
 # from settlement.models import Settlement
 
@@ -59,8 +60,23 @@ class Player(models.Model):
         return "Created road."
 
     def bank_trade(self, data):
-        receive = data['receive']
         give = data['give']
+        receive = data['receive']
+        resources = [res[0] for res in RESOURCES]
+
+        if give == receive:
+            raise Exception("Resources must be different.")
+        elif give not in resources or receive not in resources:
+            raise Exception("Resource not exists.")
+
+        resource = self.resource_set.get(resource=give)
+        resource.decrement(4)
+
+        new_resource = self.resource_set.get(resource=receive)
+        new_resource.add(1)
+
+        resource.save()
+        new_resource.save()
 
     def __str__(self):
         return str(self.user)
