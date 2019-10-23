@@ -8,8 +8,8 @@ class Game(models.Model):
         "lobby.Room",
         on_delete=models.CASCADE
     )
-    dice1 = random.randint(1, 6)
-    dice2 = random.randint(1, 6)
+    dice1 = models.IntegerField(default=random.randint(1, 6))
+    dice2 = models.IntegerField(default=random.randint(1, 6))
 
     @staticmethod
     def create_vertex(sender, **kwargs):

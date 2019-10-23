@@ -94,13 +94,26 @@ class RoomsView(viewsets.ModelViewSet):
         room = self.get_object()
         if room.game_has_started:
             return Response("The game has started")
-        if not (3 < room.number_of_players() < 4):
+        if not (3 <= room.number_of_players() <= 4):
             return Response(
                 "3 or 4 players are required",
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
-        room.start_game()
+        colours = ['red', 'green', 'blue', 'yellow']
+        print(room)
+        game = Game.objects.create(
+            room=room,
+        )
+
+        for colour, user in enumerate(room.user_set.all()):
+            game.player.create(
+                user=user,
+                colour=colours[colour],
+            )
+        room.game_has_started = True
+        room.save()
+
         return Response()
 
     def cancel_lobby(self, request, pk):
