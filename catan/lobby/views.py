@@ -2,10 +2,8 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from django.contrib.auth.models import User
 from .models import Room
 from board.models import Board
-from player.models import Player
 from game.models import Game
 from .serializers import RoomSerializer
 
@@ -94,9 +92,20 @@ class RoomsView(viewsets.ModelViewSet):
         return Response()
 
     def start_game(self, request, pk=None):
+
+        if not Room.objects.filter(id=pk).exists():
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         room = self.get_object()
+
         if room.game_has_started:
-            return Response("The game has started")
+            return Response(
+                "The game has started",
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
         if not (3 <= room.number_of_players() <= 4):
             return Response(
                 "3 or 4 players are required",
@@ -107,7 +116,6 @@ class RoomsView(viewsets.ModelViewSet):
         game = Game.objects.create(
             room=room
         )
-        print("asdasd \n", room, "\n\n")
 
         for colour, user in enumerate(room.players.all()):
             game.player_set.create(
@@ -117,8 +125,9 @@ class RoomsView(viewsets.ModelViewSet):
         room.game_has_started = True
         room.save()
 
-        print(game.player_set.all())
-        return Response()
+        return Response(
+            status=status.HTTP_201_CREATED
+        )
 
     def cancel_lobby(self, request, pk):
         room = self.get_object()
