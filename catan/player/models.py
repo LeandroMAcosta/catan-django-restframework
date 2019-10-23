@@ -1,8 +1,10 @@
 import random
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from game.models import Game
+from utils.constants import RESOURCES
 # from settlement.models import Settlement
 
 
@@ -16,6 +18,33 @@ class Player(models.Model):
     # development_cards =
     # resources_cards =
     # last_gained =
+
+    @staticmethod
+    def create_resources(sender, **kwargs):
+        job = kwargs.get('instance')
+        if kwargs['created']:
+            for r in RESOURCES:
+                if r[0] == 'nothing':
+                    continue
+                job.resource_set.create(resource=r[0])
+
+    def increase_resources(self, resources):
+        resource_list = []
+        for resource in resources:
+            r = self.resource_set.get(resource=resource[0])
+            r.add(resource[1])
+            resource_list.append(r)
+        for resource in resource_list:
+            resource.save()
+
+    def decrease_resources(self, resources):
+        resource_list = []
+        for resource in resources:
+            r = self.resource_set.get(resource=resource[0])
+            r.decrement(resource[1])
+            resource_list.append(r)
+        for resource in resource_list:
+            resource.save()
 
     def build_settlement(self, data):
         game = self.game
@@ -62,11 +91,17 @@ class Player(models.Model):
     def buy_card(self, data):
         cards_types = ['road_building', 'year_of_plenty',
                        'monopoly', 'victory_point', 'knight']
-        cnumber = random.randrange(0, 5)
-        self.card_set.create(card_type=cards_types[cnumber])
+        needed_resources = [('wool', 1), ('grain', 1),  ('ore', 1)]
+        self.decrease_resources(needed_resources)
+        card = random.randrange(0, 5)
+        self.card_set.create(card_type=cards_types[card])
+
         # for c in self.card_set.all():
         #     print(str(c))
         return "Card purchased"
 
     def __str__(self):
         return str(self.user)
+
+
+post_save.connect(Player.create_resources, sender=Player)
