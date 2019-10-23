@@ -21,8 +21,10 @@ class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Room.objects.all()
 
-    def create(self, request, name, board_id):
+    def create(self, request):
         try:
+            name = request.data['name']
+            board_id = request.data['board_id']
             if Room.objects.filter(board_id=board_id).exists():
                 raise RoomAlreadyExist
             if Room.objects.filter(name=name).exists():

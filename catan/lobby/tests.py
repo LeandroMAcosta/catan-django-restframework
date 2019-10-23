@@ -160,29 +160,41 @@ class RoomTest(TestCase):
 
         # Test1: The Board not exist
         # APIResponse
-        request = factory.post('/api/rooms/')
+        data = {
+            'name': 'room',
+            'board_id': 1
+        }
+        request = factory.post('/api/rooms/', data)
         force_authenticate(request, user=user)
         view = RoomsView.as_view({'post': 'create'})
-        response = view(request, name="room", board_id=1)
+        response = view(request)
         self.assertEqual(response.data, 'The Board not exist')
 
         # Test2: The ROOM already exists
         board = self.create_board('boardcito', user)
         room, room_data = self.create_room('roomcito', board, user, 2, False)
 
-        request = factory.post('/api/rooms/')
+        data = {
+            'name': 'roomcito',
+            'board_id': 1
+        }
+        request = factory.post('/api/rooms/', data)
         force_authenticate(request, user=user)
         view = RoomsView.as_view({'post': 'create'})
-        response = view(request, name="roomcito", board_id=1)
+        response = view(request)
         self.assertEqual(response.data, 'The room already exists')
 
         # Test3: Create ROOM
         board = self.create_board('boardcito', user)
 
-        request = factory.post('/api/rooms/')
+        data = {
+            'name': 'ROOMCREADA',
+            'board_id': 2
+        }
+        request = factory.post('/api/rooms/', data)
         force_authenticate(request, user=user)
         view = RoomsView.as_view({'post': 'create'})
-        response = view(request, name="ROOMCREADA", board_id=2)
+        response = view(request)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_start_game(self):
