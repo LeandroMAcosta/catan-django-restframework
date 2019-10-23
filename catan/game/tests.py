@@ -379,6 +379,10 @@ class GameTest(APITestCase):
 
     def test_buy_card(self):
 
+        # for r in resources:
+        #     print(str(r))
+        resources = [('wool', 1), ('ore', 1), ('grain', 1)]
+        self.player.increase_resources(resources)
         data = {
             'type': 'buy_card',
             'payload': None
@@ -392,11 +396,19 @@ class GameTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_buy_card_no_resources(self):
-        # TODO MAKE TEST WHEN THE RESOURCE CHECKS ARE IMPLEMENTED
-        pass
+        data = {
+            'type': 'buy_card',
+            'payload': None
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bank_trade_ok(self):
-        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
@@ -404,49 +416,71 @@ class GameTest(APITestCase):
                 'receive': 'grain'
             }
         }
-        # give = player.get_resource('wool')
-        # receive = player.get_resource('grain')
+        give = self.player.get_resource('wool')
+        give.amount = 4
+        give.save()
 
-        # response = self.client.post(
-        #     reverse('player-action', args=[self.game.id]),
-        #     data,
-        #     format='json'
-        # )
-        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, "Trade done.")
 
     def test_bank_trade_equal_receive_and_give(self):
-        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
                 'give': 'wool',
-                'receive': 'grain'
+                'receive': 'wool'
             }
         }
-        # resposen = self.client.post(
-        #     reverse('player-action', args=[self.game.id]),
-        #     data,
-        #     format='json'
-        # )
-        # self.assertEqual(response.status_code, status.HTTP_20)
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Resources must be different.")
         
 
     def test_bank_trade_bad_receive(self):
-        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
-                'give': '',
-                'receive': ''
+                'give': 'wool',
+                'receive': 'badreceive'
             }
         }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Resource not exists.")
+
 
     def test_bank_trade_few_resources(self):
-        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
-                'give': '',
-                'receive': ''
+                'give': 'wool',
+                'receive': 'grain'
             }
         }
+        give = self.player.get_resource('wool')
+        give.amount = 3
+        give.save()
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Insufficient resources.")
+

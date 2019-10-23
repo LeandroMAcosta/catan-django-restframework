@@ -64,10 +64,10 @@ class GameViewSets(viewsets.ModelViewSet):
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
-            message = getattr(player, action)(data)
+            message, respose_status = getattr(player, action)(data)
             return Response(
                 message,
-                status=status.HTTP_201_CREATED
+                status=respose_status
             )
         except AttributeError:
             return Response("Bad Request",
