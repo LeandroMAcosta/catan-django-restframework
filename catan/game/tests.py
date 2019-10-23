@@ -444,7 +444,6 @@ class GameTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "Resources must be different.")
-        
 
     def test_bank_trade_bad_receive(self):
         data = {
@@ -462,7 +461,6 @@ class GameTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "Resource not exists.")
-
 
     def test_bank_trade_few_resources(self):
         data = {
@@ -483,4 +481,3 @@ class GameTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "Insufficient resources.")
-
