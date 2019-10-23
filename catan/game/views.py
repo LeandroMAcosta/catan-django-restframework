@@ -18,7 +18,7 @@ class HexListViewSets(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def list(self, request, game):
-        
+
         if not Game.objects.filter(id=game).exist():
             response = {'Error': 'Game does not exists'}
             return Response(
@@ -62,7 +62,7 @@ class GameViewSets(viewsets.ModelViewSet):
 
     def action(self, request, game):
         try:
-            
+
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
