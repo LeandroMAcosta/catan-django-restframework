@@ -17,6 +17,10 @@ class Player(models.Model):
     # resources_cards =
     # last_gained =
 
+    def get_resource(self, res):
+        resource = self.resource_set.get(resource=res)
+        return resource
+
     def build_settlement(self, data):
         game = self.game
         limit = [6, 18, 30]

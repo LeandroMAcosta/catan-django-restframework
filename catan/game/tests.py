@@ -396,24 +396,43 @@ class GameTest(APITestCase):
         pass
 
     def test_bank_trade_ok(self):
+        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
-                'give': '',
-                'receive': ''
+                'give': 'wool',
+                'receive': 'grain'
             }
         }
+        # give = player.get_resource('wool')
+        # receive = player.get_resource('grain')
+
+        # response = self.client.post(
+        #     reverse('player-action', args=[self.game.id]),
+        #     data,
+        #     format='json'
+        # )
+        # self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_bank_trade_equal_receive_and_give(self):
+        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
-                'give': '',
-                'receive': ''
+                'give': 'wool',
+                'receive': 'grain'
             }
         }
+        # resposen = self.client.post(
+        #     reverse('player-action', args=[self.game.id]),
+        #     data,
+        #     format='json'
+        # )
+        # self.assertEqual(response.status_code, status.HTTP_20)
+        
 
     def test_bank_trade_bad_receive(self):
+        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
@@ -423,6 +442,7 @@ class GameTest(APITestCase):
         }
 
     def test_bank_trade_few_resources(self):
+        # TODO
         data = {
             'type': 'bank_trade',
             'payload': {
