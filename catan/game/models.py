@@ -1,13 +1,14 @@
 from django.db.models.signals import post_save
 from django.db import models
-
+import random
 
 class Game(models.Model):
     room = models.OneToOneField(
         "lobby.Room",
         on_delete=models.CASCADE
     )
-
+    dice1 = random.randint(1, 6)
+    dice2 = random.randint(1, 6)
     def get_board(self):
         return self.room.board
 
@@ -28,6 +29,10 @@ class Game(models.Model):
                     else:
                         vertex_data['level'] = 2
                     job.vertex_set.create(**vertex_data)
+
+    def throw_dice(self):
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
 
     def __str__(self):
         return str(self.id)
