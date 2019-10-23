@@ -141,7 +141,7 @@ class GameTest(APITestCase):
         # Game
         self.game = Game(room=self.room)
         self.game.save()
-        
+
         # Player
         self.player = Player(
             user=self.user,
@@ -166,7 +166,6 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
 
     def test_settlement_out_of_bounds(self):
         data = {
