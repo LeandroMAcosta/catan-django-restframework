@@ -26,7 +26,6 @@ class Player(models.Model):
                    'play_year_of_plenty_card', ' end_turn', 'bank_trade']
         return actions
 
-
     def get_resource(self, res):
         resource = self.resource_set.get(resource=res)
         return resource
@@ -136,6 +135,5 @@ class Player(models.Model):
 
     def __str__(self):
         return str(self.user)
-
 
 post_save.connect(Player.create_resources, sender=Player)
