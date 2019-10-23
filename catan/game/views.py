@@ -64,6 +64,8 @@ class GameViewSets(viewsets.ModelViewSet):
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
+            if action not in player.available_actions():
+                raise Exception("Wrong action.")
             message, respose_status = getattr(player, action)(data)
             return Response(
                 message,

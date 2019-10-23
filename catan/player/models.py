@@ -19,7 +19,13 @@ class Player(models.Model):
     # last_gained =
 
     def available_actions(self):
-        pass
+        # TODO check
+        actions = ['build_settlement', 'upgrade_city', 'build_road',
+                   'move_robber', 'buy_card', 'play_knight_card',
+                   'play_road_building_card', 'play_monopoly_card',
+                   'play_year_of_plenty_card', ' end_turn', 'bank_trade']
+        return actions
+
 
     def get_resource(self, res):
         resource = self.resource_set.get(resource=res)
