@@ -38,7 +38,7 @@ class ResourcesTestCase(TestCase):
         }
         user = User._default_manager.create_user(**user_data)
         user.save()
-
+        
         board_data = {
             'name': 'boardcito',
             'owner': user
@@ -57,7 +57,7 @@ class ResourcesTestCase(TestCase):
 
         game = Game(room=room)
         game.save()
-
+        
         self.GAME = game.id
         # Create Player
         player_data = {
