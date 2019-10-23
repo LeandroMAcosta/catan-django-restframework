@@ -33,9 +33,10 @@ class Game(models.Model):
         return self.room.board
 
     def throw_dice(self):
-        dice1 = random.randint(1, 6)
-        dice2 = random.randint(1, 6)
-        return (dice1, dice2)
+        self.dice1 = random.randint(1, 6)
+        self.dice2 = random.randint(1, 6)
+        self.save()
+        return (self.dice1, self.dice2)
 
     def __str__(self):
         return str(self.id)

@@ -85,7 +85,10 @@ class RoomsView(viewsets.ModelViewSet):
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
         except Exception:
-            return Response('BADREQUEST', status=caca)
+            return Response(
+                'BADREQUEST',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         room.players.add(user)
         return Response()
@@ -101,19 +104,20 @@ class RoomsView(viewsets.ModelViewSet):
             )
 
         colours = ['red', 'green', 'blue', 'yellow']
-        print(room)
         game = Game.objects.create(
-            room=room,
+            room=room
         )
+        print("asdasd \n", room, "\n\n")
 
-        for colour, user in enumerate(room.user_set.all()):
-            game.player.create(
+        for colour, user in enumerate(room.players.all()):
+            game.player_set.create(
                 user=user,
                 colour=colours[colour],
             )
         room.game_has_started = True
         room.save()
 
+        print(game.player_set.all())
         return Response()
 
     def cancel_lobby(self, request, pk):
