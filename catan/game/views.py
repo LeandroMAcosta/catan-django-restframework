@@ -48,6 +48,8 @@ class GameViewSets(viewsets.ModelViewSet):
 
     def action(self, request, game):
         try:
+            if not Game.objects.filter(pk=game).exists():
+                raise Game.DoesNotExist
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
