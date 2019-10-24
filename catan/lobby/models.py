@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-# from game.models import Game
+from game.models import Game
 from board.models import Board
 
 
@@ -22,18 +22,6 @@ class Room(models.Model):
 
     def number_of_players(self):
         return self.players.all().count()
-
-    def start_game(self):
-        colours = ['red', 'green', 'blue', 'yellow']
-        game = self.game.create()
-
-        for colour, user in enumerate(room.user_set.all()):
-            game.player.create(
-                user=user,
-                colour=colours[colour],
-            )
-        room.game_has_started = True
-        room.save()
 
     def __str__(self):
         return self.name

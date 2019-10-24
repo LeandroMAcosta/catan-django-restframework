@@ -2,10 +2,8 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from django.contrib.auth.models import User
 from .models import Room
 from board.models import Board
-from player.models import Player
 from game.models import Game
 from .serializers import RoomSerializer
 
@@ -21,8 +19,10 @@ class RoomsView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Room.objects.all()
 
-    def create(self, request, name, board_id):
+    def create(self, request):
         try:
+            name = request.data['name']
+            board_id = request.data['board_id']
             if Room.objects.filter(board_id=board_id).exists():
                 raise RoomAlreadyExist
             if Room.objects.filter(name=name).exists():
@@ -83,23 +83,51 @@ class RoomsView(viewsets.ModelViewSet):
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
         except Exception:
-            return Response('BADREQUEST', status=caca)
+            return Response(
+                'BADREQUEST',
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         room.players.add(user)
         return Response()
 
     def start_game(self, request, pk=None):
+
+        if not Room.objects.filter(id=pk).exists():
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         room = self.get_object()
+
         if room.game_has_started:
-            return Response("The game has started")
-        if not (3 < room.number_of_players() < 4):
+            return Response(
+                "The game has started",
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+        if not (3 <= room.number_of_players() <= 4):
             return Response(
                 "3 or 4 players are required",
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
-        room.start_game()
-        return Response()
+        colours = ['red', 'green', 'blue', 'yellow']
+        game = Game.objects.create(
+            room=room
+        )
+
+        for colour, user in enumerate(room.players.all()):
+            game.player_set.create(
+                user=user,
+                colour=colours[colour],
+            )
+        room.game_has_started = True
+        room.save()
+
+        return Response(
+            status=status.HTTP_201_CREATED
+        )
 
     def cancel_lobby(self, request, pk):
         room = self.get_object()
