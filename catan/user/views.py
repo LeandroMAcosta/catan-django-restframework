@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from .serializers import CustomAuthTokenSerializer
 from .models import User
+
 from .exceptions import UserOrPasswordEmpty
 
 
@@ -14,7 +15,9 @@ class CustomObtainAuthToken(ObtainAuthToken):
 class UserSignup(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
-    def create(self, request, username, password):
+    def create(self, request):
+        username = request.data['user']
+        password = request.data['pass']
 
         if User.objects.filter(username=username).exists():
             return Response(
@@ -37,3 +40,5 @@ class UserSignup(viewsets.ModelViewSet):
                 "Must include 'user' and 'pass'",
                 status=status.HTTP_409_CONFLICT
             )
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
