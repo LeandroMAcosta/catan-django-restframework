@@ -16,17 +16,18 @@ class UserSignup(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
     def create(self, request):
-        username = request.data['user']
-        password = request.data['pass']
-
-        if User.objects.filter(username=username).exists():
-            return Response(
-                "User alredy exist",
-                status=status.HTTP_409_CONFLICT
-            )
 
         try:
-            if username and password:
+            username = request.data.get('user', '')
+            password = request.data.get('pass', '')
+
+            if User.objects.filter(username=username).exists():
+                return Response(
+                    "User alredy exist",
+                    status=status.HTTP_409_CONFLICT
+                )
+
+            if username != '' and password != '':
                 instance = User(username=username)
                 instance.set_password(password)
                 instance.save()
