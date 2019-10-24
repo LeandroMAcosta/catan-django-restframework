@@ -165,7 +165,6 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_settlement_out_of_bounds(self):
@@ -223,7 +222,6 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_road_oob(self):
@@ -369,6 +367,38 @@ class GameTest(APITestCase):
 
         # Second road SHOULD FAIL
 
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_buy_card(self):
+
+        # for r in resources:
+        #     print(str(r))
+        resources = [('wool', 1), ('ore', 1), ('grain', 1)]
+        self.player.increase_resources(resources)
+        data = {
+            'type': 'buy_card',
+            'payload': None
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_buy_card_no_resources(self):
+
+        data = {
+            'type': 'buy_card',
+            'payload': None
+        }
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,

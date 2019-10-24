@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.db import models
+import random
 
 
 class Game(models.Model):
@@ -7,9 +8,8 @@ class Game(models.Model):
         "lobby.Room",
         on_delete=models.CASCADE
     )
-
-    def get_board(self):
-        return self.room.board
+    dice1 = models.IntegerField(default=random.randint(1, 6))
+    dice2 = models.IntegerField(default=random.randint(1, 6))
 
     @staticmethod
     def create_vertex(sender, **kwargs):
@@ -28,6 +28,15 @@ class Game(models.Model):
                     else:
                         vertex_data['level'] = 2
                     job.vertex_set.create(**vertex_data)
+
+    def get_board(self):
+        return self.room.board
+
+    def throw_dice(self):
+        self.dice1 = random.randint(1, 6)
+        self.dice2 = random.randint(1, 6)
+        self.save()
+        return (self.dice1, self.dice2)
 
     def __str__(self):
         return str(self.id)

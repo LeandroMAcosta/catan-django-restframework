@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-# from game.models import Game
+from game.models import Game
 from board.models import Board
 
 
@@ -19,6 +19,9 @@ class Room(models.Model):
         Board,
         on_delete=models.CASCADE,
     )
+
+    def number_of_players(self):
+        return self.players.all().count()
 
     def __str__(self):
         return self.name
