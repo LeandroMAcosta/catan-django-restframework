@@ -11,7 +11,14 @@ class VertexSerializer(serializers.ModelSerializer):
 
 
 class HexagonSerializer(serializers.ModelSerializer):
+    position = serializers.SerializerMethodField()
+
+    def get_position(self, instance):
+        return {
+            'index': instance.index,
+            'level': instance.level
+        }
 
     class Meta:
         model = Hexagon
-        fields = ('level', 'index', 'resource', 'token',)
+        fields = ('resource', 'token', 'position')

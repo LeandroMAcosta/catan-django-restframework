@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from board.serializers import HexagonSerializer
-from board.models import Hexagon, Vertex
 from resource.models import Resource
 from player.models import Player
 from card.models import Card
@@ -18,30 +17,17 @@ class HexListViewSets(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def list(self, request, game):
-
-        if not Game.objects.filter(id=game).exist():
-            response = {'Error': 'Game does not exists'}
-            return Response(
-                response,
-                status=status.HTTP_406_NOT_ACCEPTABLE
-            )
-        queryset = Hexagon.objects.filter(game=game)
-        serializer = HexagonSerializer(queryset, many=True)
-        size = queryset.count()
+        game = get_object_or_404(Game, pk=game)
+        board = game.get_board()
+        hexagons = board.hexagon_set.all()
+        serializer = HexagonSerializer(hexagons, many=True)
+        size = hexagons.count()
         if size == 0:
             return Response(
                 {'Error': 'Empty Board'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        elif size != 19:
-            response = {
-                'Error': 'Board incomplete',
-                'Hexes': serializer.data
-            }
-            return Response(
-                response,
-                status=status.HTTP_406_NOT_FOUND
-            )
+
         return Response({'hexes': serializer.data})
 
 
@@ -62,28 +48,24 @@ class GameViewSets(viewsets.ModelViewSet):
 
     def action(self, request, game):
         try:
-
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
             if action not in player.available_actions():
                 raise Exception("Wrong action.")
-            message, respose_status = getattr(player, action)(data)
+            message, response_status = getattr(player, action)(data)
             return Response(
                 message,
-                status=respose_status
+                status=response_status
             )
         except AttributeError:
-            return Response("Bad Request",
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                "Bad Request",
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Vertex.DoesNotExist:
-            return Response(
-                "Vertex does not exist",
                 status=status.HTTP_404_NOT_FOUND
             )
         except Player.DoesNotExist:
