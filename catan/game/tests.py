@@ -202,6 +202,9 @@ class GameTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_road_ok(self):
+
+        resources = [('brick', 1), ('lumber', 1)]
+        self.player.increase_resources(resources)
         data = {
             'type': 'build_road',
             'payload': [
