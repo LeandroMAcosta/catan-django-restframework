@@ -83,6 +83,8 @@ class Player(models.Model):
         vertex2 = game.vertex_set.get(**v2)
         if not (vertex2 in vertex1.get_neighbors()):
             raise Exception("Non adjacent or repeated vertexes.")
+        needed_resources = [('brick', 1), ('lumber', 1)]
+        self.decrease_resources(needed_resources)
         r = self.road_set.create(v1=vertex1, v2=vertex2)
         r.clean()
         r.save()
