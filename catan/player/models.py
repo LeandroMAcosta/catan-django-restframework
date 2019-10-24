@@ -35,7 +35,7 @@ class Player(models.Model):
         job = kwargs.get('instance')
         if kwargs['created']:
             for r in RESOURCES:
-                if r[0] == 'nothing':
+                if r[0] == 'desert':
                     continue
                 job.resource_set.create(resource=r[0])
 

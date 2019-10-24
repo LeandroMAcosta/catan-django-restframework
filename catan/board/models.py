@@ -73,7 +73,7 @@ class Hexagon(models.Model):
     resource = models.CharField(
         max_length=10,
         choices=RESOURCES,
-        default='nothing'
+        default='desert'
     )
 
     class Meta:
