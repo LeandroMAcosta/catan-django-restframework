@@ -379,8 +379,6 @@ class GameTest(APITestCase):
 
     def test_buy_card(self):
 
-        # for r in resources:
-        #     print(str(r))
         resources = [('wool', 1), ('ore', 1), ('grain', 1)]
         self.player.increase_resources(resources)
         data = {

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from utils.constants import RESOURCES
 from game.models import Game
-from utils.constants import RESOURCES
+import random
 
 
 class Player(models.Model):
@@ -42,7 +42,7 @@ class Player(models.Model):
     def increase_resources(self, resources):
         resource_list = []
         for resource in resources:
-            r = self.resource_set.get(resource=resource[0])
+            r = self.get_resource(resource[0])
             r.add(resource[1])
             resource_list.append(r)
         for resource in resource_list:
@@ -135,5 +135,6 @@ class Player(models.Model):
 
     def __str__(self):
         return str(self.user)
+
 
 post_save.connect(Player.create_resources, sender=Player)
