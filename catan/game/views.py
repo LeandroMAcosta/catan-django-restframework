@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from board.serializers import HexagonSerializer
-from board.models import Vertex
 from resource.models import Resource
 from player.models import Player
 from card.models import Card
@@ -67,11 +66,6 @@ class GameViewSets(viewsets.ModelViewSet):
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Vertex.DoesNotExist:
-            return Response(
-                "Vertex does not exist",
                 status=status.HTTP_404_NOT_FOUND
             )
         except Player.DoesNotExist:

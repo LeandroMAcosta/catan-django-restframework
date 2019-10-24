@@ -147,6 +147,49 @@ class GameTest(APITestCase):
         self.player.save()
         self.client.force_authenticate(self.user)
 
+    def test_game_bad_request(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        needed_resources = [('brick', 1), ('lumber', 1),
+                            ('grain', 1), ('wool', 1)]
+
+        self.player.increase_resources(needed_resources)
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id+10000]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_game_bad_action(self):
+        data = {
+            'type': 'bad_action',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        needed_resources = [('brick', 1), ('lumber', 1),
+                            ('grain', 1), ('wool', 1)]
+
+        self.player.increase_resources(needed_resources)
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Wrong action.")
+
     def test_settlement_ok(self):
         data = {
             'type': 'build_settlement',
