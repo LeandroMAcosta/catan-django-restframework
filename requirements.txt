@@ -3,3 +3,4 @@ django==2.2.5
 pep8
 pylint
 djangorestframework-jwt
+pudb
