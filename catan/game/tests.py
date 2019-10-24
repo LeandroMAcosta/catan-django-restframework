@@ -168,6 +168,28 @@ class GameTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_settlement_few_resources(self):
+        data = {
+            'type': 'build_settlement',
+            'payload': {
+                'index': 0,
+                'level': 0
+            }
+        }
+
+        needed_resources = [('lumber', 1),
+                            ('grain', 1), ('wool', 1)]
+
+        self.player.increase_resources(needed_resources)
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Not enough resources")
+
     def test_settlement_out_of_bounds(self):
         data = {
             'type': 'build_settlement',
