@@ -131,8 +131,6 @@ class Player(models.Model):
         card = random.randrange(0, 5)
         self.card_set.create(card_type=cards_types[card])
 
-        # for c in self.card_set.all():
-        #     print(str(c))
         return "Card purchased", 201
 
     def __str__(self):

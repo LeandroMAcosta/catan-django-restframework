@@ -62,20 +62,21 @@ class GameViewSets(viewsets.ModelViewSet):
 
     def action(self, request, game):
         try:
-
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']
             if action not in player.available_actions():
                 raise Exception("Wrong action.")
-            message, respose_status = getattr(player, action)(data)
+            message, response_status = getattr(player, action)(data)
             return Response(
                 message,
-                status=respose_status
+                status=response_status
             )
         except AttributeError:
-            return Response("Bad Request",
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                "Bad Request",
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",

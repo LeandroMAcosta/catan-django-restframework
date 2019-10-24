@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from board.models import Board, Vertex, Hexagon
+from board.models import Board, Hexagon
 from game.models import Game
 from lobby.models import Room
 

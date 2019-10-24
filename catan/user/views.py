@@ -1,12 +1,9 @@
-from django.db import IntegrityError as AlredyExist
-
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
 
 from .serializers import CustomAuthTokenSerializer
 from .models import User
-
 from .exceptions import UserOrPasswordEmpty
 
 

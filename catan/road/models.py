@@ -16,7 +16,7 @@ class Road(models.Model):
         + str(self.owner)
 
     def Meta(self):
-        unique_together = ['owner', 'v1', 'v2']
+        unique_together = ['owner', 'v1', 'v2']  # noqa: F841
 
     def clean(self):
         road_v1_v2 = Road.objects.filter(
