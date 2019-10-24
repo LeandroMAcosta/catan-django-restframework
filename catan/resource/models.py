@@ -20,7 +20,6 @@ class Resource(models.Model):
         self.amount = self.amount + value
 
     def decrement(self, value):
-        # print(self.resource, self.amount, value)
         if self.amount < value:
             raise Exception('Not enough resources')
         self.amount = self.amount - value
