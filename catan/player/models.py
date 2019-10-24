@@ -1,11 +1,10 @@
-import random
-
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
-from game.models import Game
+
 from utils.constants import RESOURCES
-# from settlement.models import Settlement
+from game.models import Game
+import random
 
 
 class Player(models.Model):
@@ -19,6 +18,18 @@ class Player(models.Model):
     # resources_cards =
     # last_gained =
 
+    def available_actions(self):
+        # TODO check
+        actions = ['build_settlement', 'upgrade_city', 'build_road',
+                   'move_robber', 'buy_card', 'play_knight_card',
+                   'play_road_building_card', 'play_monopoly_card',
+                   'play_year_of_plenty_card', ' end_turn', 'bank_trade']
+        return actions
+
+    def get_resource(self, res):
+        resource = self.resource_set.get(resource=res)
+        return resource
+
     @staticmethod
     def create_resources(sender, **kwargs):
         job = kwargs.get('instance')
@@ -31,7 +42,7 @@ class Player(models.Model):
     def increase_resources(self, resources):
         resource_list = []
         for resource in resources:
-            r = self.resource_set.get(resource=resource[0])
+            r = self.get_resource(resource[0])
             r.add(resource[1])
             resource_list.append(r)
         for resource in resource_list:
@@ -63,7 +74,7 @@ class Player(models.Model):
         )
         vertex.used = True
         vertex.save()
-        return "Created settlement."
+        return "Created settlement.", 201
 
     def build_road(self, data):
         game = self.game
@@ -86,7 +97,29 @@ class Player(models.Model):
         r = self.road_set.create(v1=vertex1, v2=vertex2)
         r.clean()
         r.save()
-        return "Created road."
+        return "Created road.", 201
+
+    def bank_trade(self, data):
+        give = data['give']
+        receive = data['receive']
+        resources = [res[0] for res in RESOURCES]
+
+        if give == receive:
+            raise Exception("Resources must be different.")
+        elif give not in resources or receive not in resources:
+            raise Exception("Resource not exists.")
+
+        resource = self.resource_set.get(resource=give)
+
+        if resource.amount < 4:
+            raise Exception("Insufficient resources.")
+
+        new_resource = self.resource_set.get(resource=receive)
+        new_resource.add(1)
+
+        resource.save()
+        new_resource.save()
+        return "Trade done.", 200
 
     def buy_card(self, data):
         cards_types = ['road_building', 'year_of_plenty',
@@ -98,7 +131,7 @@ class Player(models.Model):
 
         # for c in self.card_set.all():
         #     print(str(c))
-        return "Card purchased"
+        return "Card purchased", 201
 
     def __str__(self):
         return str(self.user)

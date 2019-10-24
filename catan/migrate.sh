@@ -30,4 +30,8 @@ echo "--------------------------------------"
 
 echo "from django.contrib.auth.models import User; User.objects.filter(email='admin@example.com').delete(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123')" | python manage.py shell
 
-# python manage.py loaddata catan/seeder/initial_data.json
+python manage.py loaddata catan/seeder/initial_data.json
+
+pycodestyle --exclude='migrations*, settings*' .
+
+python manage.py test
