@@ -1,8 +1,8 @@
 test:pylint:
     image: python:3.6
     script:
-        - pip install pycodestyle
-        - pycodestyle --exclude='migrations*, settings*' .
+        - pip install flake8
+        - flake8 --exclude='migrations*, settings*' .
 
 test:unittest:
     image: python:3.6

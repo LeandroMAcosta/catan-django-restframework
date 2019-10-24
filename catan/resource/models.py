@@ -20,9 +20,13 @@ class Resource(models.Model):
         self.amount = self.amount + value
 
     def decrement(self, value):
-        if(self.amount < value):
+        # print(self.resource, self.amount, value)
+        if self.amount < value:
             raise Exception('Not enough resources')
         self.amount = self.amount - value
 
     def __str__(self):
         return self.resource
+
+    class Meta:
+        unique_together = ['resource', 'player']

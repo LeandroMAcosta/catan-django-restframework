@@ -5,5 +5,5 @@ RESOURCES = (
     ('brick', 'Brick'),
     ('grain', 'Grain'),
     ('ore', 'Ore'),
-    ('nothing', 'Nothing'),
+    ('desert', 'Desert'),
 )

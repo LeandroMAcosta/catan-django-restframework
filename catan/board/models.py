@@ -61,7 +61,6 @@ class Vertex(models.Model):
         return neighbors
 
     def __str__(self):
-        # return "{0}:({1}, {2})".format(self.game, self.level, self.index)
         return "({0}, {1})".format(self.level, self.index)
 
 
@@ -74,12 +73,12 @@ class Hexagon(models.Model):
     resource = models.CharField(
         max_length=10,
         choices=RESOURCES,
-        default='nothing'
+        default='desert'
     )
 
     class Meta:
         unique_together = ['board', 'level', 'index']
 
     def __str__(self):
-        v = '(' + str(self.level) + ',' + str(self.index) + ')'
-        return 'Board ' + str(self.board) + ' ' + v
+        v = "({0} {1})".format(self.level, self.index)
+        return "Board {0} {1}".format(self.board, v)

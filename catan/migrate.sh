@@ -32,6 +32,6 @@ echo "from django.contrib.auth.models import User; User.objects.filter(email='ad
 
 python manage.py loaddata catan/seeder/initial_data.json
 
-pycodestyle --exclude='migrations*, settings*' .
+flake8 --exclude='migrations*, settings*' .
 
 python manage.py test

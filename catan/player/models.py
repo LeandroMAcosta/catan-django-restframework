@@ -35,7 +35,7 @@ class Player(models.Model):
         job = kwargs.get('instance')
         if kwargs['created']:
             for r in RESOURCES:
-                if r[0] == 'nothing':
+                if r[0] == 'desert':
                     continue
                 job.resource_set.create(resource=r[0])
 
@@ -69,9 +69,10 @@ class Player(models.Model):
         if vertex.used:
             raise Exception("Vertex alredy in use.")
 
-        self.settlement_set.create(
-            vertex=vertex
-        )
+        needed_resources = [('brick', 1), ('lumber', 1),
+                            ('grain', 1), ('wool', 1)]
+        self.decrease_resources(needed_resources)
+        self.settlement_set.create(vertex=vertex)
         vertex.used = True
         vertex.save()
         return "Created settlement.", 201
@@ -96,9 +97,9 @@ class Player(models.Model):
             raise Exception("Non adjacent or repeated vertexes.")
         needed_resources = [('brick', 1), ('lumber', 1)]
         self.decrease_resources(needed_resources)
-        r = self.road_set.create(v1=vertex1, v2=vertex2)
-        r.clean()
-        r.save()
+        resource = self.road_set.create(v1=vertex1, v2=vertex2)
+        resource.clean()
+        resource.save()
         return "Created road.", 201
 
     def bank_trade(self, data):
@@ -131,8 +132,6 @@ class Player(models.Model):
         card = random.randrange(0, 5)
         self.card_set.create(card_type=cards_types[card])
 
-        # for c in self.card_set.all():
-        #     print(str(c))
         return "Card purchased", 201
 
     def __str__(self):
