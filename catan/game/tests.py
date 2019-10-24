@@ -177,8 +177,7 @@ class GameTest(APITestCase):
             }
         }
 
-        needed_resources = [('lumber', 1),
-                            ('grain', 1), ('wool', 1)]
+        needed_resources = [('lumber', 1), ('grain', 1), ('wool', 1)]
 
         self.player.increase_resources(needed_resources)
 

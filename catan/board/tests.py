@@ -1,8 +1,14 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from board.models import Board, Hexagon
+
+from rest_framework.test import APIRequestFactory
+
 from game.models import Game
+from game.views import HexListViewSets
 from lobby.models import Room
+
+from .models import Board, Hexagon
+from .serializers import HexagonSerializer
 
 User = get_user_model()
 
@@ -21,12 +27,12 @@ class BoardTest(TestCase):
             'name': 'boardcito',
             'owner': self.user
         }
-        board = Board(**board_data)
-        board.save()
+        self.board = Board(**board_data)
+        self.board.save()
 
         room_data = {
             'name': 'roomcito',
-            'board': board,
+            'board': self.board,
             'game_has_started': False,
             'owner': self.user,
         }
@@ -55,27 +61,20 @@ class BoardTest(TestCase):
         self.assertEqual(h.resource, 'brick')
 
     def test_hex_list(self):
-        pass
-        # gid = self.game.id
-        # v = Vertex.objects.create(index=0, level=0)
-        # h = Hexagon.objects.create(
-        #     game=self.game,
-        #     position=v, token=0,
-        #                        resource="nothing")
-        # # Create a full board
-        # for i in range(0, 3):
-        #     for j in range(0, 6*i):
-        #         v = Vertex.objects.create(index=j, level=i)
-        #         h = Hexagon.objects.create(game=self.game,
-        # position=v, token=0,
-        #                                resource='lumber')
-        # view = HexListViewSets.as_view({'get': 'list'})
-        # factory = APIRequestFactory()
-        # request = factory.get('api/games/<int:game>/board/')
-        # response = view(request, game=gid)
-        # hexes = Hexagon.objects.filter(game=gid)
-        # serializer = HexagonSerializer(hexes, many=True)
-        # result = {'hexes': serializer.data}
-        # self.assertEqual(response.data, result)
+        hexagon = Hexagon.objects.create(
+            board=self.board,
+            level=0,
+            index=0,
+            token=1,
+            resource="wool"
+        )
+        hexagon.save()
 
-# Create your tests here.
+        view = HexListViewSets.as_view({'get': 'list'})
+        factory = APIRequestFactory()
+        request = factory.get('api/games/<int:game>/board/')
+        response = view(request, game=self.game.id)
+        hexes = self.board.hexagon_set.all()
+        serializer = HexagonSerializer(hexes, many=True)
+        result = {'hexes': serializer.data}
+        self.assertEqual(response.data, result)

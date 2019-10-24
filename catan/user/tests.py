@@ -1,12 +1,11 @@
-from django.test import TestCase
-from django.contrib.auth import authenticate
-from rest_framework.test import APIRequestFactory
+from django.urls import reverse
+from rest_framework.test import APIRequestFactory, APITestCase
 
 from .models import User
 from .views import UserSignup
 
 
-class UserTestCase(TestCase):
+class UserTestCase(APITestCase):
     def setUp(self):
         self.USER_USERNAME = "testuser"
         self.USER_EMAIL = "testuser@test.com"
@@ -19,20 +18,6 @@ class UserTestCase(TestCase):
         }
         user = User._default_manager.create_user(**user_data)
         user.save()
-
-    def test_authenticate_user(self):
-        user = authenticate(
-            username=self.USER_USERNAME,
-            password=self.USER_PASSWORD
-        )
-        self.assertNotEqual(user, None)
-
-    def test_bad_authenticate_user(self):
-        user = authenticate(
-            username=self.USER_USERNAME,
-            password=self.USER_PASSWORD+"badpassword"
-        )
-        self.assertEqual(user, None)
 
     def test_create(self):
 
@@ -64,5 +49,49 @@ class UserTestCase(TestCase):
         response = view(request, 'pepe', 'somepassword')
         self.assertEqual(response.status_code, 201)
 
-    def test_email_alredyexist(self):
-        pass
+    def test_login_ok(self):
+        data = {
+            'user': self.USER_USERNAME,
+            'pass': self.USER_PASSWORD
+        }
+        response = self.client.post(
+            reverse('login'),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_404(self):
+        data = {
+            'user': self.USER_USERNAME+"pepito",
+            'pass': self.USER_PASSWORD
+        }
+        response = self.client.post(
+            reverse('login'),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_login_user_empty(self):
+        data = {
+            'pass': self.USER_PASSWORD
+        }
+        response = self.client.post(
+            reverse('login'),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_login_pass_empty(self):
+        data = {
+            'pass': None,
+            'user': ''
+        }
+        response = self.client.post(
+            reverse('login'),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 400)
