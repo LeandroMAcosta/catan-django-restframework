@@ -6,10 +6,10 @@ urlpatterns = [
     path('', RoomsView.as_view({
         'post': 'create',
         'get': 'list',
-        })),
-    path('<int:room_id>/', RoomsView.as_view({
+    })),
+    path('<int:pk>/', RoomsView.as_view({
         'put': 'join',
         'patch': 'start_game',
         'delete': 'cancel_lobby'
-        })),
+    })),
 ]

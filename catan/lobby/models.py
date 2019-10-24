@@ -20,5 +20,20 @@ class Room(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def number_of_players(self):
+        return self.players.all().count()
+
+    def start_game(self):
+        colours = ['red', 'green', 'blue', 'yellow']
+        game = self.game.create()
+
+        for colour, user in enumerate(room.user_set.all()):
+            game.player.create(
+                user=user,
+                colour=colours[colour],
+            )
+        room.game_has_started = True
+        room.save()
+
     def __str__(self):
         return self.name
