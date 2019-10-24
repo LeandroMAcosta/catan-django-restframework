@@ -85,10 +85,6 @@ class ResourcesTestCase(TestCase):
             card_type='road_building',
             player=player
         )
-        Resource.objects.create(
-            resource='wool',
-            player=player
-        )
 
         force_authenticate(request, user=user)
 
@@ -159,6 +155,11 @@ class GameTest(APITestCase):
                 'level': 0
             }
         }
+
+        needed_resources = [('brick', 1), ('lumber', 1),
+                            ('grain', 1), ('wool', 1)]
+
+        self.player.increase_resources(needed_resources)
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
