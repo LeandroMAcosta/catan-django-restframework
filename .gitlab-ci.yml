@@ -2,13 +2,14 @@ before_script:
   - pip install -r requirements.txt
 
 coverage:
-  script:
-    - cd catan/
-    - python manage.py makemigrations board card game lobby player resource road settlement
-    - python manage.py migrate 
-    - coverage run --source='.' manage.py test
-    - coverage report
-  coverage: /\d+\%\s*$/
+    image: python:3.6
+    script:
+        - cd catan/
+        - python manage.py makemigrations board card game lobby player resource road settlement
+        - python manage.py migrate 
+        - coverage run --source='.' manage.py test
+        - coverage report
+    coverage: /\d+\%\s*$/
 
 test:pylint:
     image: python:3.6
