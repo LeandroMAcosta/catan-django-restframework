@@ -1,0 +1,7 @@
+[run]
+ omit =
+  */environment/*
+  */migrations/*
+  */catan/wsgi.py
+  */apps.py
+  manage.py
