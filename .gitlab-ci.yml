@@ -7,7 +7,7 @@ coverage:
         - cd catan/
         - python manage.py makemigrations board card game lobby player resource road settlement
         - python manage.py migrate 
-        - coverage run --source='.' manage.py test
+        - coverage run --source='.' --rcfile=config/.coveragerc manage.py test
         - coverage report
     coverage: /\d+\%\s*$/
 
