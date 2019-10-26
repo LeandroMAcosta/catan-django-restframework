@@ -4,6 +4,8 @@ before_script:
 coverage:
   script:
     - cd catan/
+    - python manage.py makemigrations board card game lobby player resource road settlement
+    - python manage.py migrate 
     - coverage run --source='.' manage.py test
     - coverage report
   coverage: /\d+\%\s*$/
@@ -13,10 +15,10 @@ test:pylint:
     script:
         - flake8 --exclude='migrations*, settings*' .
 
-test:unittest:
-    image: python:3.6
-    script:
-        - cd catan/
-        - python manage.py makemigrations board card game lobby player resource road settlement
-        - python manage.py migrate 
-        - python manage.py test
+# test:unittest:
+#     image: python:3.6
+#     script:
+#         - cd catan/
+#         - python manage.py makemigrations board card game lobby player resource road settlement
+#         - python manage.py migrate 
+#         - python manage.py test
