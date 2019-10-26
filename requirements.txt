@@ -4,3 +4,4 @@ pep8
 pylint
 djangorestframework-jwt
 pudb
+django_extensions
