@@ -119,6 +119,7 @@ class Player(models.Model):
 
         new_resource = self.resource_set.get(resource=receive)
         new_resource.add(1)
+        resource.decrement(4)
 
         resource.save()
         new_resource.save()

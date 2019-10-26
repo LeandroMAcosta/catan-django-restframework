@@ -3,3 +3,8 @@ django==2.2.5
 pep8
 pylint
 djangorestframework-jwt
+pudb
+django_extensions
+flake8
+coverage
+coverage-badge
