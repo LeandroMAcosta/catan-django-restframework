@@ -1,14 +1,21 @@
+before_script:
+  - pip install -r requirements.txt
+
 test:pylint:
     image: python:3.6
     script:
-        - pip install flake8
         - flake8 --exclude='migrations*, settings*' .
 
 test:unittest:
     image: python:3.6
     script:
-        - pip install -r requirements.txt
         - cd catan/
-        - python manage.py makemigrations card game lobby player resource
+        - python manage.py makemigrations board card game lobby player resource road settlement
         - python manage.py migrate 
         - python manage.py test
+
+coverage:
+  script:
+    - cd catan/
+    - coverage run --source='.' manage.py test
+  coverage: /\d+\%\s*$/

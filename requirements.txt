@@ -5,3 +5,5 @@ pylint
 djangorestframework-jwt
 pudb
 django_extensions
+flake8
+coverage
