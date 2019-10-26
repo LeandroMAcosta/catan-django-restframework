@@ -15,9 +15,9 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-``` 
-./migrate.sh
-python manage.py runserver
+``` bash
+$ ./migrate.sh
+$ python manage.py runserver
 ```
 
 ## Testing
