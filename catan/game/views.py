@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 
@@ -13,11 +13,13 @@ from .serializers import GameSerializer
 from .models import Game
 
 
-class HexListViewSets(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+class GameViewSets(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GameSerializer
+    queryset = Game.objects.all()
 
-    def list(self, request, game):
-        game = get_object_or_404(Game, pk=game)
+    def list(self, request, pk):
+        game = self.get_object()
         board = game.get_board()
         hexagons = board.hexagon_set.all()
         serializer = HexagonSerializer(hexagons, many=True)
@@ -30,14 +32,8 @@ class HexListViewSets(viewsets.ModelViewSet):
 
         return Response({'hexes': serializer.data})
 
-
-class GameViewSets(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = GameSerializer
-    queryset = Game.objects.all()
-
-    def list_cards_and_resources(self, request, game):
-        game = get_object_or_404(Game, pk=game)
+    def list_cards_and_resources(self, request, pk):
+        game = self.get_object()
         player = get_object_or_404(Player, user=request.user, game=game)
         cards = Card.objects.filter(player=player)
         resources = Resource.objects.filter(player=player)
@@ -46,10 +42,11 @@ class GameViewSets(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    def action(self, request, game):
+    def action(self, request, pk):
         try:
-            if not Game.objects.filter(pk=game).exists():
+            if not Game.objects.filter(pk=pk).exists():
                 raise Game.DoesNotExist
+            game = self.get_object()
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
             action = request.data['type']

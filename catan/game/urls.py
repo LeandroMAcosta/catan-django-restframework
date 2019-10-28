@@ -1,26 +1,19 @@
 from django.urls import path
 
-from .views import GameViewSets, HexListViewSets
+from .views import GameViewSets
 
 GameView = GameViewSets.as_view
-HexView = HexListViewSets.as_view
 
 urlpatterns = [
-    path(
-        '<int:game>/player/',
-        GameView({
+    path('<int:pk>/player/', GameView({
             'get': 'list_cards_and_resources'
-        }),
-        name='player-info'
+        }), name='player-info'
     ),
-    path(
-        '<int:game>/player/actions/',
-        GameView({
+    path('<int:pk>/player/actions/', GameView({
             'post': 'action'
-        }),
-        name='player-action'
+        }), name='player-action'
     ),
-    path('<int:game>/board/', HexView({
+    path('<int:pk>/board/', GameView({
         'get': 'list'
     })),
 ]

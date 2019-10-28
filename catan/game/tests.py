@@ -71,7 +71,7 @@ class ResourcesTestCase(TestCase):
 
     def test_list_cards_and_resources(self):
         factory = APIRequestFactory()
-        request = factory.get('/api/games/<int:game>/player/')
+        request = factory.get('/api/games/<int:pk>/player/')
         view = GameViewSets.as_view({'get': 'list_cards_and_resources'})
 
         user = User.objects.get(username=self.USER_USERNAME)
@@ -88,7 +88,7 @@ class ResourcesTestCase(TestCase):
 
         force_authenticate(request, user=user)
 
-        response = view(request, game=game.id)
+        response = view(request, pk=game.id)
 
         cards = Card.objects.filter(player=player)
         resources = Resource.objects.filter(player=player)
@@ -443,6 +443,8 @@ class GameTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    # Buy card
+
     def test_buy_card(self):
 
         resources = [('wool', 1), ('ore', 1), ('grain', 1)]
@@ -471,6 +473,8 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    # bank_trade
 
     def test_bank_trade_ok(self):
         data = {

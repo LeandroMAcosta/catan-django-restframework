@@ -1,11 +1,11 @@
 from django.urls import path
 
-from .views import HexListViewSets
+from .views import GameViewSets
 
-HexListViewSets_view = HexListViewSets.as_view
+GameViewSets_view = GameViewSets.as_view
 
 urlpatterns = [
-    path('<int:game>/board/', HexListViewSets_view({
+    path('<int:pk>/board/', GameViewSets_view({
         'get': 'list'
     })),
 ]
