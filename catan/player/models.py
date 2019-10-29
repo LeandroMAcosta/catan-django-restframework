@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from utils.constants import RESOURCES
 from game.models import Game
@@ -23,8 +24,14 @@ class Player(models.Model):
         actions = ['build_settlement', 'upgrade_city', 'build_road',
                    'move_robber', 'buy_card', 'play_knight_card',
                    'play_road_building_card', 'play_monopoly_card',
-                   'play_year_of_plenty_card', ' end_turn', 'bank_trade']
+                   'play_year_of_plenty_card', 'end_turn', 'bank_trade']
         return actions
+
+    def get_cities(self):
+        return self.settlement_set.all()
+
+    def get_roads(self):
+        return self.road_set.all()
 
     def get_total_resources(self):
         resources = self.resource_set.all()
@@ -63,17 +70,31 @@ class Player(models.Model):
 
     # Actions methods
 
-    def play_knight_card(self, data):
+    def player_available_actions(self):
         # TODO
+        pass
+
+    def play_knight_card(self, data):
         player = data.get('player', None)
         position = data.get('position', None)
 
         if player is None:
-            # return available players in this position
-            pass
+            # TODO filter by players in given position
+            game = self.game
+            players = game.player_set.filter(~Q(user=self.user))
+            players = filter(
+                lambda player: player.get_total_resources() > 7,
+                players
+            )
+            # retornar HEX_POSITION y los players
         else:
-            pass
-            # move thief and steel
+            # TODO steal a resource from the given player
+            game = self.game
+            index = position['index']
+            level = position['level']
+            hexagon = game.get_hexagon(index, level)
+            game.thief = hexagon
+            game.save()
 
     def build_settlement(self, data):
         game = self.game

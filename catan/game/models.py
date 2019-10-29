@@ -46,6 +46,11 @@ class Game(models.Model):
     def get_board(self):
         return self.room.board
 
+    def get_hexagon(self, index, level):
+        board = self.get_board()
+        hexagon = board.hexagon_set.get(index=index, level=level)
+        return hexagon
+
     def throw_dice(self):
         self.dice1 = random.randint(1, 6)
         self.dice2 = random.randint(1, 6)
