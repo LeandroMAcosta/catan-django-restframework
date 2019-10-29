@@ -39,7 +39,19 @@ class Game(models.Model):
         return (self.dice1, self.dice2)
 
     def distribute_resources(self):
-        pass
+        dice = self.dice1 + self.dice2
+        h = self.room.board.hexagon_set.filter(token=dice)
+        for hexag in h:
+            ver = hexag.get_neighboring_vertexes()
+            for v in ver:
+                level = v[0]
+                index = v[1]
+                vertex = self.vertex_set.get(level=level, index=index)
+                settl = vertex.settlement
+                if settl is not None:
+                    player = settl.owner
+                    r = hexag.resources
+                    player.increase_resources([(r, 1)])
 
     def __str__(self):
         return str(self.id)
