@@ -46,6 +46,8 @@ class ResourcesTestCase(TestCase):
         board = Board(**board_data)
         board.save()
 
+        board.hexagon_set.create()
+
         room_data = {
             'name': 'roomcito',
             'board': board,
@@ -125,6 +127,7 @@ class GameTest(APITestCase):
         )
         self.board.save()
 
+        self.board.hexagon_set.create()
         # Room
         self.room = Room(
             name='roomcito',

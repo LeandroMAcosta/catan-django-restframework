@@ -8,6 +8,28 @@
     }
   },
   {
+    "model": "board.hexagon",
+    "pk": 1,
+    "fields": {
+      "board": 1,
+      "level": 1,
+      "index": 2,
+      "resource": "wool",
+      "token": 1
+    }
+  },
+  {
+    "model": "board.hexagon",
+    "pk": 2,
+    "fields": {
+      "board": 1,
+      "level": 1,
+      "index": 0,
+      "resource": "desert",
+      "token": 1
+    }
+  },
+  {
     "model": "lobby.room",
     "pk": 1,
     "fields": {
@@ -22,18 +44,8 @@
     "model": "game.game",
     "pk": 1,
     "fields": {
-      "room": 1
-    }
-  },
-  {
-    "model": "board.hexagon",
-    "pk": 1,
-    "fields": {
-      "board": 1,
-      "level": 1,
-      "index": 2,
-      "resource": "wool",
-      "token": 1
+      "room": 1,
+      "thief": 2
     }
   },
   {

@@ -2,6 +2,8 @@ from django.db.models.signals import post_save
 from django.db import models
 import random
 
+from board.models import Hexagon
+
 
 class Game(models.Model):
     room = models.OneToOneField(
@@ -10,6 +12,18 @@ class Game(models.Model):
     )
     dice1 = models.IntegerField(default=random.randint(1, 6))
     dice2 = models.IntegerField(default=random.randint(1, 6))
+    thief = models.ForeignKey(
+        Hexagon,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+
+    def save(self, *args, **kwargs):
+        if self.thief is None:
+            board = self.get_board()
+            self.thief = board.get_desert()
+        super(Game, self).save(*args, **kwargs)
 
     @staticmethod
     def create_vertex(sender, **kwargs):

@@ -26,6 +26,10 @@ class Player(models.Model):
                    'play_year_of_plenty_card', ' end_turn', 'bank_trade']
         return actions
 
+    def get_total_resources(self):
+        resources = self.resource_set.all()
+        return sum(map(lambda resource: resource.amount, resources))
+
     def get_resource(self, res):
         resource = self.resource_set.get(resource=res)
         return resource
@@ -56,6 +60,20 @@ class Player(models.Model):
             resource_list.append(r)
         for resource in resource_list:
             resource.save()
+
+    # Actions methods
+
+    def play_knight_card(self, data):
+        # TODO
+        player = data.get('player', None)
+        position = data.get('position', None)
+
+        if player is None:
+            # return available players in this position
+            pass
+        else:
+            pass
+            # move thief and steel
 
     def build_settlement(self, data):
         game = self.game

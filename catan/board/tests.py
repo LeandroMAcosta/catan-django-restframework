@@ -29,6 +29,7 @@ class BoardTest(TestCase):
         }
         self.board = Board(**board_data)
         self.board.save()
+        self.board.hexagon_set.create(index=1)
 
         room_data = {
             'name': 'roomcito',
