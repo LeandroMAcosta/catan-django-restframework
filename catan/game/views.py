@@ -45,7 +45,7 @@ class GameViewSets(viewsets.ModelViewSet):
     def action(self, request, pk):
         try:
             if not Game.objects.filter(pk=pk).exists():
-                raise Game.DoesNotExist
+                raise Exception("Game does not exist")
             game = self.get_object()
             player = Player.objects.get(game=game, user=request.user)
             data = request.data['payload']
@@ -61,11 +61,6 @@ class GameViewSets(viewsets.ModelViewSet):
             return Response(
                 "Bad Request",
                 status=status.HTTP_400_BAD_REQUEST
-            )
-        except Game.DoesNotExist:
-            return Response(
-                "Game does not exist",
-                status=status.HTTP_404_NOT_FOUND
             )
         except Player.DoesNotExist:
             return Response(
