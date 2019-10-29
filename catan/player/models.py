@@ -11,6 +11,7 @@ class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     colour = models.CharField(max_length=100)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    victory_points = models.PositiveIntegerField(default=0)
     # settlements =
     # cities =
     # roads =
@@ -57,6 +58,10 @@ class Player(models.Model):
         for resource in resource_list:
             resource.save()
 
+    def increase_vp(self, amount):
+        self.victory_points = models.F('victory_points') + amount
+        self.save()
+
     def build_settlement(self, data):
         game = self.game
         limit = [6, 18, 30]
@@ -75,6 +80,7 @@ class Player(models.Model):
         self.settlement_set.create(vertex=vertex)
         vertex.used = True
         vertex.save()
+        self.increase_vp(1)
         return "Created settlement.", 201
 
     def build_road(self, data):

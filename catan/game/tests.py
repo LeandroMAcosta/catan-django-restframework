@@ -203,12 +203,15 @@ class GameTest(APITestCase):
                             ('grain', 1), ('wool', 1)]
 
         self.player.increase_resources(needed_resources)
+        vp = self.player.victory_points
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,
             format='json'
         )
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.victory_points, vp + 1)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_settlement_few_resources(self):
