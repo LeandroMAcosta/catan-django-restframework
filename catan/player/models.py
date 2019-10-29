@@ -4,9 +4,6 @@ from django.contrib.auth.models import User
 
 from utils.constants import RESOURCES
 from game.models import Game
-from lobby.models import Room
-from lobby.serializers import RoomSerializer
-from game.serializers import GameSerializer
 import random
 
 
@@ -141,10 +138,8 @@ class Player(models.Model):
 
     def end_turn(self, data):
         self.game.end_turn(self.game.get_player_turn())
-        room = self.game.get_player_turn()
-        print(room)
-
-        return "mensaje", 201
+        # print(self.game.get_player_turn(), self.game.dice1, self.game.dice2)
+        return "turn passed ok", 201
 
     def __str__(self):
         return str(self.user)

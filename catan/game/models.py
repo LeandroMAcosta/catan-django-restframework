@@ -33,7 +33,7 @@ class Game(models.Model):
     def get_board(self):
         return self.room.board
 
-    def get_dice(self):
+    def get_dices(self):
         return [self.dice1, self.dice2]
 
     def get_player_turn(self):
