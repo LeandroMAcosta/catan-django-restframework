@@ -9,6 +9,7 @@ import random
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    num = models.IntegerField(default=0)
     colour = models.CharField(max_length=100)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     # settlements =

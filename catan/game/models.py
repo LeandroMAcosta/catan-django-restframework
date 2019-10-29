@@ -8,6 +8,7 @@ class Game(models.Model):
         "lobby.Room",
         on_delete=models.CASCADE
     )
+    player_turn = models.IntegerField(default=0)
     dice1 = models.IntegerField(default=random.randint(1, 6))
     dice2 = models.IntegerField(default=random.randint(1, 6))
 

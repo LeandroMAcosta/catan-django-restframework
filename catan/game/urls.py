@@ -7,15 +7,13 @@ HexView = HexListViewSets.as_view
 
 urlpatterns = [
     path(
-        '<int:game>/player/',
-        GameView({
+        '<int:game>/player/', GameView({
             'get': 'list_cards_and_resources'
         }),
         name='player-info'
     ),
     path(
-        '<int:game>/player/actions/',
-        GameView({
+        '<int:game>/player/actions/', GameView({
             'post': 'action'
         }),
         name='player-action'
