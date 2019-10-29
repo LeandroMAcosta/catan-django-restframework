@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 
 from utils.constants import RESOURCES
 from game.models import Game
+from lobby.models import Room
+from lobby.serializers import RoomSerializer
+from game.serializers import GameSerializer
 import random
 
 
@@ -24,7 +27,7 @@ class Player(models.Model):
         actions = ['build_settlement', 'upgrade_city', 'build_road',
                    'move_robber', 'buy_card', 'play_knight_card',
                    'play_road_building_card', 'play_monopoly_card',
-                   'play_year_of_plenty_card', ' end_turn', 'bank_trade']
+                   'play_year_of_plenty_card', 'end_turn', 'bank_trade']
         return actions
 
     def get_resource(self, res):
@@ -135,6 +138,13 @@ class Player(models.Model):
         self.card_set.create(card_type=cards_types[card])
 
         return "Card purchased", 201
+
+    def end_turn(self, data):
+        self.game.end_turn(self.game.get_player_turn())
+        room = self.game.get_player_turn()
+        print(room)
+
+        return "mensaje", 201
 
     def __str__(self):
         return str(self.user)
