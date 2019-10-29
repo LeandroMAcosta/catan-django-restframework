@@ -38,6 +38,9 @@ class Game(models.Model):
         self.save()
         return (self.dice1, self.dice2)
 
+    def distribute_resources(self):
+        pass
+
     def __str__(self):
         return str(self.id)
 
