@@ -82,3 +82,28 @@ class Hexagon(models.Model):
     def __str__(self):
         v = "({0} {1})".format(self.level, self.index)
         return "Board {0} {1}".format(self.board, v)
+
+    def get_neighboring_vertexes(self):
+        level = self.level
+        index = self.index
+        neighbours = []
+        if level == 0:
+            for i in range(0, 6):
+                neighbours.append((0, i))
+        elif level == 1:
+            for i in range(0, 2):
+                neighbours.append((0, (index + i) % 6))
+            for i in range(0, 4):
+                neighbours.append((1, (3*index + i) % 18))
+        else:
+            if index % 2 == 0:
+                for i in range(-1, 2):
+                    neighbours.append((1, (index + index//2 + i) % 18))
+                for i in range(-1, 2):
+                    neighbours.append((2, (2*index + index//2 + i) % 30))
+            else:
+                for i in range(0, 2):
+                    neighbours.append((1, (index + index//2 + i) % 18))
+                for i in range(-1, 3):
+                    neighbours.append((2, (2*index + index//2 + i) % 30))
+        return neighbours
