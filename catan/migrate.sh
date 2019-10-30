@@ -20,7 +20,7 @@ python manage.py makemigrations
 python manage.py makemigrations player card resource lobby game board settlement road
 python manage.py migrate
 
-echo "yes" | python manage.py flush
+echo python manage.py flush
 
 echo $'\n--------------------------------------'
 echo "-- Creando usuario Admin:"
@@ -33,5 +33,3 @@ echo "from django.contrib.auth.models import User; User.objects.filter(email='ad
 python manage.py loaddata catan/seeder/initial_data.json
 
 flake8 --exclude='migrations*, settings*' .
-
-python manage.py test
