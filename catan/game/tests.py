@@ -545,3 +545,61 @@ class GameTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "Insufficient resources.")
+
+    def test_end_turn_ok(self):
+        room = Room.objects.get(id=self.room.id)
+
+        # Add player into room
+        user_data = {
+            "username": "testuser3",
+            "email": "testuser3@test.com",
+            "password": "supersecure",
+        }
+        user = User._default_manager.create_user(**user_data)
+        user.save()
+        room.players.add(user)
+
+        # Add player into room
+        user_data = {
+            "username": "testuser4",
+            "email": "testuser4@test.com",
+            "password": "supersecure",
+        }
+        user = User._default_manager.create_user(**user_data)
+        user.save()
+        room.players.add(user)
+
+        # Add player into room
+        user_data = {
+            "username": "testuser5",
+            "email": "testuser5@test.com",
+            "password": "supersecure",
+        }
+        user = User._default_manager.create_user(**user_data)
+        user.save()
+        room.players.add(user)
+
+        data = {
+            'type': 'end_turn',
+            'payload': None
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.status_code, 201)
+
+    def test_end_turn_game_not_exist(self):
+        data = {
+            'type': 'end_turn',
+            'payload': None
+        }
+        game_id = 123456789
+        response = self.client.post(
+            reverse('player-action', args=[game_id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.data, "Game does not exist")
