@@ -61,7 +61,6 @@ class GameViewSets(viewsets.ModelViewSet):
                 status=response_status
             )
         # except AttributeError:
-        #     print("343")
         #     return Response(
         #         "Bad Request",
         #         status=status.HTTP_400_BAD_REQUEST

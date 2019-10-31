@@ -622,7 +622,7 @@ class GameTest(APITestCase):
                         'level': 0,
                         'index': 2,
                     },
-                ], 
+                ],
                 [
                     {
                         'level': 0,
@@ -633,10 +633,12 @@ class GameTest(APITestCase):
                         'index': 3
                     },
                 ],
-                ]
+            ]
         }
         self.player.card_set.create(card_type="road_building")
+        self.player.refresh_from_db()
         roads = self.player.road_set.count()
+        cards = self.player.card_set.filter(card_type="road_building").count()
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,
@@ -645,3 +647,5 @@ class GameTest(APITestCase):
         self.player.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.player.road_set.count(), roads + 2)
+        self.assertEqual(self.player.card_set.filter(
+            card_type="road_building").count(), cards - 1)

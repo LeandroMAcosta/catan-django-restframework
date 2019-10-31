@@ -88,12 +88,22 @@ class Player(models.Model):
         return "Created settlement.", 201
 
     def check_valid_road(self, v1, v2):
+        game = self.game
         limit = [6, 18, 30]
         if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
             raise Exception("Level out of bounds")
         if not (0 <= v1['index'] < limit[v1['level']]
                 and 0 <= v2['index'] < limit[v2['level']]):
             raise Exception("Index out of bounds.")
+        vertex1 = game.vertex_set.get(**v1)
+        vertex2 = game.vertex_set.get(**v2)
+        if not (vertex2 in vertex1.get_neighbors()):
+            raise Exception("Non adjacent or repeated vertexes.")
+        for pl in game.player_set.all():
+            for road in pl.road_set.all():
+                if ((road.v1 == vertex1 and road.v2 == vertex2) or
+                        (road.v1 == vertex2 and road.v2 == vertex1)):
+                    raise Exception("Edge alredy in use")
 
     def create_road(self, vertex1, vertex2):
         road = self.road_set.create(v1=vertex1, v2=vertex2)
@@ -114,15 +124,8 @@ class Player(models.Model):
         self.check_valid_road(v1, v2)
         vertex1 = game.vertex_set.get(**v1)
         vertex2 = game.vertex_set.get(**v2)
-        if not (vertex2 in vertex1.get_neighbors()):
-            raise Exception("Non adjacent or repeated vertexes.")
-        for pl in self.game.player_set.all():
-            for road in pl.road_set.all():
-                if ((road.v1 == vertex1 and road.v2 == vertex2) or
-                        (road.v1 == vertex2 and road.v2 == vertex1)):
-                    raise Exception("Edge alredy in use")
-        self.create_road(vertex1, vertex2)
         self.purchase_road()
+        self.create_road(vertex1, vertex2)
         return "Created road.", 201
 
     def bank_trade(self, data):
@@ -173,24 +176,20 @@ class Player(models.Model):
             raise Exception("Insufficient arguments")
         elif len(data) > 2:
             raise Exception("Too many arguments")
-        for d in data:
-            if len(d) < 2:
+        for road_data in data:
+            if len(road_data) < 2:
                 raise Exception("Insufficient arguments")
-            elif len(d) > 2:
+            elif len(road_data) > 2:
                 raise Exception("Too many arguments")
-        for roads in data:
-            v1 = roads[0]
-            v2 = roads[1]
+        for road_data in data:
+            v1 = road_data[0]
+            v2 = road_data[1]
             self.check_valid_road(v1, v2)
+        for road_data in data:
+            v1 = road_data[0]
+            v2 = road_data[1]
             vertex1 = game.vertex_set.get(**v1)
             vertex2 = game.vertex_set.get(**v2)
-            if not (vertex2 in vertex1.get_neighbors()):
-                raise Exception("Non adjacent or repeated vertexes.")
-            for pl in self.game.player_set.all():
-                for road in pl.road_set.all():
-                    if ((road.v1 == vertex1 and road.v2 == vertex2) or
-                            (road.v1 == vertex2 and road.v2 == vertex1)):
-                        raise Exception("Edge alredy in use")
             self.create_road(vertex1, vertex2)
         card.delete()
         return "Created road.", 201
