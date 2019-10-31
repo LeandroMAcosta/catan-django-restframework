@@ -94,7 +94,12 @@ class Game(models.Model):
     def get_vertex_from_hexagon(self, index, level):
         hexagon = self.get_hexagon(index, level)
         hexagon_vertex = hexagon.get_neighboring_vertexes()
-        return map(lambda vertex: self.get_vertex(vertex[0], vertex[1]))
+        ret = list(map(
+                lambda vertex: self.get_vertex(vertex[1], vertex[0]),
+                hexagon_vertex
+            )
+        )
+        return ret
 
     def __str__(self):
         return str(self.id)

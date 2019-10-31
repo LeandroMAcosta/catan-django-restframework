@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
-from django.db.models import Q
 
 from utils.constants import RESOURCES
 from game.models import Game
@@ -74,15 +73,16 @@ class Player(models.Model):
         resources = self.resource_set.filter(amount__gt=0)
         resource = random.choice(resources)
         resource.decrement(1)
+        return resource
 
     def remove_random_resource(self, amount):
         total_resources = self.get_total_resources()
         if amount > total_resources:
             raise Exception("Not enough resources.")
-        resources = self.resource_set.filter(amount__gt=0)
 
         while amount > 0:
-            player.decrement_random_resource()
+            resource = self.decrement_random_resource()
+            resource.save()
             amount -= 1
 
     # Actions methods
@@ -103,21 +103,22 @@ class Player(models.Model):
         game = self.game
         player = data.get('player', None)
         position = data.get('position', None)
+        index = position['index']
+        level = position['level']
         hexagon = game.get_hexagon(index, level)
         game.thief = hexagon
 
         if player is not None:
             player = game.get_player_from_username(player)
-            index = position['index']
-            level = position['level']
             hexagon = game.get_hexagon(index, level)
             vertices = game.get_vertex_from_hexagon(index, level)
 
             for vertex in vertices:
                 settlement = vertex.settlement or None
-                if settlement and settlement.player == player:
+                if settlement and settlement.owner == player:
                     player.remove_random_resource(1)
                     return "Thief positioned and Player stolen.", 200
+            raise Exception("Player not in hexagon.")
 
         game.save()
         return "Thief positioned.", 200

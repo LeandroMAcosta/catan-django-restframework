@@ -22,7 +22,17 @@ class Vertex(models.Model):
     game = models.ForeignKey('game.Game', on_delete=models.CASCADE)
     level = models.PositiveIntegerField(default=0)
     index = models.PositiveIntegerField(default=0)
+    # TODO delete this field
     used = models.BooleanField(default=False)
+
+    def get_settlement(self):
+        try:
+            return self.settlement
+        except Exception:
+            return None
+
+    def is_used(self):
+        return self.get_settlement() is not None
 
     class Meta:
         unique_together = ['game', 'level', 'index']

@@ -1,4 +1,4 @@
-[ 
+[
   {
     "model": "board.board",
     "pk": 1,
@@ -58,11 +58,28 @@
     }
   },
   {
+    "model": "player.player",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "colour": "verdecito",
+      "game": 1
+    }
+  },
+  {
     "model": "card.card",
     "pk": 1,
     "fields": {
       "player": 1,
-      "card_type": "year_of_plenty"
+      "card_type": "play_knight_card"
+    }
+  },
+  {
+    "model": "settlement.settlement",
+    "pk": 1,
+    "fields": {
+      "owner": 2,
+      "vertex": 1
     }
   }
 ]

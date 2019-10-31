@@ -30,6 +30,8 @@ echo "--------------------------------------"
 
 echo "from django.contrib.auth.models import User; User.objects.filter(email='admin@example.com').delete(); User.objects.create_superuser('admin', 'admin@example.com', 'admin123')" | python manage.py shell
 
+echo "from django.contrib.auth.models import User; User.objects.filter(email='leacosta97@example.com').delete(); User.objects.create_superuser('leandro', 'leandro@example.com', 'leandro123')" | python manage.py shell
+
 python manage.py loaddata catan/seeder/initial_data.json
 
 flake8 --exclude='migrations*, settings*' .
