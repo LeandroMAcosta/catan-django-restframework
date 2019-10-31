@@ -9,4 +9,4 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ('cards', 'resources', 'dice1', 'dice2')
+        fields = ('cards', 'resources', 'player_turn', 'dice1', 'dice2')

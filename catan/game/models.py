@@ -8,6 +8,7 @@ class Game(models.Model):
         "lobby.Room",
         on_delete=models.CASCADE
     )
+    player_turn = models.IntegerField(default=0)
     dice1 = models.IntegerField(default=random.randint(1, 6))
     dice2 = models.IntegerField(default=random.randint(1, 6))
 
@@ -32,11 +33,21 @@ class Game(models.Model):
     def get_board(self):
         return self.room.board
 
+    def get_dices(self):
+        return [self.dice1, self.dice2]
+
+    def get_player_turn(self):
+        return self.player_turn
+
     def throw_dice(self):
         self.dice1 = random.randint(1, 6)
         self.dice2 = random.randint(1, 6)
         self.save()
-        return (self.dice1, self.dice2)
+
+    def end_turn(self, turn):
+        self.throw_dice()
+        self.player_turn = (turn + 1) % self.room.number_of_players()
+        self.save()
 
     def __str__(self):
         return str(self.id)
