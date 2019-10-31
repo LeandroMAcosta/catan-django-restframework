@@ -137,8 +137,8 @@ class Player(models.Model):
         return "Card purchased", 201
 
     def end_turn(self, data):
-        self.game.end_turn(self.game.get_player_turn())
-        # print(self.game.get_player_turn(), self.game.dice1, self.game.dice2)
+        self.game.end_turn()
+        # print(self.game.get_player_turn(), self.game.get_dices())
         return "turn passed ok", 201
 
     def __str__(self):
