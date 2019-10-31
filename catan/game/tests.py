@@ -126,8 +126,20 @@ class GameTest(APITestCase):
             owner=self.board_owner
         )
         self.board.save()
+        resources = ['desert', 'brick', 'wool']
+        tokens = [0, 8, 6, 9, 2, 8, 8, 6, 9, 6, 3, 9, 6, 9, 6, 4, 4, 5, 9]
+        self.board.hexagon_set.create(
+            resource=resources[0], token=tokens[0], level=0, index=0)
+        i = 1
+        for level in range(1, 3):
+            for index in range(0, 6*level):
+                self.board.hexagon_set.create(
+                    resource=resources[level], token=tokens[i], level=level,
+                    index=index)
+                i += 1
+        self.board.save()
 
-        self.board.hexagon_set.create()
+        # self.board.hexagon_set.create()
         # Room
         self.room = Room(
             name='roomcito',
@@ -163,6 +175,9 @@ class GameTest(APITestCase):
             colour='colorci3'
         )
         self.player2.save()
+        vertex = self.game.vertex_set.get(level=1, index=12)
+        self.player.settlement_set.create(vertex=vertex)
+        self.player.save()
 
     def test_game_bad_request(self):
         data = {
@@ -642,8 +657,8 @@ class GameTest(APITestCase):
             'player': None
         }
         # self.board.hexagon_set.create(index=0, level=0) Alredy created
-        self.board.hexagon_set.create(index=0, level=1)
-        self.board.hexagon_set.create(index=1, level=0)
+        # self.board.hexagon_set.create(index=0, level=1)
+        # self.board.hexagon_set.create(index=1, level=0)
         thief = self.game.thief
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -668,8 +683,8 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-        self.board.hexagon_set.create(index=0, level=1)
-        self.board.hexagon_set.create(index=1, level=0)
+        # self.board.hexagon_set.create(index=0, level=1)
+        # self.board.hexagon_set.create(index=1, level=0)
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -700,8 +715,7 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-        self.board.hexagon_set.create(index=0, level=1)
-        self.board.hexagon_set.create(index=1, level=0)
+
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -729,9 +743,7 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-        self.board.hexagon_set.create(index=0, level=1)
-        self.board.hexagon_set.create(index=1, level=0)
-        self.board.hexagon_set.create(index=2, level=2)
+
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -748,3 +760,25 @@ class GameTest(APITestCase):
 
         self.assertEqual(response.data, "Player not in hexagon.")
         self.assertEqual(response.status_code, 404)
+
+    def test_resource_assignment(self):
+        ldices = self.game.get_dices()
+        dices = ldices[0] + ldices[1]
+        bricks = self.player.get_resource_amount('brick')
+        while dices != 8:
+            self.game.throw_dice()
+            self.game.refresh_from_db()
+            ldices = self.game.get_dices()
+            dices = ldices[0] + ldices[1]
+        self.game.distribute_resources()
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.get_resource_amount('brick'), bricks + 1)
+        wools = self.player.get_resource_amount('wool')
+        while dices != 4:
+            self.game.throw_dice()
+            self.game.refresh_from_db()
+            ldices = self.game.get_dices()
+            dices = ldices[0] + ldices[1]
+        self.game.distribute_resources()
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.get_resource_amount('wool'), wools + 1)

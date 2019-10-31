@@ -75,6 +75,7 @@ class Game(models.Model):
         number_of_players = self.room.number_of_players()
         self.player_turn = (turn + 1) % number_of_players
         self.save()
+        self.distribute_resources()
 
     def distribute_resources(self):
         dice = self.dice1 + self.dice2
@@ -82,20 +83,27 @@ class Game(models.Model):
         for hexag in h:
             ver = hexag.get_neighboring_vertexes()
             for v in ver:
-                level = v[0]
-                index = v[1]
+                level = v['level']
+                index = v['index']
                 vertex = self.vertex_set.get(level=level, index=index)
-                settl = vertex.settlement
+                settl = None
+                try:
+                    settl = vertex.settlement
+                except Exception:
+                    continue
                 if settl is not None:
                     player = settl.owner
-                    r = hexag.resources
+                    r = hexag.resource
                     player.increase_resources([(r, 1)])
 
     def get_vertex_from_hexagon(self, index, level):
         hexagon = self.get_hexagon(index, level)
         hexagon_vertex = hexagon.get_neighboring_vertexes()
         ret = list(map(
-                lambda vertex: self.get_vertex(vertex[1], vertex[0]),
+                lambda vertex: self.get_vertex(
+                    index=vertex['index'],
+                    level=vertex['level']
+                ),
                 hexagon_vertex
             )
         )

@@ -14,6 +14,9 @@ class Player(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     victory_points = models.PositiveIntegerField(default=0)
 
+    def get_game(self):
+        return self.game
+
     def available_actions(self):
         # TODO check
         actions = ['build_settlement', 'upgrade_city', 'build_road',
@@ -35,6 +38,10 @@ class Player(models.Model):
     def get_resource(self, res):
         resource = self.resource_set.get(resource=res)
         return resource
+
+    def get_resource_amount(self, res):
+        resource = self.resource_set.get(resource=res)
+        return resource.amount
 
     @staticmethod
     def create_resources(sender, **kwargs):
@@ -101,7 +108,6 @@ class Player(models.Model):
         level = position['level']
         hexagon = game.get_hexagon(index, level)
         game.thief = hexagon
-
         if player is not None:
             player = game.get_player_from_username(player)
             hexagon = game.get_hexagon(index, level)
