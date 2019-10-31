@@ -75,6 +75,32 @@ class Player(models.Model):
                     "payload": payload
                 })
 
+            # TODO play_knight_card 5
+            # TODO play_road_building_card 6
+            # TODO play_monopoly_card 7
+            # TODO play_year_of_plenty_card 8
+
+            # end_turn
+            type_action = actions[9]
+            payload = None
+            available_actions.append({
+                "type": type_action,
+                "payload": payload
+            })
+
+            # bank_trade
+            type_action = actions[10]
+            payload = None
+            available_actions.append({
+                "type": type_action,
+                "payload": payload
+            })
+
+            print()
+            for i in available_actions:
+                print(i)
+                print()
+
         return actions
 
     def get_resource(self, res):
