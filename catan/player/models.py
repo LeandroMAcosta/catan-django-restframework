@@ -13,12 +13,6 @@ class Player(models.Model):
     colour = models.CharField(max_length=100)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     victory_points = models.PositiveIntegerField(default=0)
-    # settlements =
-    # cities =
-    # roads =
-    # development_cards =
-    # resources_cards =
-    # last_gained =
 
     def available_actions(self):
         # TODO check
@@ -75,7 +69,7 @@ class Player(models.Model):
         resource.decrement(1)
         return resource
 
-    def remove_random_resource(self, amount):
+    def remove_random_resources(self, amount):
         total_resources = self.get_total_resources()
         if amount > total_resources:
             raise Exception("Not enough resources.")
@@ -116,7 +110,7 @@ class Player(models.Model):
             for vertex in vertices:
                 settlement = vertex.get_settlement()
                 if settlement and settlement.owner == player:
-                    player.remove_random_resource(1)
+                    player.remove_random_resources(1)
                     return "Thief positioned and Player stolen.", 200
             raise Exception("Player not in hexagon.")
 

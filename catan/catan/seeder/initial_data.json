@@ -30,6 +30,17 @@
     }
   },
   {
+    "model": "board.hexagon",
+    "pk": 3,
+    "fields": {
+      "board": 1,
+      "level": 0,
+      "index": 0,
+      "resource": "grain",
+      "token": 3
+    }
+  },
+  {
     "model": "lobby.room",
     "pk": 1,
     "fields": {

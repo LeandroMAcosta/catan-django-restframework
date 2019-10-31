@@ -64,7 +64,7 @@ class GameViewSets(viewsets.ModelViewSet):
             )
         except Exception as error:
             err = str(error)
-            print(err)
+            # print(err)
             return Response(
                 err,
                 status=status.HTTP_404_NOT_FOUND
