@@ -1,5 +1,0 @@
-[Parent 2920, Gecko_IOThread] WARNING: pipe error (126): Conexión reinicializada por la máquina remota: file /build/firefox-u_TOfh/firefox-69.0.1+linuxmint1+tina/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 358
-[Parent 2920, Gecko_IOThread] WARNING: pipe error (80): Conexión reinicializada por la máquina remota: file /build/firefox-u_TOfh/firefox-69.0.1+linuxmint1+tina/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 358
-
-###!!! [Parent][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
-
