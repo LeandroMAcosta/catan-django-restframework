@@ -44,9 +44,11 @@ class Game(models.Model):
         self.dice2 = random.randint(1, 6)
         self.save()
 
-    def end_turn(self, turn):
+    def end_turn(self):
         self.throw_dice()
-        self.player_turn = (turn + 1) % self.room.number_of_players()
+        turn = self.player_turn
+        number_of_players = self.room.number_of_players()
+        self.player_turn = (turn + 1) % number_of_players
         self.save()
 
     def __str__(self):

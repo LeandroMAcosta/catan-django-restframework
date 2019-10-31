@@ -134,3 +134,4 @@ catan/db.sqlite3
 ./.out
 .out
 */.out
+catan/nohup.out
