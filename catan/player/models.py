@@ -91,15 +91,18 @@ class Player(models.Model):
             # bank_trade
             type_action = actions[10]
             payload = None
-            available_actions.append({
-                "type": type_action,
-                "payload": payload
-            })
 
-            print()
-            for i in available_actions:
-                print(i)
-                print()
+            r = self.resource_set.filter(amount__gte=4)
+            if r.exists():
+                available_actions.append({
+                    "type": type_action,
+                    "payload": payload
+                })
+
+            # print()
+            # for i in available_actions:
+            #     print(i)
+            #     print()
 
         return actions
 
