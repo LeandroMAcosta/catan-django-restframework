@@ -32,6 +32,10 @@ class Player(models.Model):
         resource = self.resource_set.get(resource=res)
         return resource
 
+    def get_resource_amount(self, res):
+        resource = self.resource_set.get(resource=res)
+        return resource.amount
+
     @staticmethod
     def create_resources(sender, **kwargs):
         job = kwargs.get('instance')

@@ -124,6 +124,18 @@ class GameTest(APITestCase):
             owner=self.board_owner
         )
         self.board.save()
+        resources = ['desert', 'brick', 'wool']
+        tokens = [0, 8, 6, 9, 2, 8, 8, 6, 9, 6, 3, 9, 6, 9, 6, 4, 4, 5, 9]
+        self.board.hexagon_set.create(
+            resource=resources[0], token=tokens[0], level=0, index=0)
+        i = 1
+        for level in range(1, 3):
+            for index in range(0, 6*level):
+                self.board.hexagon_set.create(
+                    resource=resources[level], token=tokens[i], level=level,
+                    index=index)
+                i += 1
+        self.board.save()
 
         # Room
         self.room = Room(
@@ -146,6 +158,10 @@ class GameTest(APITestCase):
         )
         self.player.save()
         self.client.force_authenticate(self.user)
+
+        vertex = self.game.vertex_set.get(level=1, index=12)
+        self.player.settlement_set.create(vertex=vertex)
+        self.player.save()
 
     def test_game_bad_request(self):
         data = {
@@ -606,3 +622,16 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.data, "Game does not exist")
+
+    def test_resource_assignment(self):
+        ldices = self.game.get_dices()
+        dices = ldices[0] + ldices[1]
+        bricks = self.player.get_resource_amount('brick')
+        while dices != 8 do:
+            self.game.throw_dice()
+            self.game.refresh_from_db()
+            ldices = self.game.get_dices()
+            dices = ldices[0] + ldices[1]
+        self.game.distribute_resources()
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.get_resource_amount('brick'), bricks + 1)
