@@ -10,8 +10,10 @@ import random
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    num = models.IntegerField(default=0)
     colour = models.CharField(max_length=100)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    victory_points = models.PositiveIntegerField(default=0)
     # settlements =
     # cities =
     # roads =
@@ -96,6 +98,10 @@ class Player(models.Model):
             game.thief = hexagon
             game.save()
 
+    def increase_vp(self, amount):
+        self.victory_points = models.F('victory_points') + amount
+        self.save()
+
     def build_settlement(self, data):
         game = self.game
         limit = [6, 18, 30]
@@ -114,6 +120,7 @@ class Player(models.Model):
         self.settlement_set.create(vertex=vertex)
         vertex.used = True
         vertex.save()
+        self.increase_vp(1)
         return "Created settlement.", 201
 
     def build_road(self, data):
@@ -173,6 +180,11 @@ class Player(models.Model):
         self.card_set.create(card_type=cards_types[card])
 
         return "Card purchased", 201
+
+    def end_turn(self, data):
+        self.game.end_turn()
+        # print(self.game.get_player_turn(), self.game.get_dices())
+        return "turn passed ok", 201
 
     def __str__(self):
         return str(self.user)

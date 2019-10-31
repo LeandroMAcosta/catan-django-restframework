@@ -272,7 +272,47 @@ class RoomTest(TestCase):
         response = view(request, pk=id)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_cancel_lobby(self):
-        pass
-        # La room no existe
-        # La room se elimina (cancela) correctamente
+    def test_cancel_lobby_room_not_exist(self):
+        id = 123456789
+        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
+        request = self.factory.delete('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'delete': 'cancel_lobby'})
+        response = view(request, pk=id)
+        self.assertEqual(response.data, "The ROOM does not exist")
+
+    def test_cancel_lobby_not_owner(self):
+        board = self.create_board('boardcito', self.user)
+        room, room_data = self.create_room(
+            'roomcito',
+            board,
+            self.user,
+            2,
+            True
+        )
+
+        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
+        id = 1
+        request = self.factory.delete('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'delete': 'cancel_lobby'})
+        response = view(request, pk=id)
+        self.assertEqual(response.status_code, 406)
+
+    def test_cancel_lobby_ok(self):
+        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
+        board = self.create_board('boardcito', user)
+        room, room_data = self.create_room(
+            'roomcito',
+            board,
+            user,
+            2,
+            True
+        )
+
+        id = 1
+        request = self.factory.delete('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=user)
+        view = RoomsView.as_view({'delete': 'cancel_lobby'})
+        response = view(request, pk=id)
+        self.assertEqual(response.status_code, 200)

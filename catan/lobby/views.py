@@ -64,7 +64,7 @@ class RoomsView(viewsets.ModelViewSet):
         rooms = RoomSerializer(query_set, many=True).data
         return Response(rooms)
 
-    def join(self, request, pk):
+    def join(self, request, pk=None):
         try:
             if not Room.objects.filter(id=pk).exists():
                 raise RoomNotExist
@@ -87,7 +87,6 @@ class RoomsView(viewsets.ModelViewSet):
                 'BADREQUEST',
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         room.players.add(user)
         return Response()
 
@@ -121,6 +120,7 @@ class RoomsView(viewsets.ModelViewSet):
             game.player_set.create(
                 user=user,
                 colour=colours[colour],
+                num=colour
             )
         room.game_has_started = True
         room.save()
@@ -129,7 +129,19 @@ class RoomsView(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    def cancel_lobby(self, request, pk):
+    def cancel_lobby(self, request, pk=None):
+        if not Room.objects.filter(id=pk).exists():
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         room = self.get_object()
+        if request.user != room.owner:
+            return Response(
+                'The owner is the only than can delete this room',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         room.delete()
         return Response()
