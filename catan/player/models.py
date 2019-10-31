@@ -84,6 +84,23 @@ class Player(models.Model):
         self.increase_vp(1)
         return "Created settlement.", 201
 
+    def check_valid_road(self, v1, v2):
+        limit = [6, 18, 30]
+        if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
+            raise Exception("Level out of bounds")
+        if not (0 <= v1['index'] < limit[v1['level']]
+                and 0 <= v2['index'] < limit[v2['level']]):
+            raise Exception("Index out of bounds.")
+
+    def create_road(self, vertex1, vertex2):
+        road = self.road_set.create(v1=vertex1, v2=vertex2)
+        road.clean()
+        road.save()
+
+    def purchase_road(self):
+        needed_resources = [('brick', 1), ('lumber', 1)]
+        self.decrease_resources(needed_resources)
+
     def build_road(self, data):
         game = self.game
         if len(data) < 2:
@@ -92,21 +109,13 @@ class Player(models.Model):
             raise Exception("Too many arguments")
         v1 = data[0]
         v2 = data[1]
-        limit = [6, 18, 30]
-        if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
-            raise Exception("Level out of bounds")
-        if not (0 <= v1['index'] < limit[v1['level']]
-                and 0 <= v2['index'] < limit[v2['level']]):
-            raise Exception("Index out of bounds.")
+        self.check_valid_road(v1, v2)
         vertex1 = game.vertex_set.get(**v1)
         vertex2 = game.vertex_set.get(**v2)
         if not (vertex2 in vertex1.get_neighbors()):
             raise Exception("Non adjacent or repeated vertexes.")
-        needed_resources = [('brick', 1), ('lumber', 1)]
-        self.decrease_resources(needed_resources)
-        resource = self.road_set.create(v1=vertex1, v2=vertex2)
-        resource.clean()
-        resource.save()
+        self.purchase_road()
+        self.create_road(vertex1, vertex2)
         return "Created road.", 201
 
     def bank_trade(self, data):

@@ -306,7 +306,7 @@ class RoomTest(TestCase):
             board,
             user,
             2,
-            True
+            False
         )
 
         id = 1

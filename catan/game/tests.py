@@ -288,11 +288,14 @@ class GameTest(APITestCase):
             ]
         }
 
+        roads = self.player.road_set.count()
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,
             format='json'
         )
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.road_set.count(), roads + 1)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_road_oob(self):
@@ -316,7 +319,6 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_road_non_adjacent(self):
