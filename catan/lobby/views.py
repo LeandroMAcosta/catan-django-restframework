@@ -137,6 +137,11 @@ class RoomsView(viewsets.ModelViewSet):
             )
 
         room = self.get_object()
+        if room.game_has_started:
+            return Response(
+                'The game already start',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
         if request.user != room.owner:
             return Response(
                 'The owner is the only than can delete this room',
