@@ -60,11 +60,12 @@ class GameViewSets(viewsets.ModelViewSet):
                 message,
                 status=response_status
             )
-        except AttributeError:
-            return Response(
-                "Bad Request",
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # except AttributeError:
+        #     print("343")
+        #     return Response(
+        #         "Bad Request",
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
         except Game.DoesNotExist:
             return Response(
                 "Game does not exist",
@@ -77,6 +78,7 @@ class GameViewSets(viewsets.ModelViewSet):
             )
         except Exception as error:
             err = str(error)
+            #print(err)
             return Response(
                 err,
                 status=status.HTTP_404_NOT_FOUND

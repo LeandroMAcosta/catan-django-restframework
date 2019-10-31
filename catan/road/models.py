@@ -23,11 +23,11 @@ class Road(models.Model):
         + str(self.owner)
 
     def clean(self):
-        road_v1_v2 = Road.objects.filter(
+        road_v1_v2 = Road.objects.exclude(id=self.id).filter(
             v1=self.v1, v2=self.v2,
-            owner__game=self.get_game()).exclude(id=self.id)
+            owner__game=self.get_game())
         road_v2_v1 = Road.objects.filter(
-            v1=self.v2, v2=self.v1, owner__game=self.get_game())
+            v1=self.v2, v2=self.v1)
         if road_v1_v2.exists() or road_v2_v1.exists():
             raise ValidationError({'Exception': 'Edge already in use'})
 
