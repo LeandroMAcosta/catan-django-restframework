@@ -87,7 +87,6 @@ class RoomsView(viewsets.ModelViewSet):
                 'BADREQUEST',
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         room.players.add(user)
         return Response()
 
@@ -121,6 +120,7 @@ class RoomsView(viewsets.ModelViewSet):
             game.player_set.create(
                 user=user,
                 colour=colours[colour],
+                num=colour
             )
         room.game_has_started = True
         room.save()

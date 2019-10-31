@@ -9,6 +9,7 @@ import random
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    num = models.IntegerField(default=0)
     colour = models.CharField(max_length=100)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     victory_points = models.PositiveIntegerField(default=0)
@@ -24,7 +25,7 @@ class Player(models.Model):
         actions = ['build_settlement', 'upgrade_city', 'build_road',
                    'move_robber', 'buy_card', 'play_knight_card',
                    'play_road_building_card', 'play_monopoly_card',
-                   'play_year_of_plenty_card', ' end_turn', 'bank_trade']
+                   'play_year_of_plenty_card', 'end_turn', 'bank_trade']
         return actions
 
     def get_resource(self, res):
@@ -140,6 +141,11 @@ class Player(models.Model):
         self.card_set.create(card_type=cards_types[card])
 
         return "Card purchased", 201
+
+    def end_turn(self, data):
+        self.game.end_turn()
+        # print(self.game.get_player_turn(), self.game.get_dices())
+        return "turn passed ok", 201
 
     def __str__(self):
         return str(self.user)
