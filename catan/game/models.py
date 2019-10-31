@@ -52,11 +52,17 @@ class Game(models.Model):
         hexagon = board.hexagon_set.get(index=index, level=level)
         return hexagon
 
+    def get_vertex(self, index, level):
+        return self.vertex_set.get(index=index, level=level)
+
     def get_dices(self):
         return self.dice1, self.dice2
 
     def get_player_turn(self):
         return self.player_turn
+
+    def get_player_from_username(self, username):
+        return self.player_set.get(user__username=username)
 
     def throw_dice(self):
         self.dice1 = random.randint(1, 6)
@@ -84,6 +90,11 @@ class Game(models.Model):
                     player = settl.owner
                     r = hexag.resources
                     player.increase_resources([(r, 1)])
+
+    def get_vertex_from_hexagon(self, index, level):
+        hexagon = self.get_hexagon(index, level)
+        hexagon_vertex = hexagon.get_neighboring_vertexes()
+        return map(lambda vertex: self.get_vertex(vertex[0], vertex[1]))
 
     def __str__(self):
         return str(self.id)

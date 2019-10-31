@@ -70,33 +70,57 @@ class Player(models.Model):
         for resource in resource_list:
             resource.save()
 
+    def decrement_random_resource(self):
+        resources = self.resource_set.filter(amount__gt=0)
+        resource = random.choice(resources)
+        resource.decrement(1)
+
+    def remove_random_resource(self, amount):
+        total_resources = self.get_total_resources()
+        if amount > total_resources:
+            raise Exception("Not enough resources.")
+        resources = self.resource_set.filter(amount__gt=0)
+
+        while amount > 0:
+            player.decrement_random_resource()
+            amount -= 1
+
     # Actions methods
 
     def player_available_actions(self):
         # TODO
         pass
 
+    def move_robber(self, data):
+        index = data['index']
+        level = data['level']
+        game = self.game
+        hexagon = game.get_hexagon(index, level)
+        game.thief = hexagon
+        game.save()
+
     def play_knight_card(self, data):
+        game = self.game
         player = data.get('player', None)
         position = data.get('position', None)
+        hexagon = game.get_hexagon(index, level)
+        game.thief = hexagon
 
-        if player is None:
-            # TODO filter by players in given position
-            game = self.game
-            players = game.player_set.filter(~Q(user=self.user))
-            players = filter(
-                lambda player: player.get_total_resources() > 7,
-                players
-            )
-            # retornar HEX_POSITION y los players
-        else:
-            # TODO steal a resource from the given player
-            game = self.game
+        if player is not None:
+            player = game.get_player_from_username(player)
             index = position['index']
             level = position['level']
             hexagon = game.get_hexagon(index, level)
-            game.thief = hexagon
-            game.save()
+            vertices = game.get_vertex_from_hexagon(index, level)
+
+            for vertex in vertices:
+                settlement = vertex.settlement or None
+                if settlement and settlement.player == player:
+                    player.remove_random_resource(1)
+                    return "Thief positioned and Player stolen.", 200
+
+        game.save()
+        return "Thief positioned.", 200
 
     def increase_vp(self, amount):
         self.victory_points = models.F('victory_points') + amount
