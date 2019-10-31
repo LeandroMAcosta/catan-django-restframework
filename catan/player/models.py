@@ -114,7 +114,7 @@ class Player(models.Model):
             vertices = game.get_vertex_from_hexagon(index, level)
 
             for vertex in vertices:
-                settlement = vertex.settlement or None
+                settlement = vertex.get_settlement()
                 if settlement and settlement.owner == player:
                     player.remove_random_resource(1)
                     return "Thief positioned and Player stolen.", 200
