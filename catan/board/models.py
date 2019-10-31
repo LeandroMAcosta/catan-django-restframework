@@ -106,4 +106,9 @@ class Hexagon(models.Model):
                     neighbours.append((1, (index + index//2 + i) % 18))
                 for i in range(-1, 3):
                     neighbours.append((2, (2*index + index//2 + i) % 30))
-        return neighbours
+
+        def pack_to_dict(vertex):
+            return({'level': vertex[0],
+                    'index': vertex[1]
+                    })
+        return map(pack_to_dict, neighbours)

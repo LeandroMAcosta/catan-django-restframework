@@ -58,8 +58,8 @@ class Game(models.Model):
         for hexag in h:
             ver = hexag.get_neighboring_vertexes()
             for v in ver:
-                level = v[0]
-                index = v[1]
+                level = v['level']
+                index = v['index']
                 vertex = self.vertex_set.get(level=level, index=index)
                 settl = None
                 try:
