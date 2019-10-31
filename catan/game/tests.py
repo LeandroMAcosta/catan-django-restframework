@@ -150,6 +150,20 @@ class GameTest(APITestCase):
         self.player.save()
         self.client.force_authenticate(self.user)
 
+        # Second user
+        self.username2 = "user2"
+        self.user2 = User._default_manager.create_user(
+            username=self.username2,
+        )
+        self.user2.set_password(self.password)
+        self.user2.save()
+        self.player2 = Player(
+            user=self.user2,
+            game=self.game,
+            colour='colorci3'
+        )
+        self.player2.save()
+
     def test_game_bad_request(self):
         data = {
             'type': 'build_settlement',
@@ -613,3 +627,124 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.data, "Game does not exist")
+
+    # Play knight card
+
+    def test_play_kight_card_without_player_ok(self):
+        data = {
+            'type': 'play_knight_card',
+            'payload': {
+                "position": {
+                    "index": 0,
+                    "level": 1
+                }
+            },
+            'player': None
+        }
+        # self.board.hexagon_set.create(index=0, level=0) Alredy created
+        self.board.hexagon_set.create(index=0, level=1)
+        self.board.hexagon_set.create(index=1, level=0)
+        thief = self.game.thief
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.game.refresh_from_db()
+        self.assertEqual(response.data, "Thief positioned.")
+        self.assertNotEqual(self.game.thief, thief)
+        self.assertEqual(self.game.thief.index, 0)
+        self.assertEqual(self.game.thief.level, 1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_play_kight_card_with_player_ok(self):
+        data = {
+            'type': 'play_knight_card',
+            'payload': {
+                "position": {
+                    "index": 0,
+                    "level": 1
+                },
+                'player': 'user2'
+            }
+        }
+        self.board.hexagon_set.create(index=0, level=1)
+        self.board.hexagon_set.create(index=1, level=0)
+        vertex = self.game.vertex_set.get(index=1, level=1)
+
+        self.player2.settlement_set.create(vertex=vertex)
+        self.player2.increase_resources([('wool', 4)])
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.game.refresh_from_db()
+        self.player2.refresh_from_db()
+
+        self.assertEqual(response.data, "Thief positioned and Player stolen.")
+        self.assertEqual(self.player2.get_resource('wool').amount, 3)
+        self.assertEqual(self.player2.get_total_resources(), 3)
+        self.assertEqual(response.status_code, 200)
+
+    def test_play_kight_card_few_resources(self):
+        data = {
+            'type': 'play_knight_card',
+            'payload': {
+                "position": {
+                    "index": 0,
+                    "level": 1
+                },
+                'player': 'user2'
+            }
+        }
+        self.board.hexagon_set.create(index=0, level=1)
+        self.board.hexagon_set.create(index=1, level=0)
+        vertex = self.game.vertex_set.get(index=1, level=1)
+
+        self.player2.settlement_set.create(vertex=vertex)
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.game.refresh_from_db()
+        self.player2.refresh_from_db()
+
+        self.assertEqual(response.data, "Not enough resources.")
+        self.assertEqual(response.status_code, 404)
+
+    def test_play_kight_card_player_not_in_hexagon(self):
+        data = {
+            'type': 'play_knight_card',
+            'payload': {
+                "position": {
+                    "index": 2,
+                    "level": 2
+                },
+                'player': 'user2'
+            }
+        }
+        self.board.hexagon_set.create(index=0, level=1)
+        self.board.hexagon_set.create(index=1, level=0)
+        self.board.hexagon_set.create(index=2, level=2)
+        vertex = self.game.vertex_set.get(index=1, level=1)
+
+        self.player2.settlement_set.create(vertex=vertex)
+        self.player2.increase_resources([('wool', 4)])
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.game.refresh_from_db()
+        self.player2.refresh_from_db()
+
+        self.assertEqual(response.data, "Player not in hexagon.")
+        self.assertEqual(response.status_code, 404)
