@@ -159,6 +159,31 @@ class Player(models.Model):
         # print(self.game.get_player_turn(), self.game.get_dices())
         return "turn passed ok", 201
 
+    def play_road_building_card(self, data):
+        cards = self.card_set.filter(card_type='road_building')
+        if cards.count() == 0:
+            raise Exception("Without card")
+        card = cards.first()
+        if len(data) < 2:
+            raise Exception("Insufficient arguments")
+        elif len(data) > 2:
+            raise Exception("Too many arguments")
+        for d in data:
+            if len(d) < 2:
+                raise Exception("Insufficient arguments")
+            elif len(d) > 2:
+                raise Exception("Too many arguments")
+        for roads in data:
+            v1 = roads[0]
+            v2 = roads[1]
+            self.check_valid_road(v1, v2)
+            vertex1 = game.vertex_set.get(**v1)
+            vertex2 = game.vertex_set.get(**v2)
+            if not (vertex2 in vertex1.get_neighbors()):
+                raise Exception("Non adjacent or repeated vertexes.")
+            self.create_road(vertex1, vertex2)
+        card.delete()
+
     def __str__(self):
         return str(self.user)
 
