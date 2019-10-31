@@ -97,7 +97,6 @@ class Player(models.Model):
 
     def create_road(self, vertex1, vertex2):
         road = self.road_set.create(v1=vertex1, v2=vertex2)
-        road.clean()
         road.save()
 
     def purchase_road(self):
@@ -117,8 +116,13 @@ class Player(models.Model):
         vertex2 = game.vertex_set.get(**v2)
         if not (vertex2 in vertex1.get_neighbors()):
             raise Exception("Non adjacent or repeated vertexes.")
-        self.purchase_road()
+        for pl in self.game.player_set.all():
+            for road in pl.road_set.all():
+                if ((road.v1 == vertex1 and road.v2 == vertex2) or
+                        (road.v1 == vertex2 and road.v2 == vertex1)):
+                    raise Exception("Edge alredy in use")
         self.create_road(vertex1, vertex2)
+        self.purchase_road()
         return "Created road.", 201
 
     def bank_trade(self, data):
@@ -181,6 +185,11 @@ class Player(models.Model):
             vertex2 = game.vertex_set.get(**v2)
             if not (vertex2 in vertex1.get_neighbors()):
                 raise Exception("Non adjacent or repeated vertexes.")
+            for pl in self.game.player_set.all():
+                for road in pl.road_set.all():
+                    if ((road.v1 == vertex1 and road.v2 == vertex2) or
+                            (road.v1 == vertex2 and road.v2 == vertex1)):
+                        raise Exception("Edge alredy in use")
             self.create_road(vertex1, vertex2)
         card.delete()
 

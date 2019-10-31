@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.db import models
+from itertools import chain
 import random
 
 
@@ -29,6 +30,13 @@ class Game(models.Model):
                     else:
                         vertex_data['level'] = 2
                     job.vertex_set.create(**vertex_data)
+
+    def built_roads(self):
+        players = list(self.player_set)
+        roads = list(players[0].road_set)
+        for pl in players[1:]:
+            roads = roads + list(pl.road_set)
+        return roads
 
     def get_board(self):
         return self.room.board
