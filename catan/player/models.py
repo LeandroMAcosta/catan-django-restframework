@@ -21,11 +21,60 @@ class Player(models.Model):
     # last_gained =
 
     def available_actions(self):
-        # TODO check
         actions = ['build_settlement', 'upgrade_city', 'build_road',
                    'move_robber', 'buy_card', 'play_knight_card',
                    'play_road_building_card', 'play_monopoly_card',
                    'play_year_of_plenty_card', 'end_turn', 'bank_trade']
+        available_actions = []
+        current_turn = self.game.get_player_turn()
+        my_turn = self.num
+
+        if current_turn == my_turn:
+            # buil_settlement
+            # TODO It can only be when there are roads
+            type_action = actions[0]
+            payload = []
+
+            vertexs = self.game.vertex_set.all()
+            for v in vertexs:
+                if not v.used:
+                    payload.append(v)
+
+            available_actions.append({
+                "type": type_action,
+                "payload": payload
+            })
+
+            # upgrade_city
+            type_action = actions[1]
+            payload = []
+            for v in vertexs:
+                if v.used and not v.settlement.upgrade:
+                    payload.append(v)
+
+            available_actions.append({
+                "type": type_action,
+                "payload": payload
+            })
+
+            # TODO build_road
+
+            # TODO move_robber
+
+            # buy_card
+            type_action = actions[4]
+            payload = None
+
+            wool = self.get_resource('wool').amount
+            grain = self.get_resource('grain').amount
+            ore = self.get_resource('ore').amount
+
+            if wool > 0 and grain > 0 and ore > 0:
+                available_actions.append({
+                    "type": type_action,
+                    "payload": payload
+                })
+
         return actions
 
     def get_resource(self, res):
@@ -144,7 +193,8 @@ class Player(models.Model):
 
     def end_turn(self, data):
         self.game.end_turn()
-        # print(self.game.get_player_turn(), self.game.get_dices())
+        # print("player turn: ", self.game.get_player_turn())
+        # print("dices: ", self.game.get_dices())
         return "turn passed ok", 201
 
     def __str__(self):
