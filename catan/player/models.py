@@ -20,6 +20,9 @@ class Player(models.Model):
     # resources_cards =
     # last_gained =
 
+    def get_game(self):
+        return self.game
+
     def available_actions(self):
         # TODO check
         actions = ['build_settlement', 'upgrade_city', 'build_road',
