@@ -57,9 +57,9 @@ class Player(models.Model):
                 "payload": payload
             })
 
-            # TODO build_road
+            # TODO build_road 2
 
-            # TODO move_robber
+            # TODO move_robber 3
 
             # buy_card
             type_action = actions[4]
