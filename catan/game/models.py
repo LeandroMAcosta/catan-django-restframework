@@ -50,6 +50,7 @@ class Game(models.Model):
         number_of_players = self.room.number_of_players()
         self.player_turn = (turn + 1) % number_of_players
         self.save()
+        self.distribute_resources()
 
     def distribute_resources(self):
         dice = self.dice1 + self.dice2
@@ -60,10 +61,14 @@ class Game(models.Model):
                 level = v[0]
                 index = v[1]
                 vertex = self.vertex_set.get(level=level, index=index)
-                settl = vertex.settlement
+                settl = None
+                try:
+                    settl = vertex.settlement
+                except Exception:
+                    continue
                 if settl is not None:
                     player = settl.owner
-                    r = hexag.resources
+                    r = hexag.resource
                     player.increase_resources([(r, 1)])
 
     def __str__(self):

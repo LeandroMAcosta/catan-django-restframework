@@ -627,7 +627,7 @@ class GameTest(APITestCase):
         ldices = self.game.get_dices()
         dices = ldices[0] + ldices[1]
         bricks = self.player.get_resource_amount('brick')
-        while dices != 8 do:
+        while dices != 8:
             self.game.throw_dice()
             self.game.refresh_from_db()
             ldices = self.game.get_dices()
@@ -635,3 +635,12 @@ class GameTest(APITestCase):
         self.game.distribute_resources()
         self.player.refresh_from_db()
         self.assertEqual(self.player.get_resource_amount('brick'), bricks + 1)
+        wools = self.player.get_resource_amount('wool')
+        while dices != 4:
+            self.game.throw_dice()
+            self.game.refresh_from_db()
+            ldices = self.game.get_dices()
+            dices = ldices[0] + ldices[1]
+        self.game.distribute_resources()
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.get_resource_amount('wool'), wools + 1)
