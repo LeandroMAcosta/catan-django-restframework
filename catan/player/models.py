@@ -164,6 +164,7 @@ class Player(models.Model):
         return "turn passed ok", 201
 
     def play_road_building_card(self, data):
+        game = self.game
         cards = self.card_set.filter(card_type='road_building')
         if cards.count() == 0:
             raise Exception("Without card")
@@ -192,6 +193,7 @@ class Player(models.Model):
                         raise Exception("Edge alredy in use")
             self.create_road(vertex1, vertex2)
         card.delete()
+        return "Created road.", 201
 
     def __str__(self):
         return str(self.user)

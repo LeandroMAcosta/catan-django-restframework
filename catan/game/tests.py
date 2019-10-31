@@ -608,3 +608,40 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.data, "Game does not exist")
+
+    def test_play_road_building_card_ok(self):
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ], 
+                [
+                    {
+                        'level': 0,
+                        'index': 2
+                    },
+                    {
+                        'level': 0,
+                        'index': 3
+                    },
+                ],
+                ]
+        }
+        self.player.card_set.create(card_type="road_building")
+        roads = self.player.road_set.count()
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.player.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.player.road_set.count(), roads + 2)
