@@ -21,17 +21,5 @@ class Road(models.Model):
         return "Road " + str(self.v1) + " " + str(self.v2) + " from "
         + str(self.owner)
 
-<<<<<<< HEAD
-=======
-    def clean(self):
-        road_v1_v2 = Road.objects.filter(
-            v1=self.v1, v2=self.v2,
-            owner__game=self.get_game()).exclude(id=self.id)
-        road_v2_v1 = Road.objects.filter(
-            v1=self.v2, v2=self.v1, owner__game=self.get_game())
-        if road_v1_v2.exists() or road_v2_v1.exists():
-            raise ValidationError({'Exception': 'Edge already in use'})
-
->>>>>>> 3856720d927dc57f826e8332e1cfda5f161ff01a
     class Meta:
         unique_together = ['owner', 'v1', 'v2']
