@@ -34,10 +34,13 @@ class Player(models.Model):
             type_action = actions[0]
             payload = []
 
-            vertexs = self.game.vertex_set.all()
-            for v in vertexs:
-                if not v.used:
-                    payload.append(v)
+            vertices = self.game.vertex_set.all()
+            for vertex in vertices:
+                if not vertex.is_used():
+                    payload.append({
+                        "index": vertex.index,
+                        "level": vertex.level
+                    })
 
             available_actions.append({
                 "type": type_action,
@@ -47,14 +50,15 @@ class Player(models.Model):
             # upgrade_city
             type_action = actions[1]
             payload = []
-            for v in vertexs:
-                if v.used and not v.settlement.upgrade:
-                    payload.append(v)
+            for vertex in vertices:
+                if vertex.used and not vertex.settlement.upgrade:
+                    payload.append(vertex)
 
-            available_actions.append({
-                "type": type_action,
-                "payload": payload
-            })
+            if payload:
+                available_actions.append({
+                    "type": type_action,
+                    "payload": payload
+                })
 
             # TODO build_road 2
 
@@ -74,7 +78,38 @@ class Player(models.Model):
                     "payload": payload
                 })
 
-            # TODO play_knight_card 5
+            # play_knight_card
+
+            if self.card_set.filter(card_type="knight").exists():
+                type_action = actions[5]
+                payload = []
+
+                game = self.game
+                board = game.get_board()
+                hexagons = board.hexagon_set.all()
+                for hexagon in hexagons:
+                    index = hexagon.index
+                    level = hexagon.level
+                    vertices = game.get_vertex_from_hexagon(index, level)
+                    data = {
+                        "position": {
+                            "index": index,
+                            "level": level
+                        },
+                        "players": []
+                    }
+                    for vertex in vertices:
+                        is_used = vertex.is_used()
+                        if is_used and vertex.settlement.owner != self:
+                            player = vertex.settlement.owner.user.username
+                            data["players"].append(player)
+                    payload.append(data)
+
+                    available_actions.append({
+                        "type": type_action,
+                        "payload": payload
+                    })
+
             # TODO play_road_building_card 6
             # TODO play_monopoly_card 7
             # TODO play_year_of_plenty_card 8
@@ -98,10 +133,10 @@ class Player(models.Model):
                     "payload": payload
                 })
 
-            # print()
-            # for i in available_actions:
-            #     print(i)
-            #     print()
+            print()
+            for action in available_actions:
+                print(action)
+                print()
 
         return actions
 
