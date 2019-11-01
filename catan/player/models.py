@@ -122,6 +122,7 @@ class Player(models.Model):
                     stolen_resource = player.remove_random_resources(1)
                     resource = self.get_resource(stolen_resource.resource)
                     resource.add(1)
+                    resource.save()
                     game.save()
                     return "Thief positioned and Player stolen.", 200
             raise Exception("Player not in hexagon.")
