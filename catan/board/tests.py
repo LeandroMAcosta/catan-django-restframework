@@ -1,10 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import APIRequestFactory
 
 from game.models import Game
-from game.views import GameViewSets
+from game.views import HexListViewSets
 from lobby.models import Room
 
 from .models import Board, Hexagon
@@ -29,7 +29,6 @@ class BoardTest(TestCase):
         }
         self.board = Board(**board_data)
         self.board.save()
-        self.board.hexagon_set.create(index=1)
 
         room_data = {
             'name': 'roomcito',
@@ -71,13 +70,10 @@ class BoardTest(TestCase):
         )
         hexagon.save()
 
-        view = GameViewSets.as_view({'get': 'list'})
+        view = HexListViewSets.as_view({'get': 'list'})
         factory = APIRequestFactory()
-        request = factory.get('api/games/<int:pk>/board/')
-
-        force_authenticate(request, user=self.user)
-
-        response = view(request, pk=self.game.id)
+        request = factory.get('api/games/<int:game>/board/')
+        response = view(request, game=self.game.id)
         hexes = self.board.hexagon_set.all()
         serializer = HexagonSerializer(hexes, many=True)
         result = {'hexes': serializer.data}
