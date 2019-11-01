@@ -45,7 +45,7 @@ class Game(models.Model):
                     job.vertex_set.create(**vertex_data)
 
     def get_full_dice(self):
-        return self.dice1 + self.dice
+        return self.dice1 + self.dice2
 
     def get_board(self):
         return self.room.board

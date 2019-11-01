@@ -763,30 +763,84 @@ class GameTest(APITestCase):
 
     # Move robber
 
-    def test_move_robber_without_player_ok(self):
-        pass
-        # data = {
-        #     'type': 'play_knight_card',
-        #     'payload': {
-        #         "position": {
-        #             "index": 0,
-        #             "level": 1
-        #         }
-        #     },
-        #     'player': None
-        # }
-        # thief = self.game.thief
-        # response = self.client.post(
-        #     reverse('player-action', args=[self.game.id]),
-        #     data,
-        #     format='json'
-        # )
-        # self.game.refresh_from_db()
-        # self.assertEqual(response.data, "Thief positioned.")
-        # self.assertNotEqual(self.game.thief, thief)
-        # self.assertEqual(self.game.thief.index, 0)
-        # self.assertEqual(self.game.thief.level, 1)
-        # self.assertEqual(response.status_code, 200)
+    def test_move_robber_without_player_and_more_than_7_resources_ok(self):
+        """
+        Check if all players with more than 7 resources are stolen.
+        """
+        data = {
+            'type': 'move_robber',
+            'payload': {
+                "position": {
+                    "index": 11,
+                    "level": 2
+                }
+            },
+            'player': None
+        }
+        thief = self.game.thief
+
+        vertex = self.game.vertex_set.get(index=16, level=1)
+
+        self.player2.settlement_set.create(vertex=vertex)
+        self.player2.increase_resources([('wool', 110)])
+        total = self.player2.get_total_resources()
+        self.game.dice1 = 5
+        self.game.dice2 = 2
+        self.game.save()
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.game.refresh_from_db()
+        self.player2.refresh_from_db()
+
+        self.assertEqual(response.data, "Thief positioned.")
+        self.assertNotEqual(self.game.thief, thief)
+        self.assertEqual(self.player2.get_total_resources(), total - total//2)
+        self.assertEqual(self.game.thief.index, 11)
+        self.assertEqual(self.game.thief.level, 2)
+        self.assertEqual(response.status_code, 200)
+
+    def test_move_robber_without_player_and_less_than_8_resources_ok(self):
+        """
+        Check if all players with less than 8 resources aren't stolen.
+        """
+        data = {
+            'type': 'play_knight_card',
+            'payload': {
+                "position": {
+                    "index": 0,
+                    "level": 1
+                }
+            },
+            'player': None
+        }
+        thief = self.game.thief
+
+        vertex = self.game.vertex_set.get(index=16, level=1)
+
+        self.player2.settlement_set.create(vertex=vertex)
+        self.player2.increase_resources([('wool', 7)])
+
+        total = self.player2.get_total_resources()
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.game.refresh_from_db()
+        self.player2.refresh_from_db()
+
+        self.assertEqual(response.data, "Thief positioned.")
+        self.assertNotEqual(self.game.thief, thief)
+        self.assertEqual(self.player2.get_total_resources(), total)
+        self.assertEqual(self.game.thief.index, 0)
+        self.assertEqual(self.game.thief.level, 1)
+        self.assertEqual(response.status_code, 200)
 
     def test_resource_assignment(self):
         ldices = self.game.get_dices()

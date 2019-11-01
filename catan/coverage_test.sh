@@ -1,7 +1,7 @@
 echo "..........Run migrate.sh.......... \n"
 echo ""
 
-./migrate.sh
+# ./migrate.sh
 
 echo ""
 
