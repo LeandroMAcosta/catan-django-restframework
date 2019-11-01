@@ -1,10 +1,43 @@
-[ 
+[
   {
     "model": "board.board",
     "pk": 1,
     "fields": {
       "name": "nombresito",
       "owner": 1
+    }
+  },
+  {
+    "model": "board.hexagon",
+    "pk": 1,
+    "fields": {
+      "board": 1,
+      "level": 1,
+      "index": 2,
+      "resource": "wool",
+      "token": 1
+    }
+  },
+  {
+    "model": "board.hexagon",
+    "pk": 2,
+    "fields": {
+      "board": 1,
+      "level": 1,
+      "index": 0,
+      "resource": "desert",
+      "token": 1
+    }
+  },
+  {
+    "model": "board.hexagon",
+    "pk": 3,
+    "fields": {
+      "board": 1,
+      "level": 0,
+      "index": 0,
+      "resource": "grain",
+      "token": 3
     }
   },
   {
@@ -22,18 +55,8 @@
     "model": "game.game",
     "pk": 1,
     "fields": {
-      "room": 1
-    }
-  },
-  {
-    "model": "board.hexagon",
-    "pk": 1,
-    "fields": {
-      "board": 1,
-      "level": 1,
-      "index": 2,
-      "resource": "wool",
-      "token": 1
+      "room": 1,
+      "thief": 2
     }
   },
   {
@@ -46,11 +69,28 @@
     }
   },
   {
+    "model": "player.player",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "colour": "verdecito",
+      "game": 1
+    }
+  },
+  {
     "model": "card.card",
     "pk": 1,
     "fields": {
       "player": 1,
-      "card_type": "year_of_plenty"
+      "card_type": "play_knight_card"
+    }
+  },
+  {
+    "model": "settlement.settlement",
+    "pk": 1,
+    "fields": {
+      "owner": 2,
+      "vertex": 1
     }
   }
 ]

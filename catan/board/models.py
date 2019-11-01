@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from game.models import Game
 
 from utils.constants import RESOURCES
 
@@ -12,15 +11,28 @@ class Board(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def get_desert(self):
+        return self.hexagon_set.get(resource='desert') or None
+
     def __str__(self):
         return self.name
 
 
 class Vertex(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey('game.Game', on_delete=models.CASCADE)
     level = models.PositiveIntegerField(default=0)
     index = models.PositiveIntegerField(default=0)
+    # TODO delete this field
     used = models.BooleanField(default=False)
+
+    def get_settlement(self):
+        try:
+            return self.settlement
+        except Exception:
+            return None
+
+    def is_used(self):
+        return self.get_settlement() is not None
 
     class Meta:
         unique_together = ['game', 'level', 'index']
