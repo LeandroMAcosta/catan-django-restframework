@@ -31,7 +31,6 @@ class Player(models.Model):
         if current_turn == my_turn:
             # buil_settlement
             # TODO It can only be when there are roads
-            type_action = actions[0]
             payload = []
 
             vertices = self.game.vertex_set.all()
@@ -43,12 +42,11 @@ class Player(models.Model):
                     })
 
             available_actions.append({
-                "type": type_action,
+                "type": "build_settlement",
                 "payload": payload
             })
 
             # upgrade_city
-            type_action = actions[1]
             payload = []
             for vertex in vertices:
                 if vertex.used and not vertex.settlement.upgrade:
@@ -56,32 +54,16 @@ class Player(models.Model):
 
             if payload:
                 available_actions.append({
-                    "type": type_action,
+                    "type": "upgrade_city",
                     "payload": payload
                 })
 
             # TODO build_road 2
 
-            # TODO move_robber 3
+            # move_robber and play_knight_card
+            if self.game.get_full_dice() == 7 or \
+               self.card_set.filter(card_type="knight").exists():
 
-            # buy_card
-            type_action = actions[4]
-            payload = None
-
-            wool = self.get_resource('wool').amount
-            grain = self.get_resource('grain').amount
-            ore = self.get_resource('ore').amount
-
-            if wool > 0 and grain > 0 and ore > 0:
-                available_actions.append({
-                    "type": type_action,
-                    "payload": payload
-                })
-
-            # play_knight_card
-
-            if self.card_set.filter(card_type="knight").exists():
-                type_action = actions[5]
                 payload = []
 
                 game = self.game
@@ -105,32 +87,45 @@ class Player(models.Model):
                             data["players"].append(player)
                     payload.append(data)
 
-                    available_actions.append({
-                        "type": type_action,
-                        "payload": payload
-                    })
+                    if self.game.get_full_dice() == 7:
+                        available_actions.append({
+                            "type": "move_robber",
+                            "payload": payload
+                        })
+
+                    if self.card_set.filter(card_type="knight").exists():
+                        available_actions.append({
+                            "type": "play_knight_card",
+                            "payload": payload
+                        })
+
+            # buy_card
+            wool = self.get_resource('wool').amount
+            grain = self.get_resource('grain').amount
+            ore = self.get_resource('ore').amount
+
+            if wool > 0 and grain > 0 and ore > 0:
+                available_actions.append({
+                    "type": "buy_card",
+                    "payload": None
+                })
 
             # TODO play_road_building_card 6
             # TODO play_monopoly_card 7
             # TODO play_year_of_plenty_card 8
 
             # end_turn
-            type_action = actions[9]
-            payload = None
             available_actions.append({
-                "type": type_action,
-                "payload": payload
+                "type": "end_turn",
+                "payload": None
             })
 
             # bank_trade
-            type_action = actions[10]
-            payload = None
-
             r = self.resource_set.filter(amount__gte=4)
             if r.exists():
                 available_actions.append({
-                    "type": type_action,
-                    "payload": payload
+                    "type": "bank_trade",
+                    "payload": None
                 })
 
             print()
