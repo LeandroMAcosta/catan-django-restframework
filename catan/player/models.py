@@ -170,7 +170,7 @@ class Player(models.Model):
         game = self.game
         cards = self.card_set.filter(card_type='road_building')
         if cards.count() == 0:
-            raise Exception("Without card")
+            raise Exception("Road building card missing")
         card = cards.first()
         if len(data) < 2:
             raise Exception("Insufficient arguments")
@@ -185,6 +185,9 @@ class Player(models.Model):
             v1 = road_data[0]
             v2 = road_data[1]
             self.check_valid_road(v1, v2)
+        if (((data[0][0] == data[1][0]) and (data[0][1] == data[1][1])) or
+                (data[0][0] == data[1][1]) and (data[0][1] == data[1][0])):
+            raise Exception("Repeated roads")
         for road_data in data:
             v1 = road_data[0]
             v2 = road_data[1]
