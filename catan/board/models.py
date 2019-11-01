@@ -113,5 +113,3 @@ class Hexagon(models.Model):
     def __str__(self):
         v = "({0} {1})".format(self.level, self.index)
         return "Board {0} {1}".format(self.board, v)
-
-

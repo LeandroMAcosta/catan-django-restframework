@@ -1,6 +1,5 @@
 from django.db.models.signals import post_save
 from django.db import models
-from itertools import chain
 import random
 
 
