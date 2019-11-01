@@ -93,11 +93,20 @@ class Player(models.Model):
         pass
 
     def move_robber(self, data):
-        index = data['index']
-        level = data['level']
         game = self.game
+        if game.get_full_dice() != 7:
+            raise Exception("Sum of dices must be equal to 7.")
+        position = data.get('position', None)
+        index = position['index']
+        level = position['level']
         hexagon = game.get_hexagon(index, level)
         game.thief = hexagon
+        players = game.player_set.all()
+        for player in players:
+            total = player.get_total_resources()
+            if total > 7:
+                player.remove_random_resources(total//2)
+
         game.save()
 
     def play_knight_card(self, data):
@@ -128,6 +137,7 @@ class Player(models.Model):
         self.save()
 
     def build_settlement(self, data):
+        # TODO check neighbours
         game = self.game
         limit = [6, 18, 30]
         level = data['level']
