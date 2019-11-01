@@ -87,17 +87,17 @@ class Player(models.Model):
                             data["players"].append(player)
                     payload.append(data)
 
-                    if self.game.get_full_dice() == 7:
-                        available_actions.append({
-                            "type": "move_robber",
-                            "payload": payload
-                        })
+                if self.game.get_full_dice() == 7:
+                    available_actions.append({
+                        "type": "move_robber",
+                        "payload": payload
+                    })
 
-                    if self.card_set.filter(card_type="knight").exists():
-                        available_actions.append({
-                            "type": "play_knight_card",
-                            "payload": payload
-                        })
+                if self.card_set.filter(card_type="knight").exists():
+                    available_actions.append({
+                        "type": "play_knight_card",
+                        "payload": payload
+                    })
 
             # buy_card
             wool = self.get_resource('wool').amount
@@ -129,6 +129,7 @@ class Player(models.Model):
                 })
 
             print()
+            print(self.game.get_full_dice())
             for action in available_actions:
                 print(action)
                 print()
