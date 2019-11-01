@@ -856,7 +856,6 @@ class GameTest(APITestCase):
             },
             'player': None
         }
-        thief = self.game.thief
 
         vertex = self.game.vertex_set.get(index=16, level=1)
 

@@ -76,4 +76,3 @@ class GameViewSets(viewsets.ModelViewSet):
                 "Player of authenticated user does not exist",
                 status=status.HTTP_404_NOT_FOUND
             )
-
