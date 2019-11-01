@@ -656,9 +656,6 @@ class GameTest(APITestCase):
             },
             'player': None
         }
-        # self.board.hexagon_set.create(index=0, level=0) Alredy created
-        # self.board.hexagon_set.create(index=0, level=1)
-        # self.board.hexagon_set.create(index=1, level=0)
         thief = self.game.thief
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -677,15 +674,14 @@ class GameTest(APITestCase):
             'type': 'play_knight_card',
             'payload': {
                 "position": {
-                    "index": 0,
-                    "level": 1
+                    "index": 11,
+                    "level": 2
                 },
                 'player': 'user2'
             }
         }
-        # self.board.hexagon_set.create(index=0, level=1)
-        # self.board.hexagon_set.create(index=1, level=0)
-        vertex = self.game.vertex_set.get(index=1, level=1)
+
+        vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
         self.player2.increase_resources([('wool', 4)])

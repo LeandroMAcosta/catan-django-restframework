@@ -36,8 +36,7 @@ class Player(models.Model):
         return sum(map(lambda resource: resource.amount, resources))
 
     def get_resource(self, res):
-        resource = self.resource_set.get(resource=res)
-        return resource
+        return self.resource_set.get(resource=res)
 
     def get_resource_amount(self, res):
         resource = self.resource_set.get(resource=res)
@@ -80,11 +79,12 @@ class Player(models.Model):
         total_resources = self.get_total_resources()
         if amount > total_resources:
             raise Exception("Not enough resources.")
-
+        resource = None
         while amount > 0:
             resource = self.decrement_random_resource()
             resource.save()
             amount -= 1
+        return resource
 
     # Actions methods
 
@@ -92,31 +92,25 @@ class Player(models.Model):
         # TODO
         pass
 
-    def move_robber(self, data):
+    def move_robber(self, data, knight_card=False):
         game = self.game
-        if game.get_full_dice() != 7:
+        if not knight_card and game.get_full_dice() != 7:
             raise Exception("Sum of dices must be equal to 7.")
-        position = data.get('position', None)
-        index = position['index']
-        level = position['level']
-        hexagon = game.get_hexagon(index, level)
-        game.thief = hexagon
-        players = game.player_set.all()
-        for player in players:
-            total = player.get_total_resources()
-            if total > 7:
-                player.remove_random_resources(total//2)
 
-        game.save()
-
-    def play_knight_card(self, data):
-        game = self.game
         player = data.get('player', None)
         position = data.get('position', None)
         index = position['index']
         level = position['level']
         hexagon = game.get_hexagon(index, level)
         game.thief = hexagon
+
+        if not knight_card:
+            players = game.player_set.all()
+            for player in players:
+                total = player.get_total_resources()
+                if total > 7:
+                    player.remove_random_resources(total//2)
+
         if player is not None:
             player = game.get_player_from_username(player)
             hexagon = game.get_hexagon(index, level)
@@ -125,12 +119,18 @@ class Player(models.Model):
             for vertex in vertices:
                 settlement = vertex.get_settlement()
                 if settlement and settlement.owner == player:
-                    player.remove_random_resources(1)
+                    stolen_resource = player.remove_random_resources(1)
+                    resource = self.get_resource(stolen_resource.resource)
+                    resource.add(1)
+                    game.save()
                     return "Thief positioned and Player stolen.", 200
             raise Exception("Player not in hexagon.")
 
         game.save()
         return "Thief positioned.", 200
+
+    def play_knight_card(self, data):
+        return self.move_robber(data, knight_card=True)
 
     def increase_vp(self, amount):
         self.victory_points = models.F('victory_points') + amount
