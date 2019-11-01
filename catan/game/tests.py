@@ -750,7 +750,7 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-        self.assertNotEqual(response.data, "Too many arguments")
+        self.assertEqual(response.data, "Too many arguments")
 
     def test_play_road_building_card_repeated_arguments(self):
         data = {
