@@ -37,6 +37,7 @@ class RoomTest(TestCase):
         }
         board = Board(**board_data)
         board.save()
+        board.hexagon_set.create()
         return board
 
     def create_room(self, name, board, user, max_players, gs):
@@ -306,7 +307,7 @@ class RoomTest(TestCase):
             board,
             user,
             2,
-            True
+            False
         )
 
         id = 1

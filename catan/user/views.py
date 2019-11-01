@@ -41,5 +41,3 @@ class UserSignup(viewsets.ModelViewSet):
                 "Must include 'user' and 'pass'",
                 status=status.HTTP_409_CONFLICT
             )
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
