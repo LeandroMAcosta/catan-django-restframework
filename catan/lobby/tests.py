@@ -307,7 +307,7 @@ class RoomTest(TestCase):
             board,
             user,
             2,
-            False
+            True
         )
 
         id = 1
@@ -316,7 +316,7 @@ class RoomTest(TestCase):
         view = RoomsView.as_view({'delete': 'cancel_lobby'})
         response = view(request, pk=id)
         self.assertEqual(response.status_code, 406)
-    
+
     def test_cancel_lobby_ok(self):
         user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
         board = self.create_board('boardcito', user)
