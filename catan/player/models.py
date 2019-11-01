@@ -6,6 +6,8 @@ from utils.constants import RESOURCES
 from game.models import Game
 import random
 
+from game.exceptions import ActionExceptionError
+
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -36,8 +38,7 @@ class Player(models.Model):
         return sum(map(lambda resource: resource.amount, resources))
 
     def get_resource(self, res):
-        resource = self.resource_set.get(resource=res)
-        return resource
+        return self.resource_set.get(resource=res)
 
     def get_resource_amount(self, res):
         resource = self.resource_set.get(resource=res)
@@ -71,19 +72,18 @@ class Player(models.Model):
             resource.save()
 
     def decrement_random_resource(self):
+        total_resources = self.get_total_resources()
+        if total_resources <= 0:
+            raise ActionExceptionError("Not enough resources.")
         resources = self.resource_set.filter(amount__gt=0)
         resource = random.choice(resources)
-        resource.decrement(1)
+        resource.decrement()
+        resource.save()
         return resource
 
     def remove_random_resources(self, amount):
-        total_resources = self.get_total_resources()
-        if amount > total_resources:
-            raise Exception("Not enough resources.")
-
         while amount > 0:
-            resource = self.decrement_random_resource()
-            resource.save()
+            self.decrement_random_resource()
             amount -= 1
 
     # Actions methods
@@ -92,52 +92,67 @@ class Player(models.Model):
         # TODO
         pass
 
-    def move_robber(self, data):
-        index = data['index']
-        level = data['level']
-        game = self.game
-        hexagon = game.get_hexagon(index, level)
-        game.thief = hexagon
-        game.save()
+    def move_robber(self, data, knight_card=False):
 
-    def play_knight_card(self, data):
         game = self.game
-        player = data.get('player', None)
+        player_to_steal = data.get('player', None)
         position = data.get('position', None)
         index = position['index']
         level = position['level']
         hexagon = game.get_hexagon(index, level)
         game.thief = hexagon
-        if player is not None:
-            player = game.get_player_from_username(player)
+
+        # Only for move robber
+        if not knight_card:
+            if game.get_full_dice() != 7:
+                raise ActionExceptionError("Sum of dices must be equal to 7.")
+
+            players = game.player_set.all()
+            for p in players:
+                total = p.get_total_resources()
+                if total > 7:
+                    p.remove_random_resources(total//2)
+
+        # Steal player
+        if player_to_steal is not None:
+            stolen_player = game.get_player_from_username(player_to_steal)
             hexagon = game.get_hexagon(index, level)
             vertices = game.get_vertex_from_hexagon(index, level)
 
             for vertex in vertices:
                 settlement = vertex.get_settlement()
-                if settlement and settlement.owner == player:
-                    player.remove_random_resources(1)
+                if settlement and settlement.owner == stolen_player:
+                    stolen_resource = stolen_player.decrement_random_resource()
+                    stolen_resource.save()
+                    resource = self.get_resource(stolen_resource.resource)
+                    resource.add(1)
+                    resource.save()
+                    game.save()
                     return "Thief positioned and Player stolen.", 200
-            raise Exception("Player not in hexagon.")
+            raise ActionExceptionError("Player not in hexagon.")
 
         game.save()
         return "Thief positioned.", 200
+
+    def play_knight_card(self, data):
+        return self.move_robber(data, knight_card=True)
 
     def increase_vp(self, amount):
         self.victory_points = models.F('victory_points') + amount
         self.save()
 
     def build_settlement(self, data):
+        # TODO check neighbours
         game = self.game
         limit = [6, 18, 30]
         level = data['level']
         index = data['index']
         if not (0 <= level < 3 and 0 <= index < limit[level]):
-            raise Exception("Index or level out of bounds.")
+            raise ActionExceptionError("Index or level out of bounds.")
 
         vertex = game.vertex_set.get(**data)
         if vertex.used:
-            raise Exception("Vertex alredy in use.")
+            raise ActionExceptionError("Vertex alredy in use.")
 
         needed_resources = [('brick', 1), ('lumber', 1),
                             ('grain', 1), ('wool', 1)]
@@ -151,21 +166,21 @@ class Player(models.Model):
     def build_road(self, data):
         game = self.game
         if len(data) < 2:
-            raise Exception("Insufficient arguments")
+            raise ActionExceptionError("Insufficient arguments")
         elif len(data) > 2:
-            raise Exception("Too many arguments")
+            raise ActionExceptionError("Too many arguments")
         v1 = data[0]
         v2 = data[1]
         limit = [6, 18, 30]
         if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
-            raise Exception("Level out of bounds")
+            raise ActionExceptionError("Level out of bounds")
         if not (0 <= v1['index'] < limit[v1['level']]
                 and 0 <= v2['index'] < limit[v2['level']]):
-            raise Exception("Index out of bounds.")
+            raise ActionExceptionError("Index out of bounds.")
         vertex1 = game.vertex_set.get(**v1)
         vertex2 = game.vertex_set.get(**v2)
         if not (vertex2 in vertex1.get_neighbors()):
-            raise Exception("Non adjacent or repeated vertexes.")
+            raise ActionExceptionError("Non adjacent or repeated vertexes.")
         needed_resources = [('brick', 1), ('lumber', 1)]
         self.decrease_resources(needed_resources)
         resource = self.road_set.create(v1=vertex1, v2=vertex2)
@@ -179,14 +194,14 @@ class Player(models.Model):
         resources = [res[0] for res in RESOURCES]
 
         if give == receive:
-            raise Exception("Resources must be different.")
+            raise ActionExceptionError("Resources must be different.")
         elif give not in resources or receive not in resources:
-            raise Exception("Resource not exists.")
+            raise ActionExceptionError("Resource not exists.")
 
         resource = self.resource_set.get(resource=give)
 
         if resource.amount < 4:
-            raise Exception("Insufficient resources.")
+            raise ActionExceptionError("Insufficient resources.")
 
         new_resource = self.resource_set.get(resource=receive)
         new_resource.add(1)
