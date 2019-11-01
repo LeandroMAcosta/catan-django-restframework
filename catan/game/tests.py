@@ -786,7 +786,7 @@ class GameTest(APITestCase):
         )
         self.assertEqual(response.data, "Repeated roads")
 
-    def test_play_road_building_card_invalid_arguments(self):
+    def test_play_road_building_card_bad_arguments(self):
         roads = self.player.road_set.count()
         data = {
             'type': 'play_road_building_card',
