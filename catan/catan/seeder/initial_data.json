@@ -8,6 +8,14 @@
     }
   },
   {
+    "model": "board.board",
+    "pk": 2,
+    "fields": {
+      "name": "nombresito2",
+      "owner": 1
+    }
+  },
+  {
     "model": "board.hexagon",
     "pk": 1,
     "fields": {
