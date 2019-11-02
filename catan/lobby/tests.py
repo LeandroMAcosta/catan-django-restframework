@@ -52,13 +52,12 @@ class RoomTest(TestCase):
         room.save()
         return room, room_data
 
-    def test_list_room(self):
+    def test_list_room_without_rooms(self):
         # Make an authenticated request to the view...
-        # Test1: WITHOUT rooms
         # APIResponse
         request = self.factory.get('/api/rooms/')
         force_authenticate(request, user=self.user)
-        view = RoomsView.as_view({'get': 'list'})
+        view = RoomsView.as_view({'get': 'list_rooms'})
         response = view(request)
 
         # Expected serializer output
@@ -67,7 +66,7 @@ class RoomTest(TestCase):
 
         self.assertEqual(response.data, serializer.data, [])
 
-    def test_with_rooom(self):
+    def test_list_rooms_ok(self):
         board = self.create_board('boardcito', self.user)
         room, room_data = self.create_room(
             'roomcito',
@@ -80,7 +79,7 @@ class RoomTest(TestCase):
         # APIResponse
         request = self.factory.get('/api/rooms/')
         force_authenticate(request, user=self.user)
-        view = RoomsView.as_view({'get': 'list'})
+        view = RoomsView.as_view({'get': 'list_rooms'})
         response = view(request)
         assert response.status_code == 200
 
@@ -92,6 +91,51 @@ class RoomTest(TestCase):
         serializer = RoomSerializer(data, many=True)
 
         self.assertEqual(response.data, serializer.data, room_data)
+
+    def test_list_room_does_not_exists(self):
+        # APIResponse
+        id = 123456789
+        request = self.factory.get('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=self.user)
+        view = RoomsView.as_view({'get': 'list_room'})
+        response = view(request, pk=id)
+        assert response.status_code == 406
+        self.assertEqual(response.data, 'The ROOM does not exist')
+
+    def test_list_room_ok(self):
+        board = self.create_board('boardcito', self.user)
+        room, room_data = self.create_room(
+            'roomcito',
+            board,
+            self.user,
+            4,
+            False
+        )
+        board2 = self.create_board('boardcito2', self.user)
+        room2, room_data2 = self.create_room(
+            'roomcito2',
+            board,
+            self.user,
+            4,
+            False
+        )
+
+        # APIResponse
+        id = 1
+        request = self.factory.get('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=self.user)
+        view = RoomsView.as_view({'get': 'list_room'})
+        response = view(request, pk=id)
+        assert response.status_code == 200
+        self.assertEqual(response.data['id'], id)
+
+        id = 2
+        request = self.factory.get('/api/rooms/' + str(id) + '/')
+        force_authenticate(request, user=self.user)
+        view = RoomsView.as_view({'get': 'list_room'})
+        response = view(request, pk=id)
+        assert response.status_code == 200
+        self.assertEqual(response.data['id'], id)
 
     def test_join_room_does_not_exists(self):
         id = 123456789
@@ -272,47 +316,7 @@ class RoomTest(TestCase):
         response = view(request, pk=id)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_cancel_lobby_room_not_exist(self):
-        id = 123456789
-        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
-        request = self.factory.delete('/api/rooms/' + str(id) + '/')
-        force_authenticate(request, user=user)
-        view = RoomsView.as_view({'delete': 'cancel_lobby'})
-        response = view(request, pk=id)
-        self.assertEqual(response.data, "The ROOM does not exist")
-
-    def test_cancel_lobby_not_owner(self):
-        board = self.create_board('boardcito', self.user)
-        room, room_data = self.create_room(
-            'roomcito',
-            board,
-            self.user,
-            2,
-            True
-        )
-
-        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
-        id = 1
-        request = self.factory.delete('/api/rooms/' + str(id) + '/')
-        force_authenticate(request, user=user)
-        view = RoomsView.as_view({'delete': 'cancel_lobby'})
-        response = view(request, pk=id)
-        self.assertEqual(response.status_code, 406)
-
-    def test_cancel_lobby_ok(self):
-        user = self.create_login_user("u1", "u1@gmail.com", "supersecure")
-        board = self.create_board('boardcito', user)
-        room, room_data = self.create_room(
-            'roomcito',
-            board,
-            user,
-            2,
-            False
-        )
-
-        id = 1
-        request = self.factory.delete('/api/rooms/' + str(id) + '/')
-        force_authenticate(request, user=user)
-        view = RoomsView.as_view({'delete': 'cancel_lobby'})
-        response = view(request, pk=id)
-        self.assertEqual(response.status_code, 200)
+    def test_cancel_lobby(self):
+        pass
+        # La room no existe
+        # La room se elimina (cancela) correctamente

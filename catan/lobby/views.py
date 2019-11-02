@@ -59,10 +59,20 @@ class RoomsView(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_201_CREATED)
 
-    def list(self, request):
+    def list_rooms(self, request):
         query_set = Room.objects.all()
         rooms = RoomSerializer(query_set, many=True).data
         return Response(rooms)
+
+    def list_room(self, request, pk=None):
+        if not Room.objects.filter(id=pk).exists():
+            return Response(
+                'The ROOM does not exist',
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+        query_set = self.get_object()
+        room = RoomSerializer(query_set).data
+        return Response(room)
 
     def join(self, request, pk=None):
         try:
