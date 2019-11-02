@@ -61,11 +61,11 @@ class Player(models.Model):
             # TODO build_road 2
 
             # move_robber and play_knight_card
+
             if self.game.get_full_dice() == 7 or \
                self.card_set.filter(card_type="knight").exists():
 
                 payload = []
-
                 game = self.game
                 board = game.get_board()
                 hexagons = board.hexagon_set.all()
@@ -121,8 +121,9 @@ class Player(models.Model):
             })
 
             # bank_trade
-            r = self.resource_set.filter(amount__gte=4)
-            if r.exists():
+            resource = self.resource_set.filter(amount__gte=4)
+
+            if resource.exists():
                 available_actions.append({
                     "type": "bank_trade",
                     "payload": None
@@ -133,9 +134,8 @@ class Player(models.Model):
             # for action in available_actions:
             #     print(action)
             #     print()
-
-        # return available_actions
-        return actions
+        actions = set([action["type"] for action in available_actions])
+        return available_actions, actions
 
     def get_cities(self):
         return self.settlement_set.all()
@@ -197,11 +197,6 @@ class Player(models.Model):
             amount -= 1
 
     # Actions methods
-
-    def player_available_actions(self):
-        # TODO
-        pass
-
     def move_robber(self, data, knight_card=False):
 
         game = self.game

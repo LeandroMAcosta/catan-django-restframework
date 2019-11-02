@@ -52,8 +52,8 @@ class GameViewSets(viewsets.ModelViewSet):
             player = game.player_set.get(user=request.user)
             data = request.data['payload']
             action = request.data['type']
-            if action not in player.available_actions():
-                raise ActionExceptionError("Wrong action.")
+            if action not in player.available_actions()[1]:
+                raise ActionExceptionError("Wrong or unavailable action.")
             action = getattr(player, action)
             message, response_status = action(data)
             return Response(
@@ -83,7 +83,7 @@ class GameViewSets(viewsets.ModelViewSet):
                 raise ActionExceptionError("Game does not exist")
             game = self.get_object()
             player = game.player_set.get(user=request.user)
-            actions = player.available_actions()
+            actions = player.available_actions()[0]
             return Response(actions)
         except Player.DoesNotExist:
             return Response(
