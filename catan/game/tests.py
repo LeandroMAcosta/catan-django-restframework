@@ -306,7 +306,6 @@ class GameTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_road_ok(self):
-
         resources = [('brick', 1), ('lumber', 1)]
         self.player.increase_resources(resources)
         data = {
@@ -329,6 +328,9 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
+        print("\n\n\nLA CONCHA DE TU MADRE\n\n\n")
+        print(response.data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_road_oob(self):

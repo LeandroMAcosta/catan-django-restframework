@@ -20,10 +20,14 @@ class Player(models.Model):
         return self.game
 
     def available_actions(self):
-        actions = ['build_settlement', 'upgrade_city', 'build_road',
-                   'move_robber', 'buy_card', 'play_knight_card',
-                   'play_road_building_card', 'play_monopoly_card',
-                   'play_year_of_plenty_card', 'end_turn', 'bank_trade']
+        """
+        This method verifies all possible actions that the player can do
+        :returns:
+            - available_actions - list of json with available actions from
+                player, for the endpoint GET game/:pk/player/actions
+            - actions - list of string with available actions from player,
+                to check that the action sent by post is available
+        """
         available_actions = []
         current_turn = self.game.get_player_turn()
         my_turn = self.num
@@ -57,8 +61,6 @@ class Player(models.Model):
                     "type": "upgrade_city",
                     "payload": payload
                 })
-
-            # TODO build_road 2
 
             # move_robber and play_knight_card
 
@@ -110,10 +112,6 @@ class Player(models.Model):
                     "payload": None
                 })
 
-            # TODO play_road_building_card 6
-            # TODO play_monopoly_card 7
-            # TODO play_year_of_plenty_card 8
-
             # end_turn
             available_actions.append({
                 "type": "end_turn",
@@ -129,11 +127,11 @@ class Player(models.Model):
                     "payload": None
                 })
 
-            # print()
-            # print(self.game.get_full_dice())
-            # for action in available_actions:
-            #     print(action)
-            #     print()
+            # TODO play_road_building_card 6
+            # TODO play_monopoly_card 7
+            # TODO play_year_of_plenty_card 8
+            # TODO build_road 2 (importante para los test @mateo)
+
         actions = set([action["type"] for action in available_actions])
         return available_actions, actions
 
