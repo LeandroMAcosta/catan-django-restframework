@@ -128,13 +128,14 @@ class Player(models.Model):
                     "payload": None
                 })
 
-            print()
-            print(self.game.get_full_dice())
-            for action in available_actions:
-                print(action)
-                print()
+            # print()
+            # print(self.game.get_full_dice())
+            # for action in available_actions:
+            #     print(action)
+            #     print()
 
-        return available_actions
+        # return available_actions
+        return actions
 
     def get_cities(self):
         return self.settlement_set.all()
