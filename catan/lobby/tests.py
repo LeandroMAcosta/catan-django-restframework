@@ -104,15 +104,14 @@ class RoomTest(TestCase):
 
     def test_list_room_ok(self):
         board = self.create_board('boardcito', self.user)
-        room, room_data = self.create_room(
+        self.create_room(
             'roomcito',
             board,
             self.user,
             4,
             False
         )
-        board2 = self.create_board('boardcito2', self.user)
-        room2, room_data2 = self.create_room(
+        self.create_room(
             'roomcito2',
             board,
             self.user,
