@@ -163,14 +163,8 @@ class Player(models.Model):
         self.increase_vp(1)
         return "Created settlement.", 201
 
-    def build_road(self, data):
+    def check_valid_road(self, v1, v2):
         game = self.game
-        if len(data) < 2:
-            raise ActionExceptionError("Insufficient arguments")
-        elif len(data) > 2:
-            raise ActionExceptionError("Too many arguments")
-        v1 = data[0]
-        v2 = data[1]
         limit = [6, 18, 30]
         if not (0 <= v1['level'] < 3 and 0 <= v2['level'] < 3):
             raise ActionExceptionError("Level out of bounds")
@@ -181,11 +175,33 @@ class Player(models.Model):
         vertex2 = game.vertex_set.get(**v2)
         if not (vertex2 in vertex1.get_neighbors()):
             raise ActionExceptionError("Non adjacent or repeated vertexes.")
+        for pl in game.player_set.all():
+            for road in pl.road_set.all():
+                if ((road.v1 == vertex1 and road.v2 == vertex2) or
+                        (road.v1 == vertex2 and road.v2 == vertex1)):
+                    raise ActionExceptionError("Edge alredy in use")
+
+    def create_road(self, vertex1, vertex2):
+        road = self.road_set.create(v1=vertex1, v2=vertex2)
+        road.save()
+
+    def purchase_road(self):
         needed_resources = [('brick', 1), ('lumber', 1)]
         self.decrease_resources(needed_resources)
-        resource = self.road_set.create(v1=vertex1, v2=vertex2)
-        resource.clean()
-        resource.save()
+
+    def build_road(self, data):
+        game = self.game
+        if len(data) < 2:
+            raise ActionExceptionError("Insufficient arguments")
+        elif len(data) > 2:
+            raise ActionExceptionError("Too many arguments")
+        v1 = data[0]
+        v2 = data[1]
+        self.check_valid_road(v1, v2)
+        vertex1 = game.vertex_set.get(**v1)
+        vertex2 = game.vertex_set.get(**v2)
+        self.purchase_road()
+        self.create_road(vertex1, vertex2)
         return "Created road.", 201
 
     def bank_trade(self, data):
@@ -225,6 +241,37 @@ class Player(models.Model):
         self.game.end_turn()
         # print(self.game.get_player_turn(), self.game.get_dices())
         return "turn passed ok", 201
+
+    def play_road_building_card(self, data):
+        game = self.game
+        cards = self.card_set.filter(card_type='road_building')
+        if cards.count() == 0:
+            raise ActionExceptionError("Road building card missing")
+        card = cards.first()
+        if len(data) < 2:
+            raise ActionExceptionError("Insufficient arguments")
+        elif len(data) > 2:
+            raise ActionExceptionError("Too many arguments")
+        for road_data in data:
+            if len(road_data) < 2:
+                raise ActionExceptionError("Insufficient arguments")
+            elif len(road_data) > 2:
+                raise ActionExceptionError("Too many arguments")
+        for road_data in data:
+            v1 = road_data[0]
+            v2 = road_data[1]
+            self.check_valid_road(v1, v2)
+        if (((data[0][0] == data[1][0]) and (data[0][1] == data[1][1])) or
+                (data[0][0] == data[1][1]) and (data[0][1] == data[1][0])):
+            raise ActionExceptionError("Repeated roads")
+        for road_data in data:
+            v1 = road_data[0]
+            v2 = road_data[1]
+            vertex1 = game.vertex_set.get(**v1)
+            vertex2 = game.vertex_set.get(**v2)
+            self.create_road(vertex1, vertex2)
+        card.delete()
+        return "Created road.", 201
 
     def __str__(self):
         return str(self.user)

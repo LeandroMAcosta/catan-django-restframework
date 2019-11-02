@@ -179,6 +179,10 @@ class GameTest(APITestCase):
         self.player.settlement_set.create(vertex=vertex)
         self.player.save()
 
+        v1 = self.game.vertex_set.get(level=2, index=29)
+        v2 = self.game.vertex_set.get(level=2, index=28)
+        self.player.road_set.create(v1=v1, v2=v2)
+
     def test_game_bad_request(self):
         data = {
             'type': 'build_settlement',
@@ -397,7 +401,7 @@ class GameTest(APITestCase):
             format='json'
         )
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Non adjacent or repeated vertexes.")
 
     def test_road_insufficient_arguments(self):
         data = {
@@ -417,7 +421,7 @@ class GameTest(APITestCase):
             format='json'
         )
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Insufficient arguments")
 
     def test_road_too_many_arguments(self):
         data = {
@@ -445,7 +449,7 @@ class GameTest(APITestCase):
             format='json'
         )
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "Too many arguments")
 
     def test_road_used_edge(self):
         data = {
@@ -881,6 +885,216 @@ class GameTest(APITestCase):
         self.assertNotEqual(self.game.thief.index, 11)
         self.assertNotEqual(self.game.thief.level, 2)
         self.assertEqual(response.status_code, 404)
+
+    def test_play_road_building_card_ok(self):
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 0,
+                        'index': 2
+                    },
+                    {
+                        'level': 0,
+                        'index': 3
+                    },
+                ],
+            ]
+        }
+        self.player.card_set.create(card_type="road_building")
+        self.player.refresh_from_db()
+        roads = self.player.road_set.count()
+        cards = self.player.card_set.filter(card_type="road_building").count()
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.player.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.player.road_set.count(), roads + 2)
+        self.assertEqual(self.player.card_set.filter(
+            card_type="road_building").count(), cards - 1)
+
+    def test_play_road_building_card_no_card(self):
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 0,
+                        'index': 2
+                    },
+                    {
+                        'level': 0,
+                        'index': 3
+                    },
+                ],
+            ]
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.data, "Road building card missing")
+
+    def test_play_road_building_card_invalid_arguments(self):
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ]
+            ]
+        }
+        self.player.card_set.create(card_type="road_building")
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertNotEqual(response.data, "Not enough arguments")
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ]
+            ]
+        }
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.data, "Too many arguments")
+
+    def test_play_road_building_card_repeated_arguments(self):
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+            ]
+        }
+        self.player.card_set.create(card_type="road_building")
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.assertEqual(response.data, "Repeated roads")
+
+    def test_play_road_building_card_bad_arguments(self):
+        roads = self.player.road_set.count()
+        data = {
+            'type': 'play_road_building_card',
+            'payload': [
+                [
+                    {
+                        'level': 0,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+                [
+                    {
+                        'level': 3,
+                        'index': 1
+                    },
+                    {
+                        'level': 0,
+                        'index': 2,
+                    },
+                ],
+            ]
+        }
+        self.player.card_set.create(card_type="road_building")
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+        self.player.refresh_from_db()
+        self.assertEqual(response.data, "Level out of bounds")
+        self.assertEqual(self.player.road_set.count(), roads)
 
     def test_resource_assignment(self):
         ldices = self.game.get_dices()
