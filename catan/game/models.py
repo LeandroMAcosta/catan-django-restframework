@@ -83,7 +83,10 @@ class Game(models.Model):
     def distribute_resources(self):
         dice = self.dice1 + self.dice2
         h = self.room.board.hexagon_set.filter(token=dice)
+        thief = self.thief
         for hexag in h:
+            if (thief == hexag):
+                continue
             ver = hexag.get_neighboring_vertexes()
             for v in ver:
                 level = v['level']
@@ -103,12 +106,12 @@ class Game(models.Model):
         hexagon = self.get_hexagon(index, level)
         hexagon_vertex = hexagon.get_neighboring_vertexes()
         ret = list(map(
-                lambda vertex: self.get_vertex(
-                    index=vertex['index'],
-                    level=vertex['level']
-                ),
-                hexagon_vertex
-            )
+            lambda vertex: self.get_vertex(
+                index=vertex['index'],
+                level=vertex['level']
+            ),
+            hexagon_vertex
+        )
         )
         return ret
 
