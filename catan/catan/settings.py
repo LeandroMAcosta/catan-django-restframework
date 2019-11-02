@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'django_extensions',
+    'django_nose',
     'lobby',
     'game',
     'player',
@@ -139,3 +140,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser'
    ),
 }
+
+# Django nose
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

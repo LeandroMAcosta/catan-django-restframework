@@ -1,5 +1,6 @@
 djangorestframework==3.9.4
 django==2.2.5
+django-nose
 pep8
 pylint
 djangorestframework-jwt
