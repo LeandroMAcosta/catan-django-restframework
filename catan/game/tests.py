@@ -328,8 +328,6 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-        print("\n\n\nLA CONCHA DE TU MADRE\n\n\n")
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

@@ -19,6 +19,10 @@ class Player(models.Model):
     def get_game(self):
         return self.game
 
+    def can_build_road_in_vertices(self, vertex1, vertex2):
+        return vertex1.can_build_road_of_player(self) or \
+            vertex2.can_build_road_of_player(self)
+
     def available_actions(self):
         """
         This method verifies all possible actions that the player can do
@@ -28,111 +32,144 @@ class Player(models.Model):
             - actions - list of string with available actions from player,
                 to check that the action sent by post is available
         """
+
         available_actions = []
         current_turn = self.game.get_player_turn()
         my_turn = self.num
 
-        if current_turn == my_turn:
-            # buil_settlement
-            # TODO It can only be when there are roads
-            payload = []
+        if current_turn != my_turn:
+            return available_actions, []
 
-            vertices = self.game.vertex_set.all()
-            for vertex in vertices:
-                if not vertex.is_used():
-                    payload.append({
-                        "index": vertex.index,
-                        "level": vertex.level
-                    })
+        # buil_settlement
+        # TODO It can only be when there are roads
+        payload = []
 
+        vertices = self.game.vertex_set.all()
+        for vertex in vertices:
+            if not vertex.is_used():
+                payload.append({
+                    "index": vertex.index,
+                    "level": vertex.level
+                })
+
+        available_actions.append({
+            "type": "build_settlement",
+            "payload": payload
+        })
+
+        # upgrade_city
+        payload = []
+        for vertex in vertices:
+            if vertex.used and not vertex.settlement.upgrade:
+                payload.append(vertex)
+
+        if payload:
             available_actions.append({
-                "type": "build_settlement",
+                "type": "upgrade_city",
                 "payload": payload
             })
 
-            # upgrade_city
-            payload = []
-            for vertex in vertices:
-                if vertex.used and not vertex.settlement.upgrade:
-                    payload.append(vertex)
+        # move_robber and play_knight_card
 
-            if payload:
+        if self.game.get_full_dice() == 7 or \
+           self.card_set.filter(card_type="knight").exists():
+
+            payload = []
+            game = self.game
+            board = game.get_board()
+            hexagons = board.hexagon_set.all()
+            for hexagon in hexagons:
+                index = hexagon.index
+                level = hexagon.level
+                vertices = game.get_vertex_from_hexagon(index, level)
+                data = {
+                    "position": {
+                        "index": index,
+                        "level": level
+                    },
+                    "players": []
+                }
+                for vertex in vertices:
+                    is_used = vertex.is_used()
+                    if is_used and vertex.settlement.owner != self:
+                        player = vertex.settlement.owner.user.username
+                        data["players"].append(player)
+                payload.append(data)
+
+            if self.game.get_full_dice() == 7:
                 available_actions.append({
-                    "type": "upgrade_city",
+                    "type": "move_robber",
                     "payload": payload
                 })
 
-            # move_robber and play_knight_card
-
-            if self.game.get_full_dice() == 7 or \
-               self.card_set.filter(card_type="knight").exists():
-
-                payload = []
-                game = self.game
-                board = game.get_board()
-                hexagons = board.hexagon_set.all()
-                for hexagon in hexagons:
-                    index = hexagon.index
-                    level = hexagon.level
-                    vertices = game.get_vertex_from_hexagon(index, level)
-                    data = {
-                        "position": {
-                            "index": index,
-                            "level": level
-                        },
-                        "players": []
-                    }
-                    for vertex in vertices:
-                        is_used = vertex.is_used()
-                        if is_used and vertex.settlement.owner != self:
-                            player = vertex.settlement.owner.user.username
-                            data["players"].append(player)
-                    payload.append(data)
-
-                if self.game.get_full_dice() == 7:
-                    available_actions.append({
-                        "type": "move_robber",
-                        "payload": payload
-                    })
-
-                if self.card_set.filter(card_type="knight").exists():
-                    available_actions.append({
-                        "type": "play_knight_card",
-                        "payload": payload
-                    })
-
-            # buy_card
-            wool = self.get_resource('wool').amount
-            grain = self.get_resource('grain').amount
-            ore = self.get_resource('ore').amount
-
-            if wool > 0 and grain > 0 and ore > 0:
+            if self.card_set.filter(card_type="knight").exists():
                 available_actions.append({
-                    "type": "buy_card",
-                    "payload": None
+                    "type": "play_knight_card",
+                    "payload": payload
                 })
 
-            # end_turn
+        # buy_card
+        wool = self.get_resource('wool').amount
+        grain = self.get_resource('grain').amount
+        ore = self.get_resource('ore').amount
+
+        if wool > 0 and grain > 0 and ore > 0:
             available_actions.append({
-                "type": "end_turn",
+                "type": "buy_card",
                 "payload": None
             })
 
-            # bank_trade
-            resource = self.resource_set.filter(amount__gte=4)
+        # end_turn
+        available_actions.append({
+            "type": "end_turn",
+            "payload": None
+        })
 
-            if resource.exists():
-                available_actions.append({
-                    "type": "bank_trade",
-                    "payload": None
-                })
+        # bank_trade
+        resource = self.resource_set.filter(amount__gte=4)
 
-            # TODO play_road_building_card 6
-            # TODO play_monopoly_card 7
-            # TODO play_year_of_plenty_card 8
-            # TODO build_road 2 (importante para los test @mateo)
+        if resource.exists():
+            available_actions.append({
+                "type": "bank_trade",
+                "payload": None
+            })
+
+        # TODO build_road 2 (importante para los test @mateo)
+        payload = []
+        vertices = self.game.vertex_set.all()
+        for vertex in vertices:
+            for adjacent_vertex in vertex.get_neighbors():
+                road = vertex.get_roads(adjacent_vertex)
+                roads = vertex.get_roads()
+                can_build = self.can_build_road_in_vertices(
+                    vertex,
+                    adjacent_vertex
+                )
+
+                if road is None and can_build:
+                    vertex1 = {
+                        "index": vertex.index,
+                        "level": vertex.level
+                    }
+                    vertex2 = {
+                        "index": adjacent_vertex.index,
+                        "level": adjacent_vertex.level
+                    }
+                    if [vertex2, vertex1] not in payload:
+                        payload.append([vertex1, vertex2])
+
+        available_actions.append({
+            "type": "build_road",
+            "payload": payload
+        })
+
+        # TODO play_road_building_card 6
+        # TODO play_monopoly_card 7
+        # TODO play_year_of_plenty_card 8
 
         actions = set([action["type"] for action in available_actions])
+        print(actions)
+        print(available_actions, end="\n\n\n")
         return available_actions, actions
 
     def get_cities(self):
