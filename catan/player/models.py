@@ -133,7 +133,7 @@ class Player(models.Model):
                 print(action)
                 print()
 
-        return actions
+        return available_actions
 
     def get_cities(self):
         return self.settlement_set.all()

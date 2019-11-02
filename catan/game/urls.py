@@ -10,7 +10,8 @@ urlpatterns = [
         }), name='player-info'
     ),
     path('<int:pk>/player/actions/', GameView({
-            'post': 'action'
+            'post': 'action',
+            'get': 'available_actions'
         }), name='player-action'
     ),
     path('<int:pk>/board/', GameView({
