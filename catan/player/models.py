@@ -20,6 +20,9 @@ class Player(models.Model):
         return self.game
 
     def can_build_road_in_vertices(self, vertex1, vertex2):
+        road = vertex1.get_roads(vertex2)
+        if road is not None:
+            return False
         return vertex1.can_build_road_of_player(self) or \
             vertex2.can_build_road_of_player(self)
 
@@ -139,14 +142,11 @@ class Player(models.Model):
         vertices = self.game.vertex_set.all()
         for vertex in vertices:
             for adjacent_vertex in vertex.get_neighbors():
-                road = vertex.get_roads(adjacent_vertex)
-                roads = vertex.get_roads()
                 can_build = self.can_build_road_in_vertices(
                     vertex,
                     adjacent_vertex
                 )
-
-                if road is None and can_build:
+                if can_build:
                     vertex1 = {
                         "index": vertex.index,
                         "level": vertex.level
