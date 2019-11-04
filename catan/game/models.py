@@ -82,12 +82,12 @@ class Game(models.Model):
 
     def distribute_resources(self):
         dice = self.dice1 + self.dice2
-        h = self.room.board.hexagon_set.filter(token=dice)
+        hexagons = self.room.board.hexagon_set.filter(token=dice)
         thief = self.thief
-        for hexag in h:
-            if (thief == hexag):
+        for hexagon in hexagons:
+            if (thief == hexagon):
                 continue
-            ver = hexag.get_neighboring_vertexes()
+            ver = hexagon.get_neighboring_vertexes()
             for v in ver:
                 level = v['level']
                 index = v['index']
@@ -99,7 +99,7 @@ class Game(models.Model):
                     continue
                 if settl is not None:
                     player = settl.owner
-                    r = hexag.resource
+                    r = hexagon.resource
                     player.increase_resources([(r, 1)])
 
     def get_vertex_from_hexagon(self, index, level):
