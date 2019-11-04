@@ -139,31 +139,59 @@ class Player(models.Model):
 
         # TODO build_road 2 (importante para los test @mateo)
         payload = []
-        vertices = self.game.vertex_set.all()
-        for vertex in vertices:
-            for adjacent_vertex in vertex.get_neighbors():
-                can_build = self.can_build_road_in_vertices(
-                    vertex,
-                    adjacent_vertex
-                )
-                if can_build:
-                    vertex1 = {
-                        "index": vertex.index,
-                        "level": vertex.level
-                    }
-                    vertex2 = {
-                        "index": adjacent_vertex.index,
-                        "level": adjacent_vertex.level
-                    }
-                    if [vertex2, vertex1] not in payload:
-                        payload.append([vertex1, vertex2])
-
-        available_actions.append({
-            "type": "build_road",
-            "payload": payload
-        })
+        brick = self.get_resource('brick').amount
+        lumber = self.get_resource('lumber').amount
+        if lumber > 0 and brick > 0:
+            vertices = self.game.vertex_set.all()
+            for vertex in vertices:
+                for adjacent_vertex in vertex.get_neighbors():
+                    can_build = self.can_build_road_in_vertices(
+                        vertex,
+                        adjacent_vertex
+                    )
+                    if can_build:
+                        vertex1 = {
+                            "index": vertex.index,
+                            "level": vertex.level
+                        }
+                        vertex2 = {
+                            "index": adjacent_vertex.index,
+                            "level": adjacent_vertex.level
+                        }
+                        if [vertex2, vertex1] not in payload:
+                            payload.append([vertex1, vertex2])
+            if payload:
+                available_actions.append({
+                    "type": "build_road",
+                    "payload": payload
+                })
 
         # TODO play_road_building_card 6
+        payload = []
+        if self.card_set.filter(card_type="road_building").exists():
+            vertices = self.game.vertex_set.all()
+            for vertex in vertices:
+                for adjacent_vertex in vertex.get_neighbors():
+                    can_build = self.can_build_road_in_vertices(
+                        vertex,
+                        adjacent_vertex
+                    )
+                    if can_build:
+                        vertex1 = {
+                            "index": vertex.index,
+                            "level": vertex.level
+                        }
+                        vertex2 = {
+                            "index": adjacent_vertex.index,
+                            "level": adjacent_vertex.level
+                        }
+                        if [vertex2, vertex1] not in payload:
+                            payload.append([vertex1, vertex2])
+            if payload:
+                available_actions.append({
+                    "type": "play_road_building_card",
+                    "payload": payload
+                })
         # TODO play_monopoly_card 7
         # TODO play_year_of_plenty_card 8
 
@@ -197,6 +225,12 @@ class Player(models.Model):
                 if r[0] == 'desert':
                     continue
                 job.resource_set.create(resource=r[0])
+
+    def set_resources(self, resources):
+        for resource in resources:
+            r = self.get_resource(resource[0])
+            r.set(resource[1])
+            r.save()
 
     def increase_resources(self, resources):
         resource_list = []

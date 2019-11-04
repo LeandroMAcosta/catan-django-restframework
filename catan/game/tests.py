@@ -199,7 +199,7 @@ class GameTest(APITestCase):
         needed_resources = [('brick', 1), ('lumber', 1),
                             ('grain', 1), ('wool', 1)]
 
-        self.player.increase_resources(needed_resources)
+        self.player.set_resources(needed_resources)
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id+10000]),
@@ -220,7 +220,7 @@ class GameTest(APITestCase):
         needed_resources = [('brick', 1), ('lumber', 1),
                             ('grain', 1), ('wool', 1)]
 
-        self.player.increase_resources(needed_resources)
+        self.player.set_resources(needed_resources)
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -242,7 +242,7 @@ class GameTest(APITestCase):
         needed_resources = [('brick', 1), ('lumber', 1),
                             ('grain', 1), ('wool', 1)]
 
-        self.player.increase_resources(needed_resources)
+        self.player.set_resources(needed_resources)
         vp = self.player.victory_points
 
         response = self.client.post(
@@ -265,7 +265,7 @@ class GameTest(APITestCase):
 
         needed_resources = [('lumber', 1), ('grain', 1), ('wool', 1)]
 
-        self.player.increase_resources(needed_resources)
+        self.player.set_resources(needed_resources)
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -311,7 +311,7 @@ class GameTest(APITestCase):
 
     def test_road_ok(self):
         resources = [('brick', 1), ('lumber', 1)]
-        self.player.increase_resources(resources)
+        self.player.set_resources(resources)
         data = {
             'type': 'build_road',
             'payload': [
@@ -399,6 +399,8 @@ class GameTest(APITestCase):
             ]
         }
 
+        needed_resources = [("brick", 1), ("lumber", 1)]
+        self.player.set_resources(needed_resources)
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,
@@ -418,7 +420,8 @@ class GameTest(APITestCase):
 
             ]
         }
-
+        needed_resources = [("brick", 1), ("lumber", 1)]
+        self.player.set_resources(needed_resources)
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
             data,
@@ -446,6 +449,9 @@ class GameTest(APITestCase):
 
             ]
         }
+
+        needed_resources = [("brick", 1), ("lumber", 1)]
+        self.player.set_resources(needed_resources)
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -491,7 +497,7 @@ class GameTest(APITestCase):
     def test_buy_card(self):
 
         resources = [('wool', 1), ('ore', 1), ('grain', 1)]
-        self.player.increase_resources(resources)
+        self.player.set_resources(resources)
         data = {
             'type': 'buy_card',
             'payload': None
@@ -695,7 +701,7 @@ class GameTest(APITestCase):
         vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
-        self.player2.increase_resources([('wool', 4)])
+        self.player2.set_resources([('wool', 4)])
 
         total = self.player.get_total_resources()
 
@@ -760,7 +766,7 @@ class GameTest(APITestCase):
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
-        self.player2.increase_resources([('wool', 4)])
+        self.player2.set_resources([('wool', 4)])
 
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -796,7 +802,7 @@ class GameTest(APITestCase):
         vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
-        self.player2.increase_resources([('wool', 110)])
+        self.player2.set_resources([('wool', 110)])
         total = self.player2.get_total_resources()
         self.game.dice1 = 5
         self.game.dice2 = 2
@@ -840,7 +846,7 @@ class GameTest(APITestCase):
         vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
-        self.player2.increase_resources([('wool', 7)])
+        self.player2.set_resources([('wool', 7)])
 
         total = self.player2.get_total_resources()
 
@@ -877,7 +883,7 @@ class GameTest(APITestCase):
         vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
-        self.player2.increase_resources([('wool', 110)])
+        self.player2.set_resources([('wool', 110)])
         total = self.player2.get_total_resources()
         self.game.dice1 = 5
         self.game.dice2 = 1
@@ -971,7 +977,7 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
-        self.assertEqual(response.data, "Road building card missing")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
 
     def test_play_road_building_card_invalid_arguments(self):
         data = {

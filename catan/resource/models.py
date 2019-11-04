@@ -26,6 +26,11 @@ class Resource(models.Model):
             raise NotEnoughResourcesException('Not enough resources')
         self.amount = self.amount - value
 
+    def set(self, value):
+        if value < 0:
+            raise Exception("Invalid")
+        self.amount = value
+
     def __str__(self):
         return self.resource
 
