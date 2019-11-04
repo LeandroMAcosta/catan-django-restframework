@@ -67,6 +67,7 @@ class ResourcesTestCase(TestCase):
             'user': user,
             'game': game,
             'colour': 'colorcito',
+            'num': 0
         }
         player = Player.objects.create(**player_data)
         player.save()
@@ -162,6 +163,9 @@ class GameTest(APITestCase):
         self.player.save()
         self.client.force_authenticate(self.user)
 
+        self.game.player_turn = self.player.num
+        self.game.save()
+
         # Second user
         self.username2 = "user2"
         self.user2 = User._default_manager.create_user(
@@ -224,7 +228,7 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, "Wrong action.")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
 
     def test_settlement_ok(self):
         data = {
@@ -306,7 +310,6 @@ class GameTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_road_ok(self):
-
         resources = [('brick', 1), ('lumber', 1)]
         self.player.increase_resources(resources)
         data = {
@@ -329,6 +332,7 @@ class GameTest(APITestCase):
             data,
             format='json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_road_oob(self):
@@ -550,7 +554,7 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, "Resources must be different.")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
 
     def test_bank_trade_bad_receive(self):
         data = {
@@ -567,7 +571,7 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, "Resource not exists.")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
 
     def test_bank_trade_few_resources(self):
         data = {
@@ -587,7 +591,7 @@ class GameTest(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, "Insufficient resources.")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
 
     def test_end_turn_ok(self):
         room = Room.objects.get(id=self.room.id)
@@ -660,6 +664,8 @@ class GameTest(APITestCase):
             },
             'player': None
         }
+        self.player.card_set.create(card_type="knight")
+        self.player.save()
         thief = self.game.thief
         response = self.client.post(
             reverse('player-action', args=[self.game.id]),
@@ -684,7 +690,8 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-
+        self.player.card_set.create(card_type="knight")
+        self.player.save()
         vertex = self.game.vertex_set.get(index=16, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -719,7 +726,8 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-
+        self.player.card_set.create(card_type="knight")
+        self.player.save()
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -747,7 +755,8 @@ class GameTest(APITestCase):
                 'player': 'user2'
             }
         }
-
+        self.player.card_set.create(card_type="knight")
+        self.player.save()
         vertex = self.game.vertex_set.get(index=1, level=1)
 
         self.player2.settlement_set.create(vertex=vertex)
@@ -781,6 +790,7 @@ class GameTest(APITestCase):
             },
             'player': None
         }
+
         thief = self.game.thief
 
         vertex = self.game.vertex_set.get(index=16, level=1)
@@ -813,7 +823,7 @@ class GameTest(APITestCase):
         Check if all players with less than 8 resources aren't stolen.
         """
         data = {
-            'type': 'play_knight_card',
+            'type': 'move_robber',
             'payload': {
                 "position": {
                     "index": 0,
@@ -823,6 +833,9 @@ class GameTest(APITestCase):
             'player': None
         }
         thief = self.game.thief
+        self.game.dice1 = 5
+        self.game.dice2 = 2
+        self.game.save()
 
         vertex = self.game.vertex_set.get(index=16, level=1)
 
@@ -879,7 +892,7 @@ class GameTest(APITestCase):
         self.game.refresh_from_db()
         self.player2.refresh_from_db()
 
-        self.assertEqual(response.data, "Sum of dices must be equal to 7.")
+        self.assertEqual(response.data, "Wrong or unavailable action.")
         # self.assertEqual(self.game.thief, thief)
         self.assertEqual(self.player2.get_total_resources(), total)
         self.assertNotEqual(self.game.thief.index, 11)

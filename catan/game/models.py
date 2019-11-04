@@ -2,8 +2,6 @@ from django.db.models.signals import post_save
 from django.db import models
 import random
 
-from board.models import Hexagon
-
 
 class Game(models.Model):
     room = models.OneToOneField(
@@ -14,7 +12,7 @@ class Game(models.Model):
     dice1 = models.IntegerField(default=random.randint(1, 6))
     dice2 = models.IntegerField(default=random.randint(1, 6))
     thief = models.ForeignKey(
-        Hexagon,
+        'board.Hexagon',
         on_delete=models.CASCADE,
         blank=True,
         null=True
@@ -84,7 +82,7 @@ class Game(models.Model):
         dice = self.dice1 + self.dice2
         h = self.room.board.hexagon_set.filter(token=dice)
         for hexag in h:
-            ver = hexag.get_neighboring_vertexes()
+            ver = hexag.get_neighboring_vertices()
             for v in ver:
                 level = v['level']
                 index = v['index']
@@ -101,7 +99,7 @@ class Game(models.Model):
 
     def get_vertex_from_hexagon(self, index, level):
         hexagon = self.get_hexagon(index, level)
-        hexagon_vertex = hexagon.get_neighboring_vertexes()
+        hexagon_vertex = hexagon.get_neighboring_vertices()
         ret = list(map(
                 lambda vertex: self.get_vertex(
                     index=vertex['index'],

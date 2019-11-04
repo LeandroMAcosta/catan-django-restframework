@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 
+from road.models import Road
 from utils.constants import RESOURCES
 
 
@@ -36,6 +38,24 @@ class Vertex(models.Model):
 
     class Meta:
         unique_together = ['game', 'level', 'index']
+
+    def get_roads(self, vertex=None):
+        if vertex is None:
+            return Road.objects.filter(Q(v1=self) or Q(v2=self))
+        try:
+            return Road.objects.get(
+                (Q(v1=self) and Q(v2=vertex)) or (Q(v1=vertex) and Q(v2=self))
+            )
+        except Exception:
+            return None
+
+    def can_build_road_of_player(self, player):
+        roads = self.get_roads()
+        for road in roads:
+            if road.owner == player:
+                return True
+        settlement = self.get_settlement()
+        return settlement and settlement.owner == player
 
     def get_neighbors(self):
         vertex_game = Vertex.objects.filter(game=self.game)
@@ -95,7 +115,7 @@ class Hexagon(models.Model):
         v = "({0} {1})".format(self.level, self.index)
         return "Board {0} {1}".format(self.board, v)
 
-    def get_neighboring_vertexes(self):
+    def get_neighboring_vertices(self):
         level = self.level
         index = self.index
         neighbours = []

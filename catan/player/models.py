@@ -19,13 +19,158 @@ class Player(models.Model):
     def get_game(self):
         return self.game
 
+    def can_build_road_in_vertices(self, vertex1, vertex2):
+        road = vertex1.get_roads(vertex2)
+        if road is not None:
+            return False
+        return vertex1.can_build_road_of_player(self) or \
+            vertex2.can_build_road_of_player(self)
+
     def available_actions(self):
-        # TODO check
-        actions = ['build_settlement', 'upgrade_city', 'build_road',
-                   'move_robber', 'buy_card', 'play_knight_card',
-                   'play_road_building_card', 'play_monopoly_card',
-                   'play_year_of_plenty_card', 'end_turn', 'bank_trade']
-        return actions
+        """
+        This method verifies all possible actions that the player can do
+        :returns:
+            - available_actions - list of json with available actions from
+                player, for the endpoint GET game/:pk/player/actions
+            - actions - list of string with available actions from player,
+                to check that the action sent by post is available
+        """
+
+        available_actions = []
+        current_turn = self.game.get_player_turn()
+        my_turn = self.num
+
+        if current_turn != my_turn:
+            return available_actions, []
+
+        # buil_settlement
+        # TODO It can only be when there are roads
+        payload = []
+
+        vertices = self.game.vertex_set.all()
+        for vertex in vertices:
+            if not vertex.is_used():
+                payload.append({
+                    "index": vertex.index,
+                    "level": vertex.level
+                })
+
+        available_actions.append({
+            "type": "build_settlement",
+            "payload": payload
+        })
+
+        # upgrade_city
+        payload = []
+        for vertex in vertices:
+            if vertex.used and not vertex.settlement.upgrade:
+                payload.append(vertex)
+
+        if payload:
+            available_actions.append({
+                "type": "upgrade_city",
+                "payload": payload
+            })
+
+        # move_robber and play_knight_card
+
+        if self.game.get_full_dice() == 7 or \
+           self.card_set.filter(card_type="knight").exists():
+
+            payload = []
+            game = self.game
+            board = game.get_board()
+            hexagons = board.hexagon_set.all()
+            for hexagon in hexagons:
+                index = hexagon.index
+                level = hexagon.level
+                vertices = game.get_vertex_from_hexagon(index, level)
+                data = {
+                    "position": {
+                        "index": index,
+                        "level": level
+                    },
+                    "players": []
+                }
+                for vertex in vertices:
+                    is_used = vertex.is_used()
+                    if is_used and vertex.settlement.owner != self:
+                        player = vertex.settlement.owner.user.username
+                        data["players"].append(player)
+                payload.append(data)
+
+            if self.game.get_full_dice() == 7:
+                available_actions.append({
+                    "type": "move_robber",
+                    "payload": payload
+                })
+
+            if self.card_set.filter(card_type="knight").exists():
+                available_actions.append({
+                    "type": "play_knight_card",
+                    "payload": payload
+                })
+
+        # buy_card
+        wool = self.get_resource('wool').amount
+        grain = self.get_resource('grain').amount
+        ore = self.get_resource('ore').amount
+
+        if wool > 0 and grain > 0 and ore > 0:
+            available_actions.append({
+                "type": "buy_card",
+                "payload": None
+            })
+
+        # end_turn
+        available_actions.append({
+            "type": "end_turn",
+            "payload": None
+        })
+
+        # bank_trade
+        resource = self.resource_set.filter(amount__gte=4)
+
+        if resource.exists():
+            available_actions.append({
+                "type": "bank_trade",
+                "payload": None
+            })
+
+        # TODO build_road 2 (importante para los test @mateo)
+        payload = []
+        vertices = self.game.vertex_set.all()
+        for vertex in vertices:
+            for adjacent_vertex in vertex.get_neighbors():
+                can_build = self.can_build_road_in_vertices(
+                    vertex,
+                    adjacent_vertex
+                )
+                if can_build:
+                    vertex1 = {
+                        "index": vertex.index,
+                        "level": vertex.level
+                    }
+                    vertex2 = {
+                        "index": adjacent_vertex.index,
+                        "level": adjacent_vertex.level
+                    }
+                    if [vertex2, vertex1] not in payload:
+                        payload.append([vertex1, vertex2])
+
+        available_actions.append({
+            "type": "build_road",
+            "payload": payload
+        })
+
+        # TODO play_road_building_card 6
+        # TODO play_monopoly_card 7
+        # TODO play_year_of_plenty_card 8
+
+        actions = set([action["type"] for action in available_actions])
+        print(actions)
+        print(available_actions, end="\n\n\n")
+        return available_actions, actions
 
     def get_cities(self):
         return self.settlement_set.all()
@@ -87,11 +232,6 @@ class Player(models.Model):
             amount -= 1
 
     # Actions methods
-
-    def player_available_actions(self):
-        # TODO
-        pass
-
     def move_robber(self, data, knight_card=False):
 
         game = self.game
@@ -239,7 +379,8 @@ class Player(models.Model):
 
     def end_turn(self, data):
         self.game.end_turn()
-        # print(self.game.get_player_turn(), self.game.get_dices())
+        # print("player turn: ", self.game.get_player_turn())
+        # print("dices: ", self.game.get_dices())
         return "turn passed ok", 201
 
     def play_road_building_card(self, data):
