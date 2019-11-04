@@ -319,8 +319,8 @@ class Player(models.Model):
             raise ActionExceptionError("Index out of bounds.")
         vertex1 = game.vertex_set.get(**v1)
         vertex2 = game.vertex_set.get(**v2)
-        if not (vertex2 in vertex1.get_neighbors()):
-            raise ActionExceptionError("Non adjacent or repeated vertexes.")
+        if not self.can_build_road_in_vertices(vertex1, vertex2):
+            raise ActionExceptionError("You can't build on these vertices.")
         needed_resources = [('brick', 1), ('lumber', 1)]
         self.decrease_resources(needed_resources)
         resource = self.road_set.create(v1=vertex1, v2=vertex2)

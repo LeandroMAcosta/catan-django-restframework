@@ -312,12 +312,12 @@ class GameTest(APITestCase):
             'type': 'build_road',
             'payload': [
                 {
-                    'level': 0,
-                    'index': 0
+                    'level': 1,
+                    'index': 12
                 },
                 {
                     'level': 0,
-                    'index': 1,
+                    'index': 4,
                 }
 
             ]
@@ -330,6 +330,33 @@ class GameTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_road_alredy_used_vertex(self):
+        resources = [('brick', 1), ('lumber', 1)]
+        self.player.increase_resources(resources)
+        data = {
+            'type': 'build_road',
+            'payload': [
+                {
+                    'level': 2,
+                    'index': 11
+                },
+                {
+                    'level': 2,
+                    'index': 12,
+                }
+
+            ]
+        }
+
+        response = self.client.post(
+            reverse('player-action', args=[self.game.id]),
+            data,
+            format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "You can't build on these vertices.")
 
     def test_road_oob(self):
         data = {
