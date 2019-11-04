@@ -1,13 +1,6 @@
 from rest_framework import serializers
 
-from .models import Hexagon, Vertex
-
-
-class VertexSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Vertex
-        fields = ('level', 'index',)
+from .models import Hexagon
 
 
 class HexagonSerializer(serializers.ModelSerializer):

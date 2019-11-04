@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Board, Hexagon, Vertex
+from .models import Board, Hexagon
 
 
 class BoardAdmin(admin.ModelAdmin):
@@ -8,4 +8,3 @@ class BoardAdmin(admin.ModelAdmin):
 
 admin.site.register(Board, BoardAdmin)
 admin.site.register(Hexagon)
-admin.site.register(Vertex)

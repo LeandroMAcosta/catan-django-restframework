@@ -1,15 +1,15 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from player.models import Player
-from board.models import Vertex
+# from player.models import Player
+# from game.models import Vertex
 
 
 class Road(models.Model):
-    owner = models.ForeignKey(Player, on_delete=models.CASCADE)
+    owner = models.ForeignKey('player.Player', on_delete=models.CASCADE)
     v1 = models.ForeignKey(
-        Vertex, on_delete=models.CASCADE, related_name='road_in')
+        'game.Vertex', on_delete=models.CASCADE, related_name='road_in')
     v2 = models.ForeignKey(
-        Vertex, on_delete=models.CASCADE, related_name='road_out')
+        'game.Vertex', on_delete=models.CASCADE, related_name='road_out')
 
     def __str__(self):
         return "Road {0} {1} {2}"

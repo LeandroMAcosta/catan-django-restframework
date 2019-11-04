@@ -1,6 +1,6 @@
 from django.db import models
 from player.models import Player
-from board.models import Vertex
+from game.models import Vertex
 
 
 class Settlement(models.Model):

@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
 
-from road.models import Road
 from utils.constants import RESOURCES
 
 
@@ -18,82 +16,6 @@ class Board(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Vertex(models.Model):
-    game = models.ForeignKey('game.Game', on_delete=models.CASCADE)
-    level = models.PositiveIntegerField(default=0)
-    index = models.PositiveIntegerField(default=0)
-    # TODO delete this field
-    used = models.BooleanField(default=False)
-
-    def get_settlement(self):
-        try:
-            return self.settlement
-        except Exception:
-            return None
-
-    def is_used(self):
-        return self.get_settlement() is not None
-
-    class Meta:
-        unique_together = ['game', 'level', 'index']
-
-    def get_roads(self, vertex=None):
-        if vertex is None:
-            return Road.objects.filter(Q(v1=self) or Q(v2=self))
-        try:
-            return Road.objects.get(
-                (Q(v1=self) and Q(v2=vertex)) or (Q(v1=vertex) and Q(v2=self))
-            )
-        except Exception:
-            return None
-
-    def can_build_road_of_player(self, player):
-        roads = self.get_roads()
-        for road in roads:
-            if road.owner == player:
-                return True
-        settlement = self.get_settlement()
-        return settlement and settlement.owner == player
-
-    def get_neighbors(self):
-        vertex_game = Vertex.objects.filter(game=self.game)
-        level = self.level
-        index = self.index
-        limit = [6, 18, 30]
-        neighbors = []
-
-        # Neighbors of the same level
-        neighbors.append(
-            vertex_game.get(level=level, index=(index-1) % limit[level])
-        )
-        neighbors.append(
-            vertex_game.get(level=level, index=(index+1) % limit[level])
-        )
-
-        # Neighbors of other level
-        if level == 0:
-            vertex = vertex_game.get(level=1, index=index*3)
-            neighbors.append(vertex)
-        elif level == 1:
-            new_level = index % 3
-            k = new_level == 2
-            vertex = vertex_game.get(
-                level=new_level,
-                index=k*index + (k+1)*(index+k)//3
-            )
-            neighbors.append(vertex)
-        elif (index - 1) % 5 == 0 or (index + 1) % 5 == 0:
-            vertex = vertex_game.get(
-                level=1,
-                index=index - 2*((1+index)//5)
-            )
-            neighbors.append(vertex)
-        return neighbors
-
-    def __str__(self):
-        return "({0}, {1})".format(self.level, self.index)
 
 
 class Hexagon(models.Model):
