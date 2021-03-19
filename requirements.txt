@@ -1,4 +1,4 @@
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 django==2.2.5
 pep8
 pylint
