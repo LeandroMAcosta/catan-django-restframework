@@ -1,5 +1,5 @@
 djangorestframework==3.9.4
-django==2.2.5
+django==2.2.27
 pep8
 pylint
 djangorestframework-jwt
